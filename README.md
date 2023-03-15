@@ -10,6 +10,7 @@ libphone is a library that sits on top of [PJSIP project](https://github.com/pjs
     * [Callbacks](#callbacks)
   * [CLI Demo Phone](#cli-demo-phone)
   * [Compatibility with SIP providers](#compatibility-with-sip-providers)
+    * [1und1 configuration](#1und1-configuration)
   * [Binaries](#binaries)
   * [Build instructions for Linux](#build-instructions-for-linux)
   * [Build instructions for macOS](#build-instructions-for-macos)
@@ -75,22 +76,7 @@ buddy               = "+491804100100"
 
 If you are a customer of DTAG (Deutsche Telekom AG) you can simply put in your username (which is your telephone number) and everything is set up. A password is not required for DTAG since your line-id is used for authentication.
 
-### 1und1 configuration
 
-To use this with 1und1, the configuration is as follows:
-
-```python
-useragent           = "Python CLI Phone"
-nameservers         = []
-stunservers         = ["stun.1und1.de"]
-sipserver           = "tls-sip.1und1.de"
-username            = "49<your number>"
-password            = "<password defined for number above at https://control-center.1und1.de/>"
-opus_channel_count  = 1
-opus_complexity     = 8
-opus_sample_rate    = 16000
-buddy               = "+491804100100"
-```
 
 ## Compatibility with SIP providers
 
@@ -98,8 +84,30 @@ libphone should work with almost every SIP-provider out of the box. It's been te
 - DTAG (Deutsche Telekom)
 - Starface
 - TeamFON
+- 1&1
 
 I'd be very happy if you can test with your provider and give me feedback. I am willing to help. Reach me here [Oliver Epper](https://oliver-epper.de).
+
+### 1und1 configuration
+
+Thanks to [Andreas Weber](https://github.com/andreasweberd) for providing the details.
+
+Use the following config:
+
+```python
+useragent           = "Python CLI Phone"
+nameservers         = []
+stunservers         = ["stun.1und1.de"]
+sipserver           = "tls-sip.1und1.de"
+username            = "49<your number>" # no '+'!
+password            = "<password defined for number above at https://control-center.1und1.de/>"
+opus_channel_count  = 1
+opus_complexity     = 8
+opus_sample_rate    = 16000
+buddy               = "+491804100100"
+```
+
+If you provide nameservers the library will use SRV lookup which is not supported by 1und1. Providing no nameservers the library will fall back to use the getaddr call to resolv just the sip-servers ip address.
 
 ## Binaries
 
