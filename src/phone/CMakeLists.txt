@@ -24,7 +24,7 @@ set(phone_PUBLIC_HEADERS
 add_library(phone_sharedlib SHARED)
 set_target_properties(phone_sharedlib PROPERTIES
     OUTPUT_NAME "phone"
-    VERSION 0.0.1
+    VERSION ${CMAKE_PROJECT_VERSION}
     SOVERSION 0
     PUBLIC_HEADER "${phone_PUBLIC_HEADERS}")
 target_link_libraries(phone_sharedlib PUBLIC phone)
