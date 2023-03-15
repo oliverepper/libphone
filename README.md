@@ -75,6 +75,23 @@ buddy               = "+491804100100"
 
 If you are a customer of DTAG (Deutsche Telekom AG) you can simply put in your username (which is your telephone number) and everything is set up. A password is not required for DTAG since your line-id is used for authentication.
 
+### 1und1 configuration
+
+To use this with 1und1, the configuration is as follows:
+
+```python
+useragent           = "Python CLI Phone"
+nameservers         = []
+stunservers         = ["stun.1und1.de"]
+sipserver           = "tls-sip.1und1.de"
+username            = "49<your number>"
+password            = "<password defined for number above at https://control-center.1und1.de/>"
+opus_channel_count  = 1
+opus_complexity     = 8
+opus_sample_rate    = 16000
+buddy               = "+491804100100"
+```
+
 ## Compatibility with SIP providers
 
 libphone should work with almost every SIP-provider out of the box. It's been tested with:
