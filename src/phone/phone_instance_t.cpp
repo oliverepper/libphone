@@ -23,11 +23,19 @@ phone_instance_t::~phone_instance_t() {
 }
 
 void phone_instance_t::register_on_call_state_callback(const std::function<void(int, int)>& callback) {
-    m_account->on_call_state = callback;
+    m_account->on_call_state_with_index = callback;
+}
+
+void phone_instance_t::register_on_call_state_callback(const std::function<void(std::string, int)> &callback) {
+    m_account->on_call_state_with_id = callback;
 }
 
 void phone_instance_t::register_on_incoming_call_callback(const std::function<void(int)>& callback) {
-    m_account->on_incoming_call = callback;
+    m_account->on_incoming_call_with_index = callback;
+}
+
+void phone_instance_t::register_on_incoming_call_callback(const std::function<void(std::string)> &callback) {
+    m_account->on_incoming_call_with_id = callback;
 }
 
 void phone_instance_t::configure_opus(int channel_count, int complexity, int sample_rate) {
@@ -97,10 +105,26 @@ void phone_instance_t::answer_call(int id) {
     }
 }
 
+void PHONE_EXPORT phone_instance_t::answer_call(std::string call_id) {
+    try {
+        m_account->answer_call(std::move(call_id));
+    } catch (const pj::Error& e) {
+        throw phone::exception{e.info()};
+    }
+}
+
 void phone_instance_t::hangup_call(int call_id) {
     try {
         m_account->hangup_call(call_id);
     } catch (const pj::Error &e) {
+        throw phone::exception{e.info()};
+    }
+}
+
+void PHONE_EXPORT phone_instance_t::hangup_call(std::string call_id) {
+    try {
+        m_account->hangup_call(std::move(call_id));
+    } catch (const pj::Error& e) {
         throw phone::exception{e.info()};
     }
 }

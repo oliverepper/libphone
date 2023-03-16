@@ -20,14 +20,34 @@ phone_t phone_create(const char *user_agent,
 }
 
 void phone_register_on_call_state_callback(phone_t instance, void (*cb)(int, int, void *), void *ctx) {
-    instance->register_on_call_state_callback([cb, ctx](int call_id, int state) {
-        cb(call_id, state, ctx);
+    phone_register_on_call_state_index_callback(instance, cb, ctx);
+}
+
+void phone_register_on_call_state_index_callback(phone_t instance, void (*cb)(int, int, void *), void *ctx) {
+    instance->register_on_call_state_callback([cb, ctx](int call_index, int state){
+        cb(call_index, state, ctx);
+    });
+}
+
+void phone_register_on_call_state_id_callback(phone_t instance, void (*cb)(const char *, int, void *), void *ctx) {
+    instance->register_on_call_state_callback([cb, ctx](std::string call_id, int state){
+       cb(call_id.c_str(), state, ctx);
     });
 }
 
 void phone_register_on_incoming_call_callback(phone_t instance, void (*cb)(int, void *), void *ctx) {
-    instance->register_on_incoming_call_callback([cb, ctx](int call_id) {
-        cb(call_id, ctx);
+    phone_register_on_incoming_call_index_callback(instance, cb, ctx);
+}
+
+void phone_register_on_incoming_call_index_callback(phone_t instance, void (*cb)(int, void *), void *ctx) {
+    instance->register_on_incoming_call_callback([cb, ctx](int call_index){
+        cb(call_index, ctx);
+    });
+}
+
+void phone_register_on_incoming_call_id_callback(phone_t instance, void (*cb)(const char *, void *), void *ctx) {
+    instance->register_on_incoming_call_callback([cb, ctx](std::string call_id){
+        cb(call_id.c_str(), ctx);
     });
 }
 
@@ -74,8 +94,12 @@ phone_status_t phone_make_call(phone_t instance, const char *uri) {
 }
 
 phone_status_t phone_answer_call(phone_t instance, int call_id) {
+    return phone_answer_call_index(instance, call_id);
+}
+
+phone_status_t phone_answer_call_index(phone_t instance, int call_index) {
     try {
-        instance->answer_call(call_id);
+        instance->answer_call(call_index);
     } catch (const phone::exception& e) {
         strncpy(global_last_error, e.what(), sizeof(global_last_error));
         return PHONE_STATUS_FAILURE;
@@ -83,7 +107,32 @@ phone_status_t phone_answer_call(phone_t instance, int call_id) {
     return PHONE_STATUS_SUCCESS;
 }
 
+phone_status_t phone_answer_call_id(phone_t instance, const char *call_id) {
+    try {
+        instance->answer_call(call_id);
+    } catch (const phone::exception& e) {
+        strncpy(global_last_error, e.what(), sizeof(global_last_error));
+        return EXIT_FAILURE;
+    }
+    return PHONE_STATUS_SUCCESS;
+}
+
+
 phone_status_t phone_hangup_call(phone_t instance, int call_id) {
+    return phone_hangup_call_index(instance, call_id);
+}
+
+phone_status_t phone_hangup_call_index(phone_t instance, int call_index) {
+    try {
+        instance->hangup_call(call_index);
+    } catch (const phone::exception& e) {
+        strncpy(global_last_error, e.what(), sizeof(global_last_error));
+        return PHONE_STATUS_FAILURE;
+    }
+    return PHONE_STATUS_SUCCESS;
+}
+
+phone_status_t phone_hangup_call_id(phone_t instance, const char *call_id) {
     try {
         instance->hangup_call(call_id);
     } catch (const phone::exception& e) {
@@ -104,3 +153,9 @@ const char* phone_last_error() {
 void phone_state_name(char *buffer, size_t buffer_size, int state) {
     strncpy(buffer, std::string{phone::state_name(state)}.c_str(), buffer_size);
 }
+
+
+
+
+
+
