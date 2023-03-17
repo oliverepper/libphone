@@ -91,6 +91,18 @@ auto main() -> int {
                 std::cout << "please enter desired log level 0..6: ";
                 std::cin >> level;
                 phone_instance_t::set_log_level(level);
+            } else if (command == 'd') {
+                for (const auto& e : state.phone.get_audio_devices()) {
+                    std::cout << e.id << " - " << e.name << " (" << e.input_count << "/" << e.output_count << ")" << std::endl;
+                }
+            } else if (command == 'D') {
+                int capture_index;
+                int playback_index;
+                std::cout << "please enter desired capture device: ";
+                std::cin >> capture_index;
+                std::cout << "please enter desired playback device: ";
+                std::cin >> playback_index;
+                state.phone.set_audio_devices(capture_index, playback_index);
             }
         } while (command != 'q');
     } catch (const phone::exception &e) {

@@ -38,6 +38,14 @@ namespace phone {
         if (state >= count) return "UNKNOWN STATE";
         return states[state];
     }
+
+    struct audio_device_info {
+        int id;
+        std::string driver;
+        std::string name;
+        int input_count;
+        int output_count;
+    };
 } //namespace phone
 
 class phone_instance_t {
@@ -74,6 +82,9 @@ public:
     PHONE_EXPORT int get_call_index(std::string call_id);
 
     PHONE_EXPORT static void set_log_level(int level);
+
+    PHONE_EXPORT std::vector<phone::audio_device_info> get_audio_devices();
+    PHONE_EXPORT void set_audio_devices(int capture_index, int playback_index);
 
 private:
     void create_tls_transport_with_srv_lookup();
