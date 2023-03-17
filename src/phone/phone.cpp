@@ -1,6 +1,6 @@
+#include <pjsua.h>
 #include <phone.h>
 #include <phone_instance_t.h>
-
 #include <vector>
 #include <cstring>
 
@@ -167,6 +167,13 @@ phone_status_t phone_get_call_index(phone_t instance, const char *call_id, int *
     return PHONE_STATUS_SUCCESS;
 }
 
+size_t get_audio_devices_count() {
+    return pjmedia_aud_dev_count();
+}
+
+size_t get_audio_device_info_name_length() {
+    return PJMEDIA_AUD_DEV_INFO_NAME_LEN;
+}
 
 const char* phone_last_error() {
     return global_last_error;
