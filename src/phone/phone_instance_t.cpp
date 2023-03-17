@@ -105,7 +105,7 @@ void phone_instance_t::answer_call(int id) {
     }
 }
 
-void PHONE_EXPORT phone_instance_t::answer_call(std::string call_id) {
+void phone_instance_t::answer_call(std::string call_id) {
     try {
         m_account->answer_call(std::move(call_id));
     } catch (const pj::Error& e) {
@@ -121,7 +121,7 @@ void phone_instance_t::hangup_call(int call_id) {
     }
 }
 
-void PHONE_EXPORT phone_instance_t::hangup_call(std::string call_id) {
+void phone_instance_t::hangup_call(std::string call_id) {
     try {
         m_account->hangup_call(std::move(call_id));
     } catch (const pj::Error& e) {
@@ -135,4 +135,20 @@ void phone_instance_t::hangup_calls() noexcept {
 
 void phone_instance_t::set_log_level(int level) {
     pj_log_set_level(level);
+}
+
+std::string phone_instance_t::get_call_id(int call_index) {
+    try {
+        return m_account->get_call_id(call_index);
+    } catch (const std::invalid_argument& e) {
+        throw phone::exception{e.what()};
+    }
+}
+
+int phone_instance_t::get_call_index(std::string call_id) {
+    try {
+        return m_account->get_call_index(std::move(call_id));
+    } catch (const std::invalid_argument& e) {
+        throw phone::exception{e.what()};
+    }
 }

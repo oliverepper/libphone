@@ -67,6 +67,22 @@ public:
         }
     }
 
+    std::string get_call_id(int call_index) {
+        typename std::vector<std::unique_ptr<call_t>>::iterator it = call_for(call_index);
+        if (it != std::end(m_calls)) {
+            return static_cast<std::string>(*it->get());
+        }
+        throw std::invalid_argument{"no call for id: <" + std::to_string(call_index) + ">"};
+    }
+
+    int get_call_index(std::string call_id) {
+        typename std::vector<std::unique_ptr<call_t>>::iterator it = call_for(call_id);
+        if (it != std::end(m_calls)) {
+            return static_cast<int>(*it->get());
+        }
+        throw std::invalid_argument{"no call for id: <" + call_id + ">"};
+    }
+
     void delete_call(int call_index) {
         PJ_LOG(3,(__BASE_FILE__, "Going to delete call: %d", call_index));
         auto it = call_for(call_index);

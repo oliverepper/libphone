@@ -43,6 +43,9 @@ PHONE_EXPORT phone_status_t phone_hangup_call_id(phone_t instance, const char *c
 
 PHONE_EXPORT void phone_hangup_calls(phone_t instance);
 
+PHONE_EXPORT phone_status_t phone_get_call_id(phone_t instance, int call_index, char *out, size_t size);
+PHONE_EXPORT phone_status_t phone_get_call_index(phone_t instance, const char *call_id, int *out);
+
 PHONE_EXPORT const char* phone_last_error(void);
 PHONE_EXPORT void phone_state_name(char *buffer, size_t buffer_size, int state);
 PHONE_EXPORT void phone_set_log_level(int level);

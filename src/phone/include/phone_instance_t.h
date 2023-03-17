@@ -54,23 +54,26 @@ public:
     phone_instance_t(phone_instance_t&& instance) = delete;
     phone_instance_t& operator=(phone_instance_t&& instance) = delete;
 
-    void PHONE_EXPORT register_on_call_state_callback(const std::function<void(int, int)>& callback);
-    void PHONE_EXPORT register_on_call_state_callback(const std::function<void(std::string, int)>& callback);
+    PHONE_EXPORT void register_on_call_state_callback(const std::function<void(int, int)>& callback);
+    PHONE_EXPORT void register_on_call_state_callback(const std::function<void(std::string, int)>& callback);
 
-    void PHONE_EXPORT register_on_incoming_call_callback(const std::function<void(int)>& callback);
-    void PHONE_EXPORT register_on_incoming_call_callback(const std::function<void(std::string)>& callback);
+    PHONE_EXPORT void register_on_incoming_call_callback(const std::function<void(int)>& callback);
+    PHONE_EXPORT void register_on_incoming_call_callback(const std::function<void(std::string)>& callback);
 
-    void PHONE_EXPORT configure_opus(int channel_count = 1, int complexity = 8 , int sample_rate = 16000);
-    void PHONE_EXPORT connect(std::string server, const std::string& user, std::optional<std::function<std::string()>> password = std::nullopt);
+    PHONE_EXPORT void configure_opus(int channel_count = 1, int complexity = 8 , int sample_rate = 16000);
+    PHONE_EXPORT void connect(std::string server, const std::string& user, std::optional<std::function<std::string()>> password = std::nullopt);
 
-    void PHONE_EXPORT make_call(const std::string& uri);
-    void PHONE_EXPORT answer_call(int call_index);
-    void PHONE_EXPORT answer_call(std::string call_id);
-    void PHONE_EXPORT hangup_call(int call_index);
-    void PHONE_EXPORT hangup_call(std::string call_id);
-    void PHONE_EXPORT hangup_calls() noexcept;
+    PHONE_EXPORT void make_call(const std::string& uri);
+    PHONE_EXPORT void answer_call(int call_index);
+    PHONE_EXPORT void answer_call(std::string call_id);
+    PHONE_EXPORT void hangup_call(int call_index);
+    PHONE_EXPORT void hangup_call(std::string call_id);
+    PHONE_EXPORT void hangup_calls() noexcept;
 
-    static void PHONE_EXPORT set_log_level(int level);
+    PHONE_EXPORT std::string get_call_id(int call_index);
+    PHONE_EXPORT int get_call_index(std::string call_id);
+
+    PHONE_EXPORT static void set_log_level(int level);
 
 private:
     void create_tls_transport_with_srv_lookup();
