@@ -95,7 +95,7 @@ auto main() -> int {
                 phone_instance_t::set_log_level(level);
             } else if (command == 'd') {
                 for (const auto& e : state.phone.get_audio_devices()) {
-                    fmt::print("{} - {}/{}({}/{})\n", e.id, e.driver, e.name, e.input_count, e.output_count);
+                    fmt::print("{} - {}/{} ({}/{})\n", e.id, e.driver, e.name, e.input_count, e.output_count);
                 }
             } else if (command == 'D') {
                 int capture_index;

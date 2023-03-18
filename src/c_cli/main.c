@@ -58,7 +58,7 @@ void on_call_state_with_id_cb(const char* call_id, int state, void *ctx) {
 int main() {
     struct app_state *state = malloc(sizeof(struct app_state));
     state->last_call_index = -1;
-    bzero(state->last_call_id, sizeof(state->last_call_id));
+    memset(state->last_call_id, 0, sizeof(state->last_call_id));
 
     const char *nameserver[] = {"217.237.148.22", "217.237.150.51"};
     const char *stunserver[] = {"stun.t-online.de"};
@@ -155,17 +155,19 @@ int main() {
                 break;
             case 'd':
                 {
-                    char *ptr[phone_get_audio_devices_count()];
-                    char devices[phone_get_audio_devices_count()][phone_get_audio_device_info_name_length()];
+                    size_t count = phone_get_audio_devices_count();
+                    size_t max_device_name_length = phone_get_audio_device_info_name_length() + 8;
+                    char *device_names[count];
+                    char data[count][max_device_name_length];
 
                     int i;
                     for (i = 0; i < phone_get_audio_devices_count(); i++)
-                        ptr[i] = devices[i];
-                    phone_get_audio_device_names(ptr, phone_get_audio_devices_count(),
-                                                 phone_get_audio_device_info_name_length());
+                        device_names[i] = data[i];
+                    if (phone_get_audio_device_names(device_names, count, max_device_name_length) != PHONE_STATUS_SUCCESS)
+                        fprintf(stderr, "%s\n", phone_last_error());
 
                     for (i = 0; i < phone_get_audio_devices_count(); i++) {
-                        printf("%d - %s\n", i, ptr[i]);
+                        printf("%d - %s\n", i, device_names[i]);
                     }
                 }
                 break;
