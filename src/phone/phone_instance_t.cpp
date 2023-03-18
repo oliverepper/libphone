@@ -162,12 +162,18 @@ std::vector<phone::audio_device_info> phone_instance_t::get_audio_devices() {
     int index = 0;
     for (phone::audio_device_info& i : result) {
         pjmedia_aud_dev_info info;
-        pjmedia_aud_dev_get_info(index, &info);
-        i.id = index;
-        i.driver = info.driver;
-        i.name = info.name;
-        i.input_count = info.input_count;
-        i.output_count = info.output_count;
+        auto status = pjmedia_aud_dev_get_info(index, &info);
+        if (status != PJ_SUCCESS) {
+            char error_message[PJ_ERR_MSG_SIZE] = {0};
+            pj_strerror(status, error_message, sizeof(error_message));
+            throw phone::exception{error_message};
+        } else {
+            i.id = index;
+            i.driver = info.driver;
+            i.name = info.name;
+            i.input_count = info.input_count;
+            i.output_count = info.output_count;
+        }
         ++index;
     }
 
@@ -181,7 +187,7 @@ void phone_instance_t::set_audio_devices(int capture_index, int playback_index) 
     prm.playback_dev = playback_index;
     auto status = pjsua_set_snd_dev2(&prm);
     if (status != PJ_SUCCESS) {
-        char error_message[PJ_ERR_MSG_SIZE];
+        char error_message[PJ_ERR_MSG_SIZE] = {0};
         pj_strerror(status, error_message, sizeof(error_message));
         throw phone::exception{error_message};
     } else {

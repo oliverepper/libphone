@@ -46,8 +46,10 @@ PHONE_EXPORT void phone_hangup_calls(phone_t instance);
 PHONE_EXPORT phone_status_t phone_get_call_id(phone_t instance, int call_index, char *out, size_t size);
 PHONE_EXPORT phone_status_t phone_get_call_index(phone_t instance, const char *call_id, int *out);
 
-PHONE_EXPORT size_t get_audio_devices_count();
-PHONE_EXPORT size_t get_audio_device_info_name_length();
+PHONE_EXPORT size_t phone_get_audio_devices_count();
+PHONE_EXPORT size_t phone_get_audio_device_info_name_length();
+PHONE_EXPORT phone_status_t phone_get_audio_device_names(char **device_names, size_t devices_count, size_t max_device_name_length);
+PHONE_EXPORT phone_status_t phone_set_audio_devices(int capture_device, int playback_device);
 
 PHONE_EXPORT const char* phone_last_error(void);
 PHONE_EXPORT void phone_state_name(char *buffer, size_t buffer_size, int state);

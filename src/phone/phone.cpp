@@ -167,11 +167,11 @@ phone_status_t phone_get_call_index(phone_t instance, const char *call_id, int *
     return PHONE_STATUS_SUCCESS;
 }
 
-size_t get_audio_devices_count() {
+size_t phone_get_audio_devices_count() {
     return pjmedia_aud_dev_count();
 }
 
-size_t get_audio_device_info_name_length() {
+size_t phone_get_audio_device_info_name_length() {
     return PJMEDIA_AUD_DEV_INFO_NAME_LEN;
 }
 
@@ -181,6 +181,32 @@ const char* phone_last_error() {
 
 void phone_state_name(char *buffer, size_t buffer_size, int state) {
     strncpy(buffer, std::string{phone::state_name(state)}.c_str(), buffer_size);
+}
+
+phone_status_t phone_get_audio_device_names(char **device_names, size_t devices_count, size_t max_device_name_length) {
+    int i = 0;
+    try {
+        for (const auto& e : phone_instance_t::get_audio_devices()) {
+            if (i < devices_count) {
+                strncpy(device_names[i], e.name.c_str(), max_device_name_length);
+                ++i;
+            }
+        }
+    } catch (const phone::exception& e) {
+        strncpy(global_last_error, e.what(), sizeof(global_last_error));
+        return PHONE_STATUS_FAILURE;
+    }
+    return PHONE_STATUS_SUCCESS;
+}
+
+phone_status_t phone_set_audio_devices(int capture_device, int playback_device) {
+    try {
+        phone_instance_t::set_audio_devices(capture_device, playback_device);
+    } catch (const phone::exception& e) {
+        strncpy(global_last_error, e.what(), sizeof(global_last_error));
+        return PHONE_STATUS_FAILURE;
+    }
+    return PHONE_STATUS_SUCCESS;
 }
 
 

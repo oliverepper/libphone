@@ -35,7 +35,8 @@ struct app_state {
 
 auto main() -> int {
     try {
-        app_state state{phone_instance_t{"Cli Phone in C++", {"217.237.148.22", "217.237.150.51"}, {"stun.t-online.de"}}};
+        app_state state{
+                phone_instance_t{"Cli Phone in C++", {"217.237.148.22", "217.237.150.51"}, {"stun.t-online.de"}}};
         phone_instance_t::set_log_level(0);
 
         // callbacks
@@ -64,7 +65,7 @@ auto main() -> int {
                 std::cin >> number;
                 state.phone.make_call(number);
             } else if (command == 'C') {
-                state.phone.make_call("+4915123595397");
+                state.phone.make_call("+491804100100");
             } else if (command == 'a') {
                 int call_index;
                 std::cout << "please enter call index: ";
