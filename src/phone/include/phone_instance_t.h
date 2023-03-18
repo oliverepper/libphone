@@ -83,8 +83,8 @@ public:
 
     PHONE_EXPORT static void set_log_level(int level);
 
-    PHONE_EXPORT std::vector<phone::audio_device_info> get_audio_devices();
-    PHONE_EXPORT void set_audio_devices(int capture_index, int playback_index);
+    PHONE_EXPORT static std::vector<phone::audio_device_info> get_audio_devices();
+    PHONE_EXPORT static void set_audio_devices(int capture_index, int playback_index);
 
 private:
     void create_tls_transport_with_srv_lookup();

@@ -88,63 +88,99 @@ int main() {
 
     // repl
     int command;
-    char buffer[128];
-    int call_id, level;
     do {
-        printf("last call index: %d\n> ", state->last_call_index);
-        printf("last call id: %s\n> ", state->last_call_id);
+        printf("last call index: %d\n", state->last_call_index);
+        printf("last call id: %s\n", state->last_call_id);
         command = getchar();
         switch (command) {
             case 'c':
-                printf("please enter number: ");
-                clear_input_buffer();
-                if (fgets(buffer, sizeof(buffer), stdin) == NULL) {
-                    fprintf(stderr, "could not read number\n");
-                    break;
+                {
+                    char number_buffer[128];
+                    printf("please enter number: ");
+                    if (read_string(number_buffer, sizeof(number_buffer)) != 0) break;
+                    if (phone_make_call(state->phone, number_buffer) != PHONE_STATUS_SUCCESS)
+                        fprintf(stderr, "%s\n", phone_last_error());
                 }
-                buffer[strcspn(buffer, "\n")] = '\0';
-                if (phone_make_call(state->phone, buffer) != PHONE_STATUS_SUCCESS) die(state->phone);
                 break;
             case 'C':
-                if (phone_make_call(state->phone, "+4915123595397") != PHONE_STATUS_SUCCESS) die(state->phone);
+                if (phone_make_call(state->phone, "+491804100100") != PHONE_STATUS_SUCCESS)
+                    fprintf(stderr, "%s\n", phone_last_error());
                 break;
             case 'a':
-                printf("please enter call index: ");
-                if (read_int(&call_id) != 0) break;
-                if (phone_answer_call(state->phone, call_id) != PHONE_STATUS_SUCCESS) die(state->phone);
+                {
+                    int call_index;
+                    printf("please enter call index: ");
+                    if (read_int(&call_index) != 0) break;
+                    if (phone_answer_call(state->phone, call_index) != PHONE_STATUS_SUCCESS)
+                        fprintf(stderr, "%s\n", phone_last_error());
+                }
                 break;
             case 'A':
-                printf("please enter call id: ");
-                clear_input_buffer();
-                if (fgets(buffer, sizeof(buffer), stdin) == NULL) {
-                    fprintf(stderr, "could not read id\n");
-                    break;
+                {
+                    char call_id[128];
+                    printf("please enter call id: ");
+                    if (read_string(call_id, sizeof(call_id)) != 0) break;
+                    if (phone_answer_call_id(state->phone, call_id) != PHONE_STATUS_SUCCESS)
+                        fprintf(stderr, "%s\n", phone_last_error());
                 }
-                buffer[strcspn(buffer, "\n")] = '\0';
-                if (phone_answer_call_id(state->phone, buffer) != PHONE_STATUS_SUCCESS) die(state->phone);
                 break;
             case 'h':
-                printf("please enter call index: ");
-                if (read_int(&call_id) != 0) break;
-                if (phone_hangup_call(state->phone, call_id) != PHONE_STATUS_SUCCESS) die(state->phone);
+                {
+                    int call_index;
+                    printf("please enter call index: ");
+                    if (read_int(&call_index) != 0) break;
+                    if (phone_hangup_call(state->phone, call_index) != PHONE_STATUS_SUCCESS)
+                        fprintf(stderr, "%s\n", phone_last_error());
+                }
                 break;
             case 'H':
-                printf("please enter call id: ");
-                clear_input_buffer();
-                if (fgets(buffer, sizeof(buffer), stdin) == NULL) {
-                    fprintf(stderr, "could not read id\n");
-                    break;
+                {
+                    char call_id[128];
+                    printf("please enter call id: ");
+                    if (read_string(call_id, sizeof(call_id)) != 0) break;
+                    if (phone_hangup_call_id(state->phone, call_id) != PHONE_STATUS_SUCCESS)
+                        fprintf(stderr, "%s\n", phone_last_error());
                 }
-                buffer[strcspn(buffer, "\n")] = '\0';
-                if (phone_hangup_call_id(state->phone, buffer) != PHONE_STATUS_SUCCESS) die(state->phone);
                 break;
             case 'e':
                 phone_hangup_calls(state->phone);
                 break;
             case 'l':
-                printf("please enter new log level 0..6: ");
-                if (read_int(&level) != 0) break;
-                phone_set_log_level(level);
+                {
+                    int log_level;
+                    printf("please enter new log level 0..6: ");
+                    if (read_int(&log_level) != 0) break;
+                    phone_set_log_level(log_level);
+                }
+                break;
+            case 'd':
+                {
+                    char *ptr[phone_get_audio_devices_count()];
+                    char devices[phone_get_audio_devices_count()][phone_get_audio_device_info_name_length()];
+
+                    int i;
+                    for (i = 0; i < phone_get_audio_devices_count(); i++)
+                        ptr[i] = devices[i];
+                    phone_get_audio_device_names(ptr, phone_get_audio_devices_count(),
+                                                 phone_get_audio_device_info_name_length());
+
+                    for (i = 0; i < phone_get_audio_devices_count(); i++) {
+                        printf("%d - %s\n", i, ptr[i]);
+                    }
+                }
+                break;
+            case 'D':
+                {
+                    int capture_device;
+                    int playback_device;
+                    printf("please enter desired capture device: ");
+                    clear_input_buffer();
+                    if (read_int(&capture_device) != 0) break;
+                    printf("please enter desired playback device: ");
+                    if (read_int(&playback_device) != 0) break;
+                    if (phone_set_audio_devices(capture_device, playback_device) != PHONE_STATUS_SUCCESS)
+                        fprintf(stderr, "%s\n", phone_last_error());
+                }
                 break;
             default:
                 break;
