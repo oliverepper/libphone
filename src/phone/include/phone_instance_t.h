@@ -43,8 +43,8 @@ namespace phone {
         int id;
         std::string driver;
         std::string name;
-        int input_count;
-        int output_count;
+        unsigned int input_count;
+        unsigned int output_count;
     };
 } //namespace phone
 

@@ -188,7 +188,8 @@ phone_status_t phone_get_audio_device_names(char **device_names, size_t devices_
     try {
         for (const auto& e : phone_instance_t::get_audio_devices()) {
             if (i < devices_count) {
-                strncpy(device_names[i], e.name.c_str(), max_device_name_length);
+                std::string name_with_io = e.name + " (" + std::to_string(e.input_count) + "/" + std::to_string(e.output_count) + ")";
+                strncpy(device_names[i], name_with_io.c_str(), max_device_name_length);
                 ++i;
             }
         }
