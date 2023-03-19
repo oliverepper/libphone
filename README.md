@@ -117,6 +117,12 @@ If you want to try this out I maintain the following binary distributions:
 - [libphone.0.0.1-ubuntu22.04-aarch64.tgz](https://oliver-epper.de/libphone.0.0.1-ubuntu22.04-aarch64.tgz)
 - [libphone.0.0.1-ubuntu22.04-x86_64.tgz](https://oliver-epper.de/libphone.0.0.1-ubuntu22.04-x86_64.tgz)
 
+Depending on your type of Ubuntu installation you might need to install the following as dependencies:
+
+```shell
+sudo apt install libasound2 libopus0
+```
+
 ## Build instructions for Linux
 
 I've tested this on Ubuntu 22.04.
