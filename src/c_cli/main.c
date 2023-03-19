@@ -97,6 +97,7 @@ int main() {
                 {
                     char number_buffer[128];
                     printf("please enter number: ");
+                    clear_input_buffer();
                     if (read_string(number_buffer, sizeof(number_buffer)) != 0) break;
                     if (phone_make_call(state->phone, number_buffer) != PHONE_STATUS_SUCCESS)
                         fprintf(stderr, "%s\n", phone_last_error());
@@ -110,6 +111,7 @@ int main() {
                 {
                     int call_index;
                     printf("please enter call index: ");
+                    clear_input_buffer();
                     if (read_int(&call_index) != 0) break;
                     if (phone_answer_call(state->phone, call_index) != PHONE_STATUS_SUCCESS)
                         fprintf(stderr, "%s\n", phone_last_error());
@@ -119,6 +121,7 @@ int main() {
                 {
                     char call_id[128];
                     printf("please enter call id: ");
+                    clear_input_buffer();
                     if (read_string(call_id, sizeof(call_id)) != 0) break;
                     if (phone_answer_call_id(state->phone, call_id) != PHONE_STATUS_SUCCESS)
                         fprintf(stderr, "%s\n", phone_last_error());
@@ -128,6 +131,7 @@ int main() {
                 {
                     int call_index;
                     printf("please enter call index: ");
+                    clear_input_buffer();
                     if (read_int(&call_index) != 0) break;
                     if (phone_hangup_call(state->phone, call_index) != PHONE_STATUS_SUCCESS)
                         fprintf(stderr, "%s\n", phone_last_error());
@@ -137,6 +141,7 @@ int main() {
                 {
                     char call_id[128];
                     printf("please enter call id: ");
+                    clear_input_buffer();
                     if (read_string(call_id, sizeof(call_id)) != 0) break;
                     if (phone_hangup_call_id(state->phone, call_id) != PHONE_STATUS_SUCCESS)
                         fprintf(stderr, "%s\n", phone_last_error());
@@ -149,6 +154,7 @@ int main() {
                 {
                     int log_level;
                     printf("please enter new log level 0..6: ");
+                    clear_input_buffer();
                     if (read_int(&log_level) != 0) break;
                     phone_set_log_level(log_level);
                 }
