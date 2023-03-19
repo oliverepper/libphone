@@ -83,6 +83,7 @@ public:
 
     PHONE_EXPORT static void set_log_level(int level);
 
+    PHONE_EXPORT static void refresh_audio_devices();
     PHONE_EXPORT static std::vector<phone::audio_device_info> get_audio_devices();
     PHONE_EXPORT static void set_audio_devices(int capture_index, int playback_index);
 

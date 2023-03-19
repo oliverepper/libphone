@@ -161,20 +161,25 @@ int main() {
                 break;
             case 'd':
                 {
+                    phone_refresh_audio_devices();
                     size_t count = phone_get_audio_devices_count();
                     size_t max_device_name_length = phone_get_audio_device_info_name_length() + 8;
                     char *device_names[count];
                     char data[count][max_device_name_length];
 
                     int i;
-                    for (i = 0; i < phone_get_audio_devices_count(); i++)
+                    for (i = 0; i < count; i++) {
                         device_names[i] = data[i];
+                        memset(data[i], 0, sizeof(max_device_name_length));
+                    }
+
                     if (phone_get_audio_device_names(device_names, count, max_device_name_length) != PHONE_STATUS_SUCCESS)
                         fprintf(stderr, "%s\n", phone_last_error());
 
-                    for (i = 0; i < phone_get_audio_devices_count(); i++) {
+                    for (i = 0; i < count; i++) {
                         printf("%d - %s\n", i, device_names[i]);
                     }
+                    clear_input_buffer();
                 }
                 break;
             case 'D':
@@ -191,6 +196,7 @@ int main() {
                 }
                 break;
             default:
+                clear_input_buffer();
                 break;
         }
     } while (command != 'q' && command != EOF);

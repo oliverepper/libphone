@@ -210,6 +210,10 @@ phone_status_t phone_set_audio_devices(int capture_device, int playback_device) 
     return PHONE_STATUS_SUCCESS;
 }
 
+void phone_refresh_audio_devices() {
+    phone_instance_t::refresh_audio_devices();
+}
+
 
 
 

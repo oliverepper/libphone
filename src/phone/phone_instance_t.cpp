@@ -156,7 +156,6 @@ int phone_instance_t::get_call_index(std::string call_id) {
 }
 
 std::vector<phone::audio_device_info> phone_instance_t::get_audio_devices() {
-    pjmedia_aud_dev_refresh();
     std::vector<phone::audio_device_info> result{pjmedia_aud_dev_count()};
 
     int index = 0;
@@ -193,4 +192,8 @@ void phone_instance_t::set_audio_devices(int capture_index, int playback_index) 
     } else {
         PJ_LOG(3,(__BASE_FILE__, "did set capture device to: %d and playback device to: %d", capture_index, playback_index));
     }
+}
+
+void phone_instance_t::refresh_audio_devices() {
+    pjmedia_aud_dev_refresh();
 }
