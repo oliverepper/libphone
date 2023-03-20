@@ -95,6 +95,7 @@ int main() {
 
         switch (command) {
             case 'c':
+                clear_input_buffer();
                 {
                     char number_buffer[128];
                     printf("please enter number: ");
@@ -104,10 +105,12 @@ int main() {
                 }
                 break;
             case 'C':
+                clear_input_buffer();
                 if (phone_make_call(state->phone, "+491804100100") != PHONE_STATUS_SUCCESS)
                     fprintf(stderr, "%s\n", phone_last_error());
                 break;
             case 'a':
+                clear_input_buffer();
                 {
                     int call_index;
                     printf("please enter call index: ");
@@ -117,6 +120,7 @@ int main() {
                 }
                 break;
             case 'A':
+                clear_input_buffer();
                 {
                     char call_id[128];
                     printf("please enter call id: ");
@@ -126,6 +130,7 @@ int main() {
                 }
                 break;
             case 'h':
+                clear_input_buffer();
                 {
                     int call_index;
                     printf("please enter call index: ");
@@ -135,6 +140,7 @@ int main() {
                 }
                 break;
             case 'H':
+                clear_input_buffer();
                 {
                     char call_id[128];
                     printf("please enter call id: ");
@@ -144,9 +150,11 @@ int main() {
                 }
                 break;
             case 'e':
+                clear_input_buffer();
                 phone_hangup_calls(state->phone);
                 break;
             case 'l':
+                clear_input_buffer();
                 {
                     int log_level;
                     printf("please enter new log level 0..6: ");
@@ -155,6 +163,7 @@ int main() {
                 }
                 break;
             case 'd':
+                clear_input_buffer();
                 {
                     phone_refresh_audio_devices();
                     size_t count = phone_get_audio_devices_count();
@@ -177,6 +186,7 @@ int main() {
                 }
                 break;
             case 'D':
+                clear_input_buffer();
                 {
                     int capture_device;
                     int playback_device;
@@ -189,10 +199,9 @@ int main() {
                 }
                 break;
             default:
-
+                clear_input_buffer();
                 break;
         }
-
     } while (command != 'q' && command != EOF);
     printf("shutting down...\n");
     phone_destroy(state->phone);
