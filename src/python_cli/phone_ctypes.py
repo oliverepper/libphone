@@ -92,6 +92,31 @@ phone_hangup_calls = libphone.phone_hangup_calls
 phone_hangup_calls.restype = None
 phone_hangup_calls.argtypes = [c_void_p]
 
+# PHONE_EXPORT void phone_refresh_audio_devices();
+phone_refresh_audio_devices = libphone.phone_refresh_audio_devices
+phone_refresh_audio_devices.restype = None
+phone_refresh_audio_devices.argtypes = None
+
+# PHONE_EXPORT size_t phone_get_audio_devices_count();
+phone_get_audio_devices_count = libphone.phone_get_audio_devices_count
+phone_get_audio_devices_count.restype = c_size_t
+phone_get_audio_devices_count.argtypes = None
+
+# PHONE_EXPORT size_t phone_get_audio_device_info_name_length();
+phone_get_audio_device_info_name_length = libphone.phone_get_audio_device_info_name_length
+phone_get_audio_device_info_name_length.restype = c_size_t
+phone_get_audio_device_info_name_length.argtypes = None
+
+# phone_get_audio_device_names
+__phone_get_audio_device_names = libphone.phone_get_audio_device_names
+__phone_get_audio_device_names.restype = c_int
+__phone_get_audio_device_names.argtypes = [POINTER(c_char_p), POINTER(c_size_t), c_size_t, c_int]
+
+# set audio device
+phone_set_audio_devices = libphone.phone_set_audio_devices
+phone_set_audio_devices.restype = c_int
+phone_set_audio_devices.argtypes = [c_int, c_int]
+
 # destroy phone
 phone_destroy = libphone.phone_destroy
 phone_destroy.restype = None
@@ -116,6 +141,22 @@ def die(instance):
     phone_destroy(instance)
     phone_last_error()
     exit(1)
+
+
+def phone_get_audio_device_names(filter):
+    if not 0 <= filter <= 2:
+        filter = 0
+    c_count = c_size_t(phone_get_audio_devices_count())
+    max_device_name_length = phone_get_audio_device_info_name_length()
+    device_names = (c_char_p * c_count.value)()
+
+    for i in range(c_count.value):
+        device_names[i] = cast(create_string_buffer(max_device_name_length), c_char_p)
+
+    if __phone_get_audio_device_names(device_names, byref(c_count), max_device_name_length, filter) != PHONE_STATUS_SUCCESS:
+        return []
+
+    return [e.decode('utf-8') for e in device_names[:c_count.value]]
 
 
 def phone_create(user_agent, nameservers, stunservers):
@@ -159,5 +200,7 @@ a - answer a call
 h - hangup a call
 H - kill all calls
 l - change log level
+d - list audio devices
+D - change audio devices
 q - quit
 '''

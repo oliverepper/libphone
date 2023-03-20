@@ -77,6 +77,22 @@ while command != 'q':
     elif command == 'l':
         level = int(input("please enter desired log-level 0..6: "))
         phone_set_log_level(level)
+    elif command == 'd':
+        phone_refresh_audio_devices()
+        print("""
+        0 - no filter
+        1 - capture devices
+        2 - playback devices
+        """)
+        filter = int(input("do you want a filter?: "))
+        for idx, device in enumerate(phone_get_audio_device_names(filter)):
+            print(f"{idx} - {device}")
+        print()
+    elif command == 'D':
+        capture_device = int(input("please enter desired capture device: "))
+        playback_device = int(input("please enter desired playback device: "))
+        if phone_set_audio_devices(capture_device, playback_device) != PHONE_STATUS_SUCCESS:
+            print(phone_last_error())
 
 print("shutting down...")
 phone_destroy(phone)
