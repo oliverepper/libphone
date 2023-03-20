@@ -1,7 +1,6 @@
 #include <phone_instance_t.h>
 #include <iostream>
 #include <thread>
-#include <fmt/core.h>
 
 struct app_state {
     phone_instance_t phone;
@@ -94,8 +93,9 @@ auto main() -> int {
                 std::cin >> level;
                 phone_instance_t::set_log_level(level);
             } else if (command == 'd') {
-                for (const auto& e : state.phone.get_audio_devices()) {
-                    fmt::print("{} - {}/{} ({}/{})\n", e.id, e.driver, e.name, e.input_count, e.output_count);
+                phone_instance_t::refresh_audio_devices();
+                for (const auto& e : phone_instance_t::get_audio_devices()) {
+                    std::cout << e.id << " - " << e.driver << "/" << e.name << " (" << e.input_count << "/" << e.output_count << ")" << std::endl;
                 }
             } else if (command == 'D') {
                 int capture_index;
@@ -104,7 +104,7 @@ auto main() -> int {
                 std::cin >> capture_index;
                 std::cout << "please enter desired playback device: ";
                 std::cin >> playback_index;
-                state.phone.set_audio_devices(capture_index, playback_index);
+                phone_instance_t::set_audio_devices(capture_index, playback_index);
             }
         } while (command != 'q');
     } catch (const phone::exception &e) {

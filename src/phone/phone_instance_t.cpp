@@ -147,9 +147,9 @@ std::string phone_instance_t::get_call_id(int call_index) {
     }
 }
 
-int phone_instance_t::get_call_index(std::string call_id) {
+int phone_instance_t::get_call_index(const std::string& call_id) {
     try {
-        return m_account->get_call_index(std::move(call_id));
+        return m_account->get_call_index(call_id);
     } catch (const std::invalid_argument& e) {
         throw phone::exception{e.what()};
     }

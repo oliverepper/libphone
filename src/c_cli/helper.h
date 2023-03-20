@@ -15,7 +15,8 @@ void clear_input_buffer(void) {
     while ((c = getchar() != '\n') && c != EOF);
 }
 
-int read_string(char *out, size_t size) {
+int read_string(char *out, int size) {
+    clear_input_buffer();
     if (fgets(out, size, stdin) == NULL) {
         fprintf(stderr, "could not read from stdin");
         return 1;

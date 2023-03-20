@@ -92,12 +92,12 @@ int main() {
         printf("last call index: %d\n", state->last_call_index);
         printf("last call id: %s\n", state->last_call_id);
         command = getchar();
+
         switch (command) {
             case 'c':
                 {
                     char number_buffer[128];
                     printf("please enter number: ");
-                    clear_input_buffer();
                     if (read_string(number_buffer, sizeof(number_buffer)) != 0) break;
                     if (phone_make_call(state->phone, number_buffer) != PHONE_STATUS_SUCCESS)
                         fprintf(stderr, "%s\n", phone_last_error());
@@ -111,7 +111,6 @@ int main() {
                 {
                     int call_index;
                     printf("please enter call index: ");
-                    clear_input_buffer();
                     if (read_int(&call_index) != 0) break;
                     if (phone_answer_call(state->phone, call_index) != PHONE_STATUS_SUCCESS)
                         fprintf(stderr, "%s\n", phone_last_error());
@@ -121,7 +120,6 @@ int main() {
                 {
                     char call_id[128];
                     printf("please enter call id: ");
-                    clear_input_buffer();
                     if (read_string(call_id, sizeof(call_id)) != 0) break;
                     if (phone_answer_call_id(state->phone, call_id) != PHONE_STATUS_SUCCESS)
                         fprintf(stderr, "%s\n", phone_last_error());
@@ -131,7 +129,6 @@ int main() {
                 {
                     int call_index;
                     printf("please enter call index: ");
-                    clear_input_buffer();
                     if (read_int(&call_index) != 0) break;
                     if (phone_hangup_call(state->phone, call_index) != PHONE_STATUS_SUCCESS)
                         fprintf(stderr, "%s\n", phone_last_error());
@@ -141,7 +138,6 @@ int main() {
                 {
                     char call_id[128];
                     printf("please enter call id: ");
-                    clear_input_buffer();
                     if (read_string(call_id, sizeof(call_id)) != 0) break;
                     if (phone_hangup_call_id(state->phone, call_id) != PHONE_STATUS_SUCCESS)
                         fprintf(stderr, "%s\n", phone_last_error());
@@ -154,7 +150,6 @@ int main() {
                 {
                     int log_level;
                     printf("please enter new log level 0..6: ");
-                    clear_input_buffer();
                     if (read_int(&log_level) != 0) break;
                     phone_set_log_level(log_level);
                 }
@@ -179,7 +174,6 @@ int main() {
                     for (i = 0; i < count; i++) {
                         printf("%d - %s\n", i, device_names[i]);
                     }
-                    clear_input_buffer();
                 }
                 break;
             case 'D':
@@ -187,7 +181,6 @@ int main() {
                     int capture_device;
                     int playback_device;
                     printf("please enter desired capture device: ");
-                    clear_input_buffer();
                     if (read_int(&capture_device) != 0) break;
                     printf("please enter desired playback device: ");
                     if (read_int(&playback_device) != 0) break;
@@ -196,9 +189,10 @@ int main() {
                 }
                 break;
             default:
-                clear_input_buffer();
+
                 break;
         }
+
     } while (command != 'q' && command != EOF);
     printf("shutting down...\n");
     phone_destroy(state->phone);

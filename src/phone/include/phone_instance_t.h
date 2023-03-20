@@ -79,7 +79,7 @@ public:
     PHONE_EXPORT void hangup_calls() noexcept;
 
     PHONE_EXPORT std::string get_call_id(int call_index);
-    PHONE_EXPORT int get_call_index(std::string call_id);
+    PHONE_EXPORT int get_call_index(const std::string& call_id);
 
     PHONE_EXPORT static void set_log_level(int level);
 

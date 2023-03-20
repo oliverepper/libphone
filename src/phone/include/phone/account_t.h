@@ -49,7 +49,7 @@ public:
 
     template<typename ID>
     void answer_call(ID id) {
-        typename std::vector<std::unique_ptr<call_t>>::iterator it = call_for(id);
+        typename std::vector<std::unique_ptr<call_t>>::iterator it = call_for(id); //NOLINT(modernize-use-auto)
         if (it != std::end(m_calls)) {
             pj::CallOpParam prm;
             prm.statusCode = PJSIP_SC_OK;
@@ -59,7 +59,7 @@ public:
 
     template<typename ID>
     void hangup_call(ID id) {
-        typename std::vector<std::unique_ptr<call_t>>::iterator it = call_for(id);
+        typename std::vector<std::unique_ptr<call_t>>::iterator it = call_for(id); //NOLINT(modernize-use-auto)
         if (it != std::end(m_calls)) {
             pj::CallOpParam prm;
             prm.statusCode = PJSIP_SC_DECLINE;
@@ -68,17 +68,17 @@ public:
     }
 
     std::string get_call_id(int call_index) {
-        typename std::vector<std::unique_ptr<call_t>>::iterator it = call_for(call_index);
+        typename std::vector<std::unique_ptr<call_t>>::iterator it = call_for(call_index); //NOLINT(modernize-use-auto)
         if (it != std::end(m_calls)) {
-            return static_cast<std::string>(*it->get());
+            return static_cast<std::string>(*it->get()); //NOLINT(readability-redundant-smartptr-get)
         }
         throw std::invalid_argument{"no call for id: <" + std::to_string(call_index) + ">"};
     }
 
-    int get_call_index(std::string call_id) {
-        typename std::vector<std::unique_ptr<call_t>>::iterator it = call_for(call_id);
+    int get_call_index(const std::string& call_id) {
+        typename std::vector<std::unique_ptr<call_t>>::iterator it = call_for(call_id); //NOLINT(modernize-use-auto)
         if (it != std::end(m_calls)) {
-            return static_cast<int>(*it->get());
+            return static_cast<int>(*it->get()); //NOLINT(readability-redundant-smartptr-get)
         }
         throw std::invalid_argument{"no call for id: <" + call_id + ">"};
     }
