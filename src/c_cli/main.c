@@ -173,7 +173,7 @@ int main() {
                         memset(data[i], 0, sizeof(max_device_name_length));
                     }
 
-                    if (phone_get_audio_device_names(device_names, count, max_device_name_length) != PHONE_STATUS_SUCCESS)
+                    if (phone_get_audio_device_names(device_names, &count, max_device_name_length, DEVICE_FILTER_NONE) != PHONE_STATUS_SUCCESS)
                         fprintf(stderr, "%s\n", phone_last_error());
 
                     for (i = 0; i < count; i++) {

@@ -183,20 +183,39 @@ void phone_state_name(char *buffer, size_t buffer_size, int state) {
     strncpy(buffer, std::string{phone::state_name(state)}.c_str(), buffer_size);
 }
 
-phone_status_t phone_get_audio_device_names(char **device_names, size_t devices_count, size_t max_device_name_length) {
-    int i = 0;
+phone_status_t phone_get_audio_device_names(char **device_names, size_t *devices_count, size_t max_device_name_length, device_filter_t filter) {
+    std::function<bool(phone::audio_device_info)> pred;
+    switch (filter) {
+        case DEVICE_FILTER_INPUT:
+            pred = [](const auto& info){ return info.input_count == 0; };
+            break;
+        case DEVICE_FILTER_OUTPUT:
+            pred = [](const auto& info){ return info.output_count == 0; };
+            break;
+        default:
+            pred = [](const auto& info){ return false; };
+            break;
+    }
+
+    std::vector<phone::audio_device_info> devices{*devices_count};
     try {
-        for (const auto& e : phone_instance_t::get_audio_devices()) {
-            if (i < devices_count) {
-                std::string name_with_io = e.name + " (" + std::to_string(e.input_count) + "/" + std::to_string(e.output_count) + ")";
-                strncpy(device_names[i], name_with_io.c_str(), max_device_name_length);
-                ++i;
-            }
-        }
+        devices = phone_instance_t::get_audio_devices();
     } catch (const phone::exception& e) {
         strncpy(global_last_error, e.what(), sizeof(global_last_error));
         return PHONE_STATUS_FAILURE;
     }
+
+    devices.erase(std::remove_if(std::begin(devices), std::end(devices), pred), std::end(devices));
+
+    int i = 0;
+    for (const auto& e : devices) {
+        if (i < *devices_count) {
+            std::string name_with_io = e.name + " (" + std::to_string(e.input_count) + "/" + std::to_string(e.output_count) + ")";
+            strncpy(device_names[i], name_with_io.c_str(), max_device_name_length);
+            ++i;
+        }
+    }
+    *devices_count = i;
     return PHONE_STATUS_SUCCESS;
 }
 
