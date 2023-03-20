@@ -210,8 +210,7 @@ phone_status_t phone_get_audio_device_names(char **device_names, size_t *devices
     int i = 0;
     for (const auto& e : devices) {
         if (i < *devices_count) {
-            std::string name_with_io = e.name + " (" + std::to_string(e.input_count) + "/" + std::to_string(e.output_count) + ")";
-            strncpy(device_names[i], name_with_io.c_str(), max_device_name_length);
+            strncpy(device_names[i], e.name.c_str(), max_device_name_length);
             ++i;
         }
     }

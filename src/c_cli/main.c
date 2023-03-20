@@ -163,7 +163,7 @@ int main() {
                 {
                     phone_refresh_audio_devices();
                     size_t count = phone_get_audio_devices_count();
-                    size_t max_device_name_length = phone_get_audio_device_info_name_length() + 8;
+                    size_t max_device_name_length = phone_get_audio_device_info_name_length();
                     char *device_names[count];
                     char data[count][max_device_name_length];
 
