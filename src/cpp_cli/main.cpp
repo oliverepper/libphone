@@ -34,7 +34,8 @@ struct app_state {
 
 auto main() -> int {
     try {
-        app_state state{phone_instance_t{"Cli Phone in C++", {"217.237.148.22", "217.237.150.51"}, {"stun.t-online.de"}}};
+        app_state state{
+                phone_instance_t{"Cli Phone in C++", {"217.237.148.22", "217.237.150.51"}, {"stun.t-online.de"}}};
         phone_instance_t::set_log_level(0);
 
         // callbacks
@@ -63,7 +64,7 @@ auto main() -> int {
                 std::cin >> number;
                 state.phone.make_call(number);
             } else if (command == 'C') {
-                state.phone.make_call("+4915123595397");
+                state.phone.make_call("+491804100100");
             } else if (command == 'a') {
                 int call_index;
                 std::cout << "please enter call index: ";
@@ -91,6 +92,19 @@ auto main() -> int {
                 std::cout << "please enter desired log level 0..6: ";
                 std::cin >> level;
                 phone_instance_t::set_log_level(level);
+            } else if (command == 'd') {
+                phone_instance_t::refresh_audio_devices();
+                for (const auto& e : phone_instance_t::get_audio_devices()) {
+                    std::cout << e.id << " - " << e.driver << "/" << e.name << " (" << e.input_count << "/" << e.output_count << ")" << std::endl;
+                }
+            } else if (command == 'D') {
+                int capture_index;
+                int playback_index;
+                std::cout << "please enter desired capture device: ";
+                std::cin >> capture_index;
+                std::cout << "please enter desired playback device: ";
+                std::cin >> playback_index;
+                phone_instance_t::set_audio_devices(capture_index, playback_index);
             }
         } while (command != 'q');
     } catch (const phone::exception &e) {

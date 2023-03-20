@@ -10,6 +10,8 @@ phone_instance_t::phone_instance_t(std::string user_agent, std::vector<std::stri
     ep_cfg.uaConfig.userAgent = std::move(user_agent);
     ep_cfg.uaConfig.nameserver = std::move(nameserver);
     ep_cfg.uaConfig.stunServer = std::move(stunserver);
+
+    ep_cfg.medConfig.ecOptions = PJMEDIA_ECHO_USE_SW_ECHO;
     try {
         m_ep->libCreate();
         m_ep->libInit(ep_cfg);
@@ -145,10 +147,53 @@ std::string phone_instance_t::get_call_id(int call_index) {
     }
 }
 
-int phone_instance_t::get_call_index(std::string call_id) {
+int phone_instance_t::get_call_index(const std::string& call_id) {
     try {
-        return m_account->get_call_index(std::move(call_id));
+        return m_account->get_call_index(call_id);
     } catch (const std::invalid_argument& e) {
         throw phone::exception{e.what()};
     }
+}
+
+std::vector<phone::audio_device_info> phone_instance_t::get_audio_devices() {
+    std::vector<phone::audio_device_info> result{pjmedia_aud_dev_count()};
+
+    int index = 0;
+    for (phone::audio_device_info& i : result) {
+        pjmedia_aud_dev_info info;
+        auto status = pjmedia_aud_dev_get_info(index, &info);
+        if (status != PJ_SUCCESS) {
+            char error_message[PJ_ERR_MSG_SIZE] = {0};
+            pj_strerror(status, error_message, sizeof(error_message));
+            throw phone::exception{error_message};
+        } else {
+            i.id = index;
+            i.driver = info.driver;
+            i.name = info.name;
+            i.input_count = info.input_count;
+            i.output_count = info.output_count;
+        }
+        ++index;
+    }
+
+    return result;
+}
+
+void phone_instance_t::set_audio_devices(int capture_index, int playback_index) {
+    pjsua_snd_dev_param prm;
+    pjsua_snd_dev_param_default(&prm);
+    prm.capture_dev = capture_index;
+    prm.playback_dev = playback_index;
+    auto status = pjsua_set_snd_dev2(&prm);
+    if (status != PJ_SUCCESS) {
+        char error_message[PJ_ERR_MSG_SIZE] = {0};
+        pj_strerror(status, error_message, sizeof(error_message));
+        throw phone::exception{error_message};
+    } else {
+        PJ_LOG(3,(__BASE_FILE__, "did set capture device to: %d and playback device to: %d", capture_index, playback_index));
+    }
+}
+
+void phone_instance_t::refresh_audio_devices() {
+    pjmedia_aud_dev_refresh();
 }

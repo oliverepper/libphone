@@ -12,7 +12,17 @@
 
 void clear_input_buffer(void) {
     int c;
-    while ((c = getchar() != '\n') && c != EOF);
+    while ((c = getchar() != '\n') && c != EOF) {};
+}
+
+int read_string(char *out, int size) {
+    if (fgets(out, size, stdin) == NULL) {
+        fprintf(stderr, "could not read from stdin");
+        return 1;
+    }
+
+    out[strcspn(out, "\n")] = '\0';
+    return 0;
 }
 
 int read_int(int *in) {
@@ -20,13 +30,7 @@ int read_int(int *in) {
     long value;
     char *endptr;
 
-    clear_input_buffer();
-    if (fgets(input, sizeof(input), stdin) == NULL) {
-        fprintf(stderr, "could not read from stdin");
-        return 1;
-    }
-
-    input[strcspn(input, "\n")] = '\0';
+    if (read_string(input, sizeof(input)) != 0) return 1;
 
     value = strtol(input, &endptr, sizeof(input));
     if (*input == '\0' || *endptr != '\0') {

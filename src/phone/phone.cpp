@@ -1,6 +1,6 @@
+#include <pjsua.h>
 #include <phone.h>
 #include <phone_instance_t.h>
-
 #include <vector>
 #include <cstring>
 
@@ -167,6 +167,13 @@ phone_status_t phone_get_call_index(phone_t instance, const char *call_id, int *
     return PHONE_STATUS_SUCCESS;
 }
 
+size_t phone_get_audio_devices_count() {
+    return pjmedia_aud_dev_count();
+}
+
+size_t phone_get_audio_device_info_name_length() {
+    return PJMEDIA_AUD_DEV_INFO_NAME_LEN;
+}
 
 const char* phone_last_error() {
     return global_last_error;
@@ -174,6 +181,55 @@ const char* phone_last_error() {
 
 void phone_state_name(char *buffer, size_t buffer_size, int state) {
     strncpy(buffer, std::string{phone::state_name(state)}.c_str(), buffer_size);
+}
+
+phone_status_t phone_get_audio_device_names(char **device_names, size_t *devices_count, size_t max_device_name_length, device_filter_t filter) {
+    std::function<bool(phone::audio_device_info)> pred;
+    switch (filter) {
+        case DEVICE_FILTER_INPUT:
+            pred = [](const auto& info){ return info.input_count == 0; };
+            break;
+        case DEVICE_FILTER_OUTPUT:
+            pred = [](const auto& info){ return info.output_count == 0; };
+            break;
+        default:
+            pred = [](const auto& info){ return false; };
+            break;
+    }
+
+    std::vector<phone::audio_device_info> devices{*devices_count};
+    try {
+        devices = phone_instance_t::get_audio_devices();
+    } catch (const phone::exception& e) {
+        strncpy(global_last_error, e.what(), sizeof(global_last_error));
+        return PHONE_STATUS_FAILURE;
+    }
+
+    devices.erase(std::remove_if(std::begin(devices), std::end(devices), pred), std::end(devices));
+
+    int i = 0;
+    for (const auto& e : devices) {
+        if (i < *devices_count) {
+            strncpy(device_names[i], e.name.c_str(), max_device_name_length);
+            ++i;
+        }
+    }
+    *devices_count = i;
+    return PHONE_STATUS_SUCCESS;
+}
+
+phone_status_t phone_set_audio_devices(int capture_device, int playback_device) {
+    try {
+        phone_instance_t::set_audio_devices(capture_device, playback_device);
+    } catch (const phone::exception& e) {
+        strncpy(global_last_error, e.what(), sizeof(global_last_error));
+        return PHONE_STATUS_FAILURE;
+    }
+    return PHONE_STATUS_SUCCESS;
+}
+
+void phone_refresh_audio_devices() {
+    phone_instance_t::refresh_audio_devices();
 }
 
 

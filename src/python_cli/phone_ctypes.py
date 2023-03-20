@@ -48,14 +48,19 @@ __phone_create.restype = c_void_p
 __phone_create.argtypes = [c_char_p, POINTER(c_char_p), c_size_t, POINTER(c_char_p), c_size_t]
 
 # phone_register_on_incoming_call_callback
-phone_register_on_incoming_call_callback = libphone.phone_register_on_incoming_call_callback
-phone_register_on_incoming_call_callback.restype = None
-phone_register_on_incoming_call_callback.argtypes = [c_void_p, c_void_p, c_void_p]
+phone_register_on_incoming_call_index_callback = libphone.phone_register_on_incoming_call_index_callback
+phone_register_on_incoming_call_index_callback.restype = None
+phone_register_on_incoming_call_index_callback.argtypes = [c_void_p, c_void_p, c_void_p]
+
+# phone_register_on_incoming_call_id_callback
+phone_register_on_incoming_call_id_callback = libphone.phone_register_on_incoming_call_id_callback
+phone_register_on_incoming_call_id_callback.restype = None
+phone_register_on_incoming_call_id_callback.argtypes = [c_void_p, c_void_p, c_void_p]
 
 # phone_register_on_call_state_callback
-phone_register_on_call_state_callback = libphone.phone_register_on_call_state_callback
-phone_register_on_call_state_callback.restype = None
-phone_register_on_call_state_callback.argtypes = [c_void_p, c_void_p, c_void_p]
+phone_register_on_call_state_index_callback = libphone.phone_register_on_call_state_index_callback
+phone_register_on_call_state_index_callback.restype = None
+phone_register_on_call_state_index_callback.argtypes = [c_void_p, c_void_p, c_void_p]
 
 # phone_configure_opus
 phone_configure_opus = libphone.phone_configure_opus
@@ -92,6 +97,31 @@ phone_hangup_calls = libphone.phone_hangup_calls
 phone_hangup_calls.restype = None
 phone_hangup_calls.argtypes = [c_void_p]
 
+# PHONE_EXPORT void phone_refresh_audio_devices();
+phone_refresh_audio_devices = libphone.phone_refresh_audio_devices
+phone_refresh_audio_devices.restype = None
+phone_refresh_audio_devices.argtypes = None
+
+# PHONE_EXPORT size_t phone_get_audio_devices_count();
+phone_get_audio_devices_count = libphone.phone_get_audio_devices_count
+phone_get_audio_devices_count.restype = c_size_t
+phone_get_audio_devices_count.argtypes = None
+
+# PHONE_EXPORT size_t phone_get_audio_device_info_name_length();
+phone_get_audio_device_info_name_length = libphone.phone_get_audio_device_info_name_length
+phone_get_audio_device_info_name_length.restype = c_size_t
+phone_get_audio_device_info_name_length.argtypes = None
+
+# phone_get_audio_device_names
+__phone_get_audio_device_names = libphone.phone_get_audio_device_names
+__phone_get_audio_device_names.restype = c_int
+__phone_get_audio_device_names.argtypes = [POINTER(c_char_p), POINTER(c_size_t), c_size_t, c_int]
+
+# set audio device
+phone_set_audio_devices = libphone.phone_set_audio_devices
+phone_set_audio_devices.restype = c_int
+phone_set_audio_devices.argtypes = [c_int, c_int]
+
 # destroy phone
 phone_destroy = libphone.phone_destroy
 phone_destroy.restype = None
@@ -107,6 +137,30 @@ __phone_last_error = libphone.phone_last_error
 __phone_last_error.restype = c_char_p
 __phone_last_error.argtypes = None
 
+# PHONE_EXPORT phone_status_t phone_get_call_id(phone_t instance, int call_index, char *out, size_t size);
+
+# get_call_id
+__phone_get_call_id = libphone.phone_get_call_id
+__phone_get_call_id.restype = c_int
+__phone_get_call_id.argtypes = [c_void_p, c_int, c_char_p, c_size_t]
+
+def phone_get_call_id(phone, call_index):
+    buffer = create_string_buffer(128)
+    if __phone_get_call_id(phone, call_index, buffer, len(buffer)) != PHONE_STATUS_SUCCESS:
+        raise Exception(f"could not get call_id for index {call_index}")
+    return buffer.value.decode()
+
+# PHONE_EXPORT phone_status_t phone_get_call_index(phone_t instance, const char *call_id, int *out);
+# get_call_index
+__phone_get_call_index = libphone.phone_get_call_index
+__phone_get_call_index.restype = c_int
+__phone_get_call_index.argtypes = [c_void_p, c_char_p, POINTER(c_int)]
+
+def phone_get_call_index(phone, call_id):
+    index = c_int()
+    if __phone_get_call_index(phone, call_id, byref(index)) != PHONE_STATUS_SUCCESS:
+        raise Exception(f"could not get call_index for id {call_id.value.decode('utf-8')}")
+    return  index.value
 
 def phone_last_error():
     print("ERROR: " + __phone_last_error().decode('utf-8'))
@@ -116,6 +170,22 @@ def die(instance):
     phone_destroy(instance)
     phone_last_error()
     exit(1)
+
+
+def phone_get_audio_device_names(filter):
+    if not 0 <= filter <= 2:
+        filter = 0
+    c_count = c_size_t(phone_get_audio_devices_count())
+    max_device_name_length = phone_get_audio_device_info_name_length()
+    device_names = (c_char_p * c_count.value)()
+
+    for i in range(c_count.value):
+        device_names[i] = cast(create_string_buffer(max_device_name_length), c_char_p)
+
+    if __phone_get_audio_device_names(device_names, byref(c_count), max_device_name_length, filter) != PHONE_STATUS_SUCCESS:
+        return []
+
+    return [e.decode('utf-8') for e in device_names[:c_count.value]]
 
 
 def phone_create(user_agent, nameservers, stunservers):
@@ -159,5 +229,7 @@ a - answer a call
 h - hangup a call
 H - kill all calls
 l - change log level
+d - list audio devices
+D - change audio devices
 q - quit
 '''
