@@ -108,7 +108,10 @@ while command != 'q':
     1 - capture devices
     2 - playback devices
         """)
-        filter = int(input("do you want a filter?: "))
+        try:
+            filter = int(input("do you want a filter?: "))
+        except ValueError:
+            filter = DEVICE_FILTER_NONE
         for idx, device in enumerate(phone_get_audio_device_names(filter)):
             print(f"{idx} - {device}")
         print()
