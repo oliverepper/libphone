@@ -1,5 +1,6 @@
 //NOLINTBEGIN
 #include <phone/version.h>
+#include <cstring>
 
 unsigned phone_version_major() {
     return @phone_VERSION_MAJOR@;
@@ -15,5 +16,13 @@ unsigned phone_version_patch() {
 
 __attribute__((unused)) unsigned phone_version_tweak() {
     return @phone_VERSION_TWEAK@ + 0;
+}
+
+void phone_git_hash(char *out, size_t size) {
+    strncpy(out, "@phone_GIT_HASH@", size);
+}
+
+void phone_git_description(char *out, size_t size) {
+    strncpy(out, "@phone_GIT_DESCRIPTION@", size);
 }
 //NOLINTEND

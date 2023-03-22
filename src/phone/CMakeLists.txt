@@ -1,9 +1,29 @@
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(PJPROJECT REQUIRED libpjproject)
 
-configure_file(version.cpp.in version.cpp @ONLY)
+find_package(Git REQUIRED)
+execute_process(
+        COMMAND ${GIT_EXECUTABLE} rev-parse HEAD
+        RESULT_VARIABLE result
+        OUTPUT_VARIABLE phone_GIT_HASH
+        OUTPUT_STRIP_TRAILING_WHITESPACE)
+if(result)
+    message(FATAL_ERROR "failed to get git hash: ${result}")
+endif()
 
-add_library(phone_version OBJECT ${CMAKE_CURRENT_BINARY_DIR}/version.cpp)
+execute_process(
+        COMMAND ${GIT_EXECUTABLE} describe --dirty
+        RESULT_VARIABLE result
+        OUTPUT_VARIABLE phone_GIT_DESCRIPTION
+        OUTPUT_STRIP_TRAILING_WHITESPACE)
+if(result)
+    message(FATAL_ERROR "failed to get git description: ${result}")
+endif()
+
+configure_file(version_c.cpp.in version.cpp @ONLY)
+configure_file(version_cpp.cpp.in version_cpp.cpp @ONLY)
+
+add_library(phone_version OBJECT ${CMAKE_CURRENT_BINARY_DIR}/version.cpp ${CMAKE_CURRENT_BINARY_DIR}/version_cpp.cpp)
 
 target_include_directories(phone_version
         PUBLIC

@@ -89,10 +89,18 @@ int main() {
 
     // repl
     int command;
+    char git_hash[128];
+    char git_description[128];
+    phone_git_hash(git_hash, sizeof(git_hash));
+    phone_git_description(git_description, sizeof(git_description));
     do {
         printf("last call index: %d\n", state->last_call_index);
         printf("last call id: %s\n", state->last_call_id);
-        printf("libphone version %d.%d.%d\n\n", phone_version_major(), phone_version_minor(), phone_version_patch());
+        printf("libphone version %d.%d.%d (%s)\n",
+               phone_version_major(), phone_version_minor(), phone_version_patch(),
+               git_hash);
+        printf("%s\n\n", git_description);
+
         command = getchar();
 
         switch (command) {
