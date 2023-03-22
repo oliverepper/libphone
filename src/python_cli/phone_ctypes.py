@@ -42,6 +42,14 @@ except Found as f:
 # defines
 PHONE_STATUS_SUCCESS = 0
 
+# device_filter
+device_filter_t = c_int
+DEVICE_FILTER_NONE = 0
+DEVICE_FILTER_INPUT = 1
+DEVICE_FILTER_OUPUT = 2
+
+
+
 # create_phone
 __phone_create = libphone.phone_create
 __phone_create.restype = c_void_p
@@ -61,6 +69,11 @@ phone_register_on_incoming_call_id_callback.argtypes = [c_void_p, c_void_p, c_vo
 phone_register_on_call_state_index_callback = libphone.phone_register_on_call_state_index_callback
 phone_register_on_call_state_index_callback.restype = None
 phone_register_on_call_state_index_callback.argtypes = [c_void_p, c_void_p, c_void_p]
+
+# phone_register_on_call_state_callback
+phone_register_on_call_state_id_callback = libphone.phone_register_on_call_state_id_callback
+phone_register_on_call_state_id_callback.restype = None
+phone_register_on_call_state_id_callback.argtypes = [c_void_p, c_void_p, c_void_p]
 
 # phone_configure_opus
 phone_configure_opus = libphone.phone_configure_opus
@@ -82,17 +95,33 @@ __phone_make_call = libphone.phone_make_call
 __phone_make_call.restype = c_int
 __phone_make_call.argtypes = [c_void_p, c_char_p]
 
+# phone_answer_call_index
+__phone_answer_call_index = libphone.phone_answer_call_index
+__phone_answer_call_index.restype = c_int
+__phone_answer_call_index.argtypes = [c_void_p, c_int]
+
+# phone_answer_call_id
+__phone_answer_call_id = libphone.phone_answer_call_id
+__phone_answer_call_id.restype = c_int
+__phone_answer_call_id.argtypes = [c_void_p, c_char_p]
+
 # phone_answer_call
-phone_answer_call = libphone.phone_answer_call
-phone_answer_call.restype = c_int
-phone_answer_call.argtypes = [c_void_p, c_int]
+phone_answer_call = __phone_answer_call_index
 
 # phone_hangup_call
-phone_hangup_call = libphone.phone_hangup_call
-phone_hangup_call.restype = c_int
-phone_hangup_call.argtypes = [c_void_p, c_int]
+__phone_hangup_call_index = libphone.phone_hangup_call
+__phone_hangup_call_index.restype = c_int
+__phone_hangup_call_index.argtypes = [c_void_p, c_int]
 
 # phone_hangup_call
+__phone_hangup_call_id = libphone.phone_hangup_call_id
+__phone_hangup_call_id.restype = c_int
+__phone_hangup_call_id.argtypes = [c_void_p, c_char_p]
+
+# phone_hangup_call
+phone_hangup_call = __phone_hangup_call_index
+
+# phone_hangup_calls
 phone_hangup_calls = libphone.phone_hangup_calls
 phone_hangup_calls.restype = None
 phone_hangup_calls.argtypes = [c_void_p]
@@ -115,7 +144,7 @@ phone_get_audio_device_info_name_length.argtypes = None
 # phone_get_audio_device_names
 __phone_get_audio_device_names = libphone.phone_get_audio_device_names
 __phone_get_audio_device_names.restype = c_int
-__phone_get_audio_device_names.argtypes = [POINTER(c_char_p), POINTER(c_size_t), c_size_t, c_int]
+__phone_get_audio_device_names.argtypes = [POINTER(c_char_p), POINTER(c_size_t), c_size_t, device_filter_t]
 
 # set audio device
 phone_set_audio_devices = libphone.phone_set_audio_devices
@@ -173,8 +202,8 @@ def die(instance):
 
 
 def phone_get_audio_device_names(filter):
-    if not 0 <= filter <= 2:
-        filter = 0
+    if not DEVICE_FILTER_NONE <= filter <= DEVICE_FILTER_OUPUT:
+        filter = DEVICE_FILTER_NONE
     c_count = c_size_t(phone_get_audio_devices_count())
     max_device_name_length = phone_get_audio_device_info_name_length()
     device_names = (c_char_p * c_count.value)()
@@ -216,6 +245,16 @@ def phone_make_call(phone, uri):
     return __phone_make_call(phone, c_uri)
 
 
+def phone_answer_call_id(phone, call_id):
+    c_call_id = c_char_p(call_id.encode('utf-8'))
+    return __phone_answer_call_id(phone, c_call_id)
+
+
+def phone_hangup_call_id(phone, call_id):
+    c_call_id = c_char_p(call_id.encode('utf-8'))
+    return __phone_hangup_call_id(phone, c_call_id)
+
+
 def phone_state_name(state):
     buffer = create_string_buffer(64)
     __phone_state_name(buffer, len(buffer), state)
@@ -225,9 +264,11 @@ def phone_state_name(state):
 helptext = '''
 c - call a number
 C - call Time Announcement of Telekom Germany
-a - answer a call
-h - hangup a call
-H - kill all calls
+a - answer a call (index)
+A - answer a call (id)
+h - hangup a call (index)
+H - hangup a call (id)
+e - kill all calls
 l - change log level
 d - list audio devices
 D - change audio devices

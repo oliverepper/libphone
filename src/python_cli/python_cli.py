@@ -13,7 +13,7 @@ useragent           = "Python CLI Phone"
 nameservers         = ["217.237.148.22", "217.237.150.51"]
 stunservers         = ["stun.t-online.de"]
 sipserver           = "tel.t-online.de"
-username            = "+49..."
+username            = "+4965191899543"
 password            = None
 opus_channel_count  = 1
 opus_complexity     = 8
@@ -46,16 +46,26 @@ def on_incoming_call_id_cb(call_id, ctx):
 # noinspection PyShadowingNames,PyUnusedLocal
 @CFUNCTYPE(None, c_int, c_int, c_void_p)
 def on_call_state_index_cb(call_index, state, ctx):
-    print(f"Call: {call_index} – state: {phone_state_name(state)}")
+    print(f"Call index: {call_index} and id: {phone_get_call_id(phone, call_index)} – state: {phone_state_name(state)}")
+
+
+# noinspection PyShadowingNames,PyUnusedLocal
+@CFUNCTYPE(None, c_char_p, c_int, c_void_p)
+def on_call_state_id_cb(call_id, state, ctx):
+    print(f"Call id: {call_id.decode('utf-8')} and index: {phone_get_call_index(phone, call_id)} – state: {phone_state_name(state)}")
 
 
 phone_register_on_incoming_call_index_callback(phone, on_incoming_call_index_cb, None)
 phone_register_on_incoming_call_id_callback(phone, on_incoming_call_id_cb, None)
 phone_register_on_call_state_index_callback(phone, on_call_state_index_cb, None)
+phone_register_on_call_state_id_callback(phone, on_call_state_id_cb, None)
+
 
 if phone_configure_opus(phone, opus_channel_count, opus_complexity, opus_sample_rate) != PHONE_STATUS_SUCCESS:
     die(phone)
 if phone_connect(phone, sipserver, username, password) != PHONE_STATUS_SUCCESS:
+    die(phone)
+if phone_set_audio_devices(0, 1) != PHONE_STATUS_SUCCESS:
     die(phone)
 
 print(helptext)
@@ -74,11 +84,19 @@ while command != 'q':
         call_id = int(input("please enter call id: "))
         if phone_answer_call(phone, call_id) != PHONE_STATUS_SUCCESS:
             print(phone_last_error())
+    elif command == 'A':
+        call_id = input("please enter call id: ")
+        if (phone_answer_call_id(phone, call_id)) != PHONE_STATUS_SUCCESS:
+            print(phone_last_error())
     elif command == 'h':
         call_id = int(input("please enter call id: "))
         if phone_hangup_call(phone, call_id) != PHONE_STATUS_SUCCESS:
             print(phone_last_error())
     elif command == 'H':
+        call_id = input("please enter call id: ")
+        if phone_hangup_call_id(phone, call_id) != PHONE_STATUS_SUCCESS:
+            print(phone_last_error())
+    elif command == 'e':
         phone_hangup_calls(phone)
     elif command == 'l':
         level = int(input("please enter desired log-level 0..6: "))
