@@ -37,3 +37,4 @@ set_target_properties(phone_sharedlib PROPERTIES
     SOVERSION 0
     PUBLIC_HEADER "${phone_PUBLIC_HEADERS}")
 target_link_libraries(phone_sharedlib PUBLIC phone phone_version)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/include/phone/version.h DESTINATION include/phone)
