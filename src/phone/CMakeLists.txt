@@ -10,7 +10,7 @@ target_include_directories(phone_version
         ${CMAKE_CURRENT_SOURCE_DIR}/include
         ${CMAKE_CURRENT_BINARY_DIR})
 
-add_library(phone OBJECT phone.cpp phone_instance_t.cpp include/phone/account_t.h include/phone/call_t.h)
+add_library(phone OBJECT phone.cpp phone_instance_t.cpp include/private/account_t.h include/private/call_t.h)
 
 include(GenerateExportHeader)
 generate_export_header(phone BASE_NAME "phone")
@@ -37,4 +37,4 @@ set_target_properties(phone_sharedlib PROPERTIES
     SOVERSION 0
     PUBLIC_HEADER "${phone_PUBLIC_HEADERS}")
 target_link_libraries(phone_sharedlib PUBLIC phone phone_version)
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/include/phone/version.h DESTINATION include/phone)
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/phone DESTINATION include)
