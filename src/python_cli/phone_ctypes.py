@@ -46,7 +46,8 @@ PHONE_STATUS_SUCCESS = 0
 device_filter_t = c_int
 DEVICE_FILTER_NONE = 0
 DEVICE_FILTER_INPUT = 1
-DEVICE_FILTER_OUPUT = 2
+DEVICE_FILTER_OUTPUT = 2
+
 
 # PHONE_EXPORT phone_t phone_create(const char *user_agent,
 #                                   const char * const nameserver[], size_t nameserver_count,
@@ -197,7 +198,7 @@ def phone_get_call_index(phone, call_id):
     index = c_int()
     if __phone_get_call_index(phone, call_id, byref(index)) != PHONE_STATUS_SUCCESS:
         raise Exception(f"could not get call_index for id {call_id.value.decode('utf-8')}")
-    return  index.value
+    return index.value
 
 
 # PHONE_EXPORT void phone_refresh_audio_devices();
@@ -219,12 +220,12 @@ phone_get_audio_device_info_name_length.argtypes = None
 
 
 # PHONE_EXPORT phone_status_t phone_get_audio_device_names(char **device_names, size_t *devices_count, size_t max_device_name_length, device_filter_t filter);
-def phone_get_audio_device_names(filter):
+def phone_get_audio_device_names(device_filter):
     __phone_get_audio_device_names = libphone.phone_get_audio_device_names
     __phone_get_audio_device_names.restype = c_int
     __phone_get_audio_device_names.argtypes = [POINTER(c_char_p), POINTER(c_size_t), c_size_t, device_filter_t]
-    if not DEVICE_FILTER_NONE <= filter <= DEVICE_FILTER_OUPUT:
-        filter = DEVICE_FILTER_NONE
+    if not DEVICE_FILTER_NONE <= device_filter <= DEVICE_FILTER_OUTPUT:
+        device_filter = DEVICE_FILTER_NONE
     c_count = c_size_t(phone_get_audio_devices_count())
     max_device_name_length = phone_get_audio_device_info_name_length()
     device_names = (c_char_p * c_count.value)()
@@ -232,10 +233,10 @@ def phone_get_audio_device_names(filter):
     for i in range(c_count.value):
         device_names[i] = cast(create_string_buffer(max_device_name_length), c_char_p)
 
-    if __phone_get_audio_device_names(device_names, byref(c_count), max_device_name_length, filter) != PHONE_STATUS_SUCCESS:
+    if __phone_get_audio_device_names(device_names, byref(c_count), max_device_name_length, device_filter) != PHONE_STATUS_SUCCESS:
         return []
 
-    return [e.decode('utf-8') for e in device_names[:c_count.value]]
+    return [device_name.decode('utf-8') for device_name in device_names[:c_count.value]]
 
 
 # PHONE_EXPORT phone_status_t phone_set_audio_devices(int capture_device, int playback_device);

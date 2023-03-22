@@ -37,6 +37,7 @@ phone_set_log_level(0)
 def on_incoming_call_index_cb(call_index, ctx):
     print(f"Incoming call with index: {call_index} and id: {phone_get_call_id(phone, call_index)}")
 
+
 @CFUNCTYPE(None, c_char_p, c_void_p)
 def on_incoming_call_id_cb(call_id, ctx):
     c_faulty_string = c_char_p('🥷'.encode('utf-8'))
@@ -109,10 +110,10 @@ while command != 'q':
     2 - playback devices
         """)
         try:
-            filter = int(input("do you want a filter?: "))
+            device_filter = int(input("do you want a filter?: "))
         except ValueError:
-            filter = DEVICE_FILTER_NONE
-        for idx, device in enumerate(phone_get_audio_device_names(filter)):
+            device_filter = DEVICE_FILTER_NONE
+        for idx, device in enumerate(phone_get_audio_device_names(device_filter)):
             print(f"{idx} - {device}")
         print()
     elif command == 'D':
