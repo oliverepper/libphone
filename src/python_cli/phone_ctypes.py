@@ -269,6 +269,47 @@ phone_set_log_level.restype = None
 phone_set_log_level.argtypes = [c_int]
 
 
+# PHONE_EXPORT unsigned phone_version_major();
+phone_version_major = libphone.phone_version_major
+phone_version_major.restype = c_uint
+phone_version_major.argtypes = None
+
+# PHONE_EXPORT unsigned phone_version_minor();
+phone_version_minor = libphone.phone_version_minor
+phone_version_minor.restype = c_uint
+phone_version_minor.argtypes = None
+
+# PHONE_EXPORT unsigned phone_version_patch();
+phone_version_patch = libphone.phone_version_patch
+phone_version_patch.restype = c_uint
+phone_version_patch.argtypes = None
+
+# __attribute__((unused)) unsigned phone_version_tweak();
+phone_version_tweak = libphone.phone_version_tweak
+phone_version_tweak.restype = c_uint
+phone_version_tweak.argtypes = None
+
+
+# PHONE_EXPORT void phone_git_hash(char *out, size_t size);
+def phone_git_hash():
+    __phone_git_hash = libphone.phone_git_hash
+    __phone_git_hash.restype = None
+    __phone_git_hash.argtypes = [c_char_p, c_size_t]
+    buffer = create_string_buffer(64)
+    __phone_git_hash(buffer, len(buffer))
+    return buffer.value.decode('utf-8')
+
+
+# PHONE_EXPORT void phone_git_description(char *out, size_t size);
+def phone_git_description():
+    __phone_git_description = libphone.phone_git_description
+    __phone_git_description.restype = None
+    __phone_git_description.argtypes = [c_char_p, c_size_t]
+    buffer = create_string_buffer(64)
+    __phone_git_description(buffer, len(buffer))
+    return buffer.value.decode('utf-8')
+
+
 def die(instance):
     phone_destroy(instance)
     phone_last_error()

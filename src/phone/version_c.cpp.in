@@ -14,7 +14,7 @@ unsigned phone_version_patch() {
     return @phone_VERSION_PATCH@ + 0;
 }
 
-__attribute__((unused)) unsigned phone_version_tweak() {
+unsigned phone_version_tweak() {
     return @phone_VERSION_TWEAK@ + 0;
 }
 

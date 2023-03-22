@@ -97,8 +97,7 @@ int main() {
         printf("last call index: %d\n", state->last_call_index);
         printf("last call id: %s\n", state->last_call_id);
         printf("libphone version %d.%d.%d (%s)\n",
-               phone_version_major(), phone_version_minor(), phone_version_patch(),
-               git_hash);
+               phone_version_major(), phone_version_minor(), phone_version_patch(), git_hash);
         printf("%s\n\n", git_description);
 
         command = getchar();

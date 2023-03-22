@@ -73,6 +73,11 @@ print(helptext)
 
 command = ''
 while command != 'q':
+    print(f"libphone version {phone_version_major()}.{phone_version_minor()}.{phone_version_patch()}-{phone_version_tweak()}")
+    print(phone_git_hash())
+    print(phone_git_description())
+    print()
+
     command = input()
     if command == 'C':
         if phone_make_call(phone, buddy) != PHONE_STATUS_SUCCESS:
