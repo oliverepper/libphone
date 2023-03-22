@@ -1,0 +1,19 @@
+//NOLINTBEGIN
+#include <phone/version.h>
+
+unsigned phone_version_major() {
+    return @phone_VERSION_MAJOR@;
+}
+
+unsigned phone_version_minor() {
+    return @phone_VERSION_MINOR@ + 0;
+}
+
+unsigned phone_version_patch() {
+    return @phone_VERSION_PATCH@ + 0;
+}
+
+__attribute__((unused)) unsigned phone_version_tweak() {
+    return @phone_VERSION_TWEAK@ + 0;
+}
+//NOLINTEND
