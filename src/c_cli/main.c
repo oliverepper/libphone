@@ -1,5 +1,6 @@
 #include "helper.h"
 #include <phone.h>
+#include <phone/version.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -91,6 +92,7 @@ int main() {
     do {
         printf("last call index: %d\n", state->last_call_index);
         printf("last call id: %s\n", state->last_call_id);
+        printf("libphone version %d.%d.%d\n\n", phone_version_major(), phone_version_minor(), phone_version_patch());
         command = getchar();
 
         switch (command) {
