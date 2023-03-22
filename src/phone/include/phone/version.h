@@ -6,9 +6,11 @@ extern "C"
 {
 #endif
 
-unsigned phone_version_major();
-unsigned phone_version_minor();
-unsigned phone_version_patch();
+#include <phone_export.h>
+
+PHONE_EXPORT unsigned phone_version_major();
+PHONE_EXPORT unsigned phone_version_minor();
+PHONE_EXPORT unsigned phone_version_patch();
 __attribute__((unused)) unsigned phone_version_tweak();
 
 #ifdef __cplusplus

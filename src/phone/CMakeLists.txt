@@ -1,11 +1,14 @@
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(PJPROJECT REQUIRED libpjproject)
 
-configure_file(version.cpp.in phone_version.cpp @ONLY)
+configure_file(version.cpp.in version.cpp @ONLY)
 
-add_library(phone_version STATIC ${CMAKE_CURRENT_BINARY_DIR}/phone_version.cpp)
+add_library(phone_version OBJECT ${CMAKE_CURRENT_BINARY_DIR}/version.cpp)
 
-target_include_directories(phone_version PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(phone_version
+        PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+        ${CMAKE_CURRENT_BINARY_DIR})
 
 add_library(phone OBJECT phone.cpp phone_instance_t.cpp include/phone/account_t.h include/phone/call_t.h)
 
@@ -20,7 +23,7 @@ target_include_directories(phone
         ${CMAKE_CURRENT_BINARY_DIR}
         PRIVATE
         include/phone)
-target_link_libraries(phone PRIVATE ${PJPROJECT_LINK_LIBRARIES} phone_version)
+target_link_libraries(phone PRIVATE ${PJPROJECT_LINK_LIBRARIES})
 
 set(phone_PUBLIC_HEADERS
         ${CMAKE_CURRENT_SOURCE_DIR}/include/phone.h
@@ -33,4 +36,4 @@ set_target_properties(phone_sharedlib PROPERTIES
     VERSION ${CMAKE_PROJECT_VERSION}
     SOVERSION 0
     PUBLIC_HEADER "${phone_PUBLIC_HEADERS}")
-target_link_libraries(phone_sharedlib PUBLIC phone)
+target_link_libraries(phone_sharedlib PUBLIC phone phone_version)

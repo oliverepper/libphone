@@ -1,4 +1,5 @@
 #include <phone_instance_t.h>
+#include <phone/version.h>
 #include <iostream>
 #include <thread>
 
@@ -56,6 +57,9 @@ auto main() -> int {
 
         // repl
         char command = 'q';
+        std::cout << "libphone version: " << phone_version_major() << "."
+                                          << phone_version_minor() << "."
+                                          << phone_version_patch() << std::endl;
         do {
             std::cin >> command;
             if (command == 'c') {
