@@ -474,6 +474,32 @@ phone_status_t phone_call_answer_after_id(phone_t instance, const char *call_id,
     return PHONE_STATUS_SUCCESS;
 }
 
+phone_status_t phone_call_answer_after_index(phone_t instance, int call_index, int *answer_after) {
+    try {
+        auto call_answer_after = instance->call_answer_after(call_index);
+        *answer_after = -1;
+        if (call_answer_after.has_value())
+            *answer_after = call_answer_after.value();
+    } catch (const phone::exception& e) {
+        strncpy(global_last_error, e.what(), sizeof(global_last_error));
+        return PHONE_STATUS_FAILURE;
+    }
+    return PHONE_STATUS_SUCCESS;
+}
+
+phone_status_t phone_call_answer_after_id(phone_t instance, const char *call_id, int *answer_after) {
+    try {
+        auto call_answer_after = instance->call_answer_after(call_id);
+        *answer_after = -1;
+        if (call_answer_after.has_value())
+            *answer_after = call_answer_after.value();
+    } catch (const phone::exception& e) {
+        strncpy(global_last_error, e.what(), sizeof(global_last_error));
+        return PHONE_STATUS_FAILURE;
+    }
+    return PHONE_STATUS_SUCCESS;
+}
+
 
 
 
