@@ -3,6 +3,8 @@
 #include <iostream>
 #include <thread>
 
+auto password_function = []() { return PASSWORD; };
+
 struct app_state {
     phone_instance_t phone;
     std::string last_call_id;
@@ -72,7 +74,7 @@ auto main() -> int {
                 std::cin >> number;
                 state.phone.make_call(number);
             } else if (command == 'C') {
-                state.phone.make_call("+491804100100");
+                state.phone.make_call(BUDDY_NUMBER);
             } else if (command == 'a') {
                 int call_index;
                 std::cout << "please enter call index: ";

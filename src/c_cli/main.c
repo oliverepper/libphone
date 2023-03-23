@@ -113,7 +113,7 @@ int main() {
                 break;
             case 'C':
                 clear_input_buffer();
-                if (phone_make_call(state->phone, "+491804100100") != PHONE_STATUS_SUCCESS)
+                if (phone_make_call(state->phone, BUDDY_NUMBER) != PHONE_STATUS_SUCCESS)
                     fprintf(stderr, "%s\n", phone_last_error());
                 break;
             case 'a':
