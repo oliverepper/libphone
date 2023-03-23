@@ -35,11 +35,20 @@ public:
             auto call_info_header = static_cast<pjsip_generic_string_hdr *>(pjsip_msg_find_hdr_by_name(rx_data->msg_info.msg, &call_info_key,
                                                                                                        nullptr));
 
-            if (call_info_header) {
-                auto answer_after_key = pj_str((char *)"answer-after");
-                char *pos = pj_stristr(&call_info_header->hvalue, &answer_after_key);
-                pos = strstr(pos, "=");
-                m_calls.back()->answer_after.emplace(std::stoi(++pos));
+            while (call_info_header != nullptr) {
+                do {
+                    auto answer_after_key = pj_str((char *)"answer-after");
+                    char *pos = pj_stristr(&call_info_header->hvalue, &answer_after_key);
+                    if (pos == nullptr)
+                        break;
+                    pos = strstr(pos, "=");
+                    if (pos == nullptr)
+                        break;
+                    m_calls.back()->answer_after.emplace(std::stoi(++pos));
+                } while (false);
+                if (m_calls.back()->answer_after.has_value())
+                    break;
+                call_info_header = static_cast<pjsip_generic_string_hdr *>(pjsip_msg_find_hdr_by_name(rx_data->msg_info.msg, &call_info_key, call_info_header->next));
             }
         }
 
