@@ -197,3 +197,35 @@ void phone_instance_t::set_audio_devices(int capture_index, int playback_index) 
 void phone_instance_t::refresh_audio_devices() {
     pjmedia_aud_dev_refresh();
 }
+
+std::optional<std::string> phone_instance_t::call_incoming_message(int call_index) {
+    try {
+        return m_account->call_incoming_message(call_index);
+    } catch (const std::invalid_argument& e) {
+        throw phone::exception{e.what()};
+    }
+}
+
+std::optional<std::string> phone_instance_t::call_incoming_message(const std::string& call_id) {
+    try {
+        return m_account->call_incoming_message(call_id);
+    } catch (const std::invalid_argument& e) {
+        throw phone::exception{e.what()};
+    }
+}
+
+std::optional<int> phone_instance_t::call_answer_after(int call_index) {
+    try {
+        return m_account->call_answer_after(call_index);
+    } catch (const std::invalid_argument& e) {
+        throw phone::exception{e.what()};
+    }
+}
+
+std::optional<int> phone_instance_t::call_answer_after(const std::string& call_id) {
+    try {
+        return m_account->call_answer_after(call_id);
+    } catch (const std::invalid_argument& e) {
+        throw phone::exception{e.what()};
+    }
+}
