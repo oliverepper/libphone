@@ -1,6 +1,5 @@
 //NOLINTBEGIN
 #include <phone/version.hpp>
-#include <cstring>
 
 std::string phone_git_hash() {
     return "@phone_GIT_HASH@";
