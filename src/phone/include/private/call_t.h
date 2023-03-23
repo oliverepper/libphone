@@ -8,6 +8,9 @@ public:
     std::optional<std::function<void(int, int)>> on_call_state_with_index;
     std::optional<std::function<void(std::string, int)>> on_call_state_with_id;
 
+    std::optional<std::string> incoming_message;
+    std::optional<int> answer_after;
+
     explicit call_t(pj::Account &account, std::function<void(int)> delete_from_account, int call_id = PJSUA_INVALID_ID)
             : pj::Call(account, call_id), m_delete_call_from_account{std::move(delete_from_account)} {}
 
