@@ -21,7 +21,7 @@ void on_incoming_call_with_index_cb(int call_index, __attribute__((unused)) void
     s->last_call_index = call_index;
 
     char call_id_buffer[128] = {0};
-    if (phone_get_call_id(s->phone, 100, call_id_buffer, sizeof(call_id_buffer)) != PHONE_STATUS_SUCCESS)
+    if (phone_get_call_id(s->phone, call_index, call_id_buffer, sizeof(call_id_buffer)) != PHONE_STATUS_SUCCESS)
         fprintf(stderr, "%s\n", phone_last_error());
 
     printf("Incoming call index: %d, id: %s\n", call_index, call_id_buffer);
