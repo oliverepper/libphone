@@ -2,7 +2,7 @@
 #define PHONE_VERSION_H
 
 #include <phone_export.h>
-#include <cstddef>
+#include <stddef.h>
 
 #ifdef __cplusplus
 extern "C"
