@@ -25,6 +25,8 @@ endif()
 message(DEBUG "CMAKE_INSTALL_RPATH: ${CMAKE_INSTALL_RPATH}")
 list(POP_BACK CMAKE_MESSAGE_INDENT)
 
+include(cmake/credentials.cmake)
+
 add_subdirectory(src bin)
 
 install(TARGETS phone_sharedlib)

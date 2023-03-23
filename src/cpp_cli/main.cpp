@@ -53,7 +53,7 @@ auto main() -> int {
         state.phone.configure_opus();
 
         // connect
-        state.phone.connect("tel.t-online.de", "+4965191899543");
+        state.phone.connect(SERVER, USER, PASSWORD_FUNCTION);
 
         // repl
         char command = 'q';

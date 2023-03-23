@@ -82,9 +82,7 @@ int main() {
         die(state->phone);
 
     // connect
-    if (phone_connect(state->phone,
-                      "tel.t-online.de",
-                      "+4965191899543", NULL) != PHONE_STATUS_SUCCESS)
+    if (phone_connect(state->phone, SERVER, USER, PASSWORD) != PHONE_STATUS_SUCCESS)
         die(state->phone);
 
     // repl
