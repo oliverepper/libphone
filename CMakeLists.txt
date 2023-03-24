@@ -25,13 +25,6 @@ endif()
 message(DEBUG "CMAKE_INSTALL_RPATH: ${CMAKE_INSTALL_RPATH}")
 list(POP_BACK CMAKE_MESSAGE_INDENT)
 
-
-if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/myfile.txt")
-    # Do something if myfile.txt exists
-else()
-    # Do something if myfile.txt does not exist
-endif()
-
 if (EXISTS "${CMAKE_SOURCE_DIR}/cmake/credentials.cmake")
     include(cmake/credentials.cmake)
 else()

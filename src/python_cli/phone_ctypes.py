@@ -256,7 +256,7 @@ def phone_call_answer_after_index(phone, call_index):
     return answer_after.value
 
 
-#PHONE_EXPORT phone_status_t phone_call_answer_after_id(phone_t instance, const char *call_id, int *answer_after);
+# PHONE_EXPORT phone_status_t phone_call_answer_after_id(phone_t instance, const char *call_id, int *answer_after);
 def phone_call_answer_after_id(phone, call_id):
     __phone_call_answer_after_id = libphone.phone_call_answer_after_id
     __phone_call_answer_after_id.restype = c_int

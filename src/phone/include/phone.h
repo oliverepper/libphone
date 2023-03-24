@@ -26,7 +26,7 @@ typedef struct {
     char *driver;
     char *name;
     unsigned input_count;
-    unsigned ouput_count;
+    unsigned output_count;
 } audio_device_info_t;
 
 PHONE_EXPORT phone_t phone_create(const char *user_agent,
