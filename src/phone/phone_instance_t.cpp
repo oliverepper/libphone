@@ -155,11 +155,11 @@ int phone_instance_t::get_call_index(const std::string& call_id) {
     }
 }
 
-std::vector<phone::audio_device_info> phone_instance_t::get_audio_devices() {
-    std::vector<phone::audio_device_info> result{pjmedia_aud_dev_count()};
+std::vector<phone::audio_device_info_t> phone_instance_t::get_audio_devices() {
+    std::vector<phone::audio_device_info_t> result{pjmedia_aud_dev_count()};
 
     int index = 0;
-    for (phone::audio_device_info& i : result) {
+    for (phone::audio_device_info_t& i : result) {
         pjmedia_aud_dev_info info;
         auto status = pjmedia_aud_dev_get_info(index, &info);
         if (status != PJ_SUCCESS) {

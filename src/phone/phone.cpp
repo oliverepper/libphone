@@ -167,15 +167,7 @@ phone_status_t phone_get_call_index(phone_t instance, const char *call_id, int *
     return PHONE_STATUS_SUCCESS;
 }
 
-size_t phone_get_audio_devices_count() {
-    return pjmedia_aud_dev_count();
-}
-
-size_t phone_get_audio_device_info_name_length() {
-    return PJMEDIA_AUD_DEV_INFO_NAME_LEN;
-}
-
-const char* phone_last_error() {
+const char* phone_last_error(void) {
     return global_last_error;
 }
 
@@ -183,8 +175,20 @@ void phone_state_name(char *buffer, size_t buffer_size, int state) {
     strncpy(buffer, std::string{phone::state_name(state)}.c_str(), buffer_size);
 }
 
+void phone_refresh_audio_devices(void) {
+    phone_instance_t::refresh_audio_devices();
+}
+
+size_t phone_get_audio_devices_count(void) {
+    return pjmedia_aud_dev_count();
+}
+
+size_t phone_get_audio_device_info_name_length(void) {
+    return PJMEDIA_AUD_DEV_INFO_NAME_LEN;
+}
+
 phone_status_t phone_get_audio_device_names(char **device_names, size_t *devices_count, size_t max_device_name_length, device_filter_t filter) {
-    std::function<bool(phone::audio_device_info)> pred;
+    std::function<bool(phone::audio_device_info_t)> pred;
     switch (filter) {
         case DEVICE_FILTER_INPUT:
             pred = [](const auto& info){ return info.input_count == 0; };
@@ -197,7 +201,7 @@ phone_status_t phone_get_audio_device_names(char **device_names, size_t *devices
             break;
     }
 
-    std::vector<phone::audio_device_info> devices{*devices_count};
+    std::vector<phone::audio_device_info_t> devices{*devices_count};
     try {
         devices = phone_instance_t::get_audio_devices();
     } catch (const phone::exception& e) {
@@ -228,13 +232,10 @@ phone_status_t phone_set_audio_devices(int capture_device, int playback_device) 
     return PHONE_STATUS_SUCCESS;
 }
 
-void phone_refresh_audio_devices() {
-    phone_instance_t::refresh_audio_devices();
+phone_status_t
+phone_get_audio_devices(audio_device_info_t *devices, size_t *devices_count, size_t max_device_name_length,
+                        size_t max_driver_name_length) {
+    // TODO: implement
+    strncpy(global_last_error, "not yet implemented", sizeof(global_last_error));
+    return PHONE_STATUS_FAILURE;
 }
-
-
-
-
-
-
-
