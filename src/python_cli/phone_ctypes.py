@@ -197,7 +197,7 @@ def phone_get_call_index(phone, call_id):
     __phone_get_call_index.argtypes = [c_void_p, c_char_p, POINTER(c_int)]
     index = c_int()
     if __phone_get_call_index(phone, call_id, byref(index)) != PHONE_STATUS_SUCCESS:
-        raise Exception(f"could not get call_index for id {call_id.value.decode('utf-8')}")
+        raise Exception(phone_last_error())
     return index.value
 
 
@@ -243,6 +243,28 @@ def phone_get_audio_device_names(device_filter):
 phone_set_audio_devices = libphone.phone_set_audio_devices
 phone_set_audio_devices.restype = c_int
 phone_set_audio_devices.argtypes = [c_int, c_int]
+
+
+# PHONE_EXPORT phone_status_t phone_call_answer_after_index(phone_t instance, int call_index, int *answer_after);
+def phone_call_answer_after_index(phone, call_index):
+    __phone_call_answer_after_index = libphone.phone_call_answer_after_index
+    __phone_call_answer_after_index.restype = c_int
+    __phone_call_answer_after_index.argtypes = [c_void_p, c_int, POINTER(c_int)]
+    answer_after = c_int()
+    if __phone_call_answer_after_index(phone, call_index, byref(answer_after)) != PHONE_STATUS_SUCCESS:
+        raise Exception(phone_last_error())
+    return answer_after.value
+
+
+#PHONE_EXPORT phone_status_t phone_call_answer_after_id(phone_t instance, const char *call_id, int *answer_after);
+def phone_call_answer_after_id(phone, call_id):
+    __phone_call_answer_after_id = libphone.phone_call_answer_after_id
+    __phone_call_answer_after_id.restype = c_int
+    __phone_call_answer_after_id.argtypes = [c_void_p, c_char_p, POINTER(c_int)]
+    answer_after = c_int()
+    if __phone_call_answer_after_id(phone, call_id, byref(answer_after)) != PHONE_STATUS_SUCCESS:
+        raise Exception(phone_last_error())
+    return answer_after.value
 
 
 # PHONE_EXPORT const char* phone_last_error(void);

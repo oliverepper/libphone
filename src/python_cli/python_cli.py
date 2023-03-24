@@ -2,6 +2,7 @@
 
 import os
 import sys
+import time
 
 current_file = os.path.abspath(__file__)
 current_dir = os.path.dirname(current_file)
@@ -37,11 +38,25 @@ phone_set_log_level(0)
 def on_incoming_call_index_cb(call_index, ctx):
     print(f"Incoming call with index: {call_index} and id: {phone_get_call_id(phone, call_index)}")
 
+    # answer_after = phone_call_answer_after_index(phone, call_index)
+    # if answer_after >= 0:
+    #     # FIXME: we need to be able to register threads!
+    #     print(f"will auto answer call after {answer_after} seconds")
+    #     time.sleep(answer_after)
+    #     phone_answer_call(phone, call_index)
+
 
 @CFUNCTYPE(None, c_char_p, c_void_p)
 def on_incoming_call_id_cb(call_id, ctx):
     c_faulty_string = c_char_p('🥷'.encode('utf-8'))
     print(f"Incoming call with id: {call_id.decode('utf-8')} and index: {phone_get_call_index(phone, call_id)}")
+
+    answer_after = phone_call_answer_after_id(phone, call_id)
+    if answer_after >= 0:
+        # FIXME: we need to be able to register threads!
+        print(f"will auto answer call after {answer_after} seconds")
+        time.sleep(answer_after)
+        phone_answer_call_id(phone, call_id.decode('utf-8'))
 
 
 # noinspection PyShadowingNames,PyUnusedLocal
