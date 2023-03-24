@@ -44,7 +44,13 @@ public:
                     pos = strstr(pos, "=");
                     if (pos == nullptr)
                         break;
-                    m_calls.back()->answer_after.emplace(std::stoi(++pos));
+                    try {
+                        m_calls.back()->answer_after.emplace(std::stoi(++pos));
+                    } catch (const std::invalid_argument& e) {
+                        PJ_LOG(1, (__BASE_FILE__, "%s", e.what()));
+                    } catch (const std::out_of_range& e) {
+                        PJ_LOG(1, (__BASE_FILE__, "%s", e.what()));
+                    }
                 } while (false);
                 if (m_calls.back()->answer_after.has_value())
                     break;
