@@ -2,3 +2,4 @@ build
 cmake-build-debug
 .idea
 TODO.md
+cmake/credentials.cmake
