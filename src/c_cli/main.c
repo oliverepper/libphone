@@ -3,6 +3,7 @@
 #include <phone/version.h>
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 
 void die(phone_t instance) {
     phone_destroy(instance);
@@ -25,6 +26,13 @@ void on_incoming_call_with_index_cb(int call_index, __attribute__((unused)) void
         fprintf(stderr, "%s\n", phone_last_error());
 
     printf("Incoming call index: %d, id: %s\n", call_index, call_id_buffer);
+
+    int answer_after;
+    phone_call_answer_after_index(s->phone, call_index, &answer_after);
+    if (answer_after >= 0) {
+        sleep(answer_after);
+        phone_answer_call_index(s->phone, call_index);
+    }
 }
 
 void on_incoming_call_with_id_cb(const char *call_id, __attribute__((unused)) void *ctx) {
@@ -35,6 +43,13 @@ void on_incoming_call_with_id_cb(const char *call_id, __attribute__((unused)) vo
         fprintf(stderr, "%s\n", phone_last_error());
 
     printf("Incoming call id: %s, index: %d\n", call_id, s->last_call_index);
+
+    int answer_after;
+    phone_call_answer_after_id(s->phone, call_id, &answer_after);
+    if (answer_after >= 0) {
+        sleep(answer_after);
+        phone_answer_call_id(s->phone, call_id);
+    }
 }
 
 void on_call_state_with_index_cb(int call_index, int state, void *ctx) {
