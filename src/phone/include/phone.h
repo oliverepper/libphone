@@ -16,6 +16,7 @@ typedef struct phone_instance_t *phone_t;
 typedef int phone_status_t;
 
 typedef enum {
+    // IDEA ABI breaking change better names: DEVICE_FILTER_NO_FILTER/ALL_DEVICES, DEVICE_FILTER_INPUT_DEVICES
     DEVICE_FILTER_NONE,
     DEVICE_FILTER_INPUT,
     DEVICE_FILTER_OUTPUT
@@ -62,9 +63,12 @@ PHONE_EXPORT phone_status_t phone_get_call_index(phone_t instance, const char *c
 
 PHONE_EXPORT void phone_refresh_audio_devices(void);
 PHONE_EXPORT size_t phone_get_audio_devices_count(void);
+PHONE_EXPORT size_t phone_get_audio_device_driver_name_length(void);
 PHONE_EXPORT size_t phone_get_audio_device_info_name_length(void);
-PHONE_EXPORT phone_status_t phone_get_audio_device_names(char **device_names, size_t *devices_count, size_t max_device_name_length, device_filter_t filter);
-PHONE_EXPORT phone_status_t phone_get_audio_devices(audio_device_info_t *devices, size_t *devices_count, size_t max_device_name_length, size_t max_driver_name_length);
+PHONE_DEPRECATED_EXPORT phone_status_t phone_get_audio_device_names(char **device_names, size_t *devices_count, size_t max_device_name_length, device_filter_t filter);
+PHONE_EXPORT phone_status_t
+phone_get_audio_devices(audio_device_info_t *devices, size_t *devices_count, size_t max_driver_name_length,
+                        size_t max_device_name_length, device_filter_t filter);
 PHONE_EXPORT phone_status_t phone_set_audio_devices(int capture_device, int playback_device);
 
 /**
