@@ -3,6 +3,7 @@
 #include <phone_instance_t.h>
 #include <vector>
 #include <cstring>
+#include <ranges>
 
 char global_last_error[1024] = "no error";
 
@@ -187,6 +188,13 @@ size_t phone_get_audio_device_info_name_length(void) {
     return PJMEDIA_AUD_DEV_INFO_NAME_LEN;
 }
 
+size_t phone_get_audio_device_driver_name_length(void) {
+    auto lens = std::views::transform(phone_instance_t::get_audio_devices(), [](const phone::audio_device_info_t& info){
+        return info.driver.length();
+    });
+    return std::ranges::max(lens);
+}
+
 phone_status_t phone_get_audio_device_names(char **device_names, size_t *devices_count, size_t max_device_name_length, device_filter_t filter) {
     std::function<bool(phone::audio_device_info_t)> pred;
     switch (filter) {
@@ -222,6 +230,47 @@ phone_status_t phone_get_audio_device_names(char **device_names, size_t *devices
     return PHONE_STATUS_SUCCESS;
 }
 
+phone_status_t
+phone_get_audio_devices(audio_device_info_t *devices, size_t *devices_count, size_t max_driver_name_length,
+                        size_t max_device_name_length, device_filter_t filter) {
+    std::function<bool(phone::audio_device_info_t)> pred;
+    switch (filter) {
+        case DEVICE_FILTER_INPUT:
+            pred = [](const auto& info){ return info.input_count > 0; };
+            break;
+        case DEVICE_FILTER_OUTPUT:
+            pred = [](const auto& info){ return info.output_count > 0; };
+            break;
+        default:
+            pred = [](const auto& info){ return true; };
+            break;
+    }
+
+    std::vector<phone::audio_device_info_t> _devices{*devices_count};
+    try {
+        _devices = phone_instance_t::get_audio_devices();
+    } catch (const phone::exception& e) {
+        strncpy(global_last_error, e.what(), std::size(global_last_error));
+        return PHONE_STATUS_FAILURE;
+    }
+
+    int i = 0;
+    for (const auto& e : _devices | std::views::filter(pred)) {
+        if (i < *devices_count) {
+            devices[i].id = e.id;
+            strncpy(devices[i].driver, e.driver.c_str(), max_driver_name_length);
+            devices[i].driver[max_driver_name_length - 1] = '\0';
+            strncpy(devices[i].name, e.name.c_str(), max_device_name_length);
+            devices[i].name[max_device_name_length - 1] = '\0';
+            devices[i].input_count = e.input_count;
+            devices[i].output_count = e.output_count;
+            ++i;
+        }
+    }
+    *devices_count = i;
+    return PHONE_STATUS_SUCCESS;
+}
+
 phone_status_t phone_set_audio_devices(int capture_device, int playback_device) {
     try {
         phone_instance_t::set_audio_devices(capture_device, playback_device);
@@ -230,14 +279,6 @@ phone_status_t phone_set_audio_devices(int capture_device, int playback_device) 
         return PHONE_STATUS_FAILURE;
     }
     return PHONE_STATUS_SUCCESS;
-}
-
-phone_status_t
-phone_get_audio_devices(audio_device_info_t *devices, size_t *devices_count, size_t max_device_name_length,
-                        size_t max_driver_name_length) {
-    // TODO: implement
-    strncpy(global_last_error, "not yet implemented", sizeof(global_last_error));
-    return PHONE_STATUS_FAILURE;
 }
 
 phone_status_t phone_call_answer_after_index(phone_t instance, int call_index, int *answer_after) {
