@@ -111,7 +111,7 @@ If you provide nameservers the library will use SRV lookup which is not supporte
 
 ## Handling of audio devices
 
-You can select the desired audio capture and audio playback device at any time. To list all the devices available in your system you can call `phone_get_audio_devices(DEVICE_FILTER_NONE)`. You can then iterate over this array and print out all the device information:
+You can select the desired audio capture and audio playback device at any time. To list all the devices available in your system you can call `phone_get_audio_devices(device_filter_t)`. You can then iterate over thre resulting array and print out all the device information:
 
 ```python
 for device in phone_get_audio_devices(device_filter):
