@@ -109,6 +109,25 @@ buddy               = "+491804100100"
 
 If you provide nameservers the library will use SRV lookup which is not supported by 1und1. Providing no nameservers the library will fall back to use the getaddr call to resolv just the sip-servers ip address.
 
+## Handling of audio devices
+
+You can select the desired audio capture and audio playback device at any time. To list all the devices available in your system you can call `phone_get_audio_devices(DEVICE_FILTER_NONE)`. You can then iterate over this array and print out all the device information:
+
+```python
+for device in phone_get_audio_devices(device_filter):
+    print(f"{device.id} - {device.driver}/{device.name} ({device.input_count}/{device.output_count})")
+```
+
+![CLI Demo Phone Audio List](python_cli_list_audio_devices.png)
+
+To select capture and playback device use the function `phone_set_audio_devices`:
+
+```python
+phone_set_audio_devices(capture_device_id, playback_device_id)
+```
+
+## answer-after
+
 ## Binaries
 
 If you want to try this out I maintain the following binary distributions:
