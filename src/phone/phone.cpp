@@ -222,6 +222,36 @@ phone_status_t phone_get_audio_device_names(char **device_names, size_t *devices
     return PHONE_STATUS_SUCCESS;
 }
 
+phone_status_t
+phone_get_audio_devices(audio_device_info_t *devices, size_t *devices_count, size_t max_device_name_length,
+                        size_t max_driver_name_length) {
+    std::vector<phone::audio_device_info_t> _devices{*devices_count};
+    try {
+        _devices = phone_instance_t::get_audio_devices();
+    } catch (const phone::exception& e) {
+        strncpy(global_last_error, e.what(), std::size(global_last_error));
+        return PHONE_STATUS_FAILURE;
+    }
+
+    // IDEA: maybe introduce the filter here, too
+
+    int i = 0;
+    for (const auto& e : _devices) {
+        if (i < *devices_count) {
+            devices[i].id = e.id;
+            strncpy(devices[i].driver, e.driver.c_str(), max_driver_name_length);
+            devices[i].driver[max_driver_name_length - 1] = '\0';
+            strncpy(devices[i].name, e.name.c_str(), max_device_name_length);
+            devices[i].name[max_device_name_length - 1] = '\0';
+            devices[i].input_count = e.input_count;
+            devices[i].output_count = e.output_count;
+            ++i;
+        }
+    }
+    *devices_count = i;
+    return PHONE_STATUS_SUCCESS;
+}
+
 phone_status_t phone_set_audio_devices(int capture_device, int playback_device) {
     try {
         phone_instance_t::set_audio_devices(capture_device, playback_device);
@@ -230,14 +260,6 @@ phone_status_t phone_set_audio_devices(int capture_device, int playback_device) 
         return PHONE_STATUS_FAILURE;
     }
     return PHONE_STATUS_SUCCESS;
-}
-
-phone_status_t
-phone_get_audio_devices(audio_device_info_t *devices, size_t *devices_count, size_t max_device_name_length,
-                        size_t max_driver_name_length) {
-    // TODO: implement
-    strncpy(global_last_error, "not yet implemented", sizeof(global_last_error));
-    return PHONE_STATUS_FAILURE;
 }
 
 phone_status_t phone_call_answer_after_index(phone_t instance, int call_index, int *answer_after) {

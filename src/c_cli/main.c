@@ -206,6 +206,29 @@ int main() {
                         printf("%d - %s\n", i, device_names[i]);
                     }
                 }
+                {
+                    phone_refresh_audio_devices();
+                    size_t count = phone_get_audio_devices_count();
+                    size_t max_driver_name_length = 5;
+                    size_t max_device_name_length = phone_get_audio_device_info_name_length();
+
+                    audio_device_info_t devices[count];
+                    char driver_names[count][max_driver_name_length];
+                    char device_names[count][max_device_name_length];
+
+                    int i;
+                    for (i = 0; i < count; i++) {
+                        devices[i].driver = driver_names[i];
+                        devices[i].name = device_names[i];
+                    }
+
+                    if (phone_get_audio_devices(devices, &count, max_device_name_length, max_driver_name_length) != PHONE_STATUS_SUCCESS)
+                        fprintf(stderr, "%s\n", phone_last_error());
+
+                    for (i = 0; i < count; i++) {
+                        printf("%d - %s/%s (%d/%d)\n", devices[i].id, devices[i].driver, devices[i].name, devices[i].input_count, devices[i].output_count);
+                    }
+                }
                 break;
             case 'D':
                 clear_input_buffer();
