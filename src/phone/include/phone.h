@@ -66,6 +66,21 @@ PHONE_EXPORT size_t phone_get_audio_devices_count(void);
 PHONE_EXPORT size_t phone_get_audio_device_driver_name_length(void);
 PHONE_EXPORT size_t phone_get_audio_device_info_name_length(void);
 PHONE_DEPRECATED_EXPORT phone_status_t phone_get_audio_device_names(char **device_names, size_t *devices_count, size_t max_device_name_length, device_filter_t filter);
+
+/**
+ * Get the audio devices that are available in the system.
+ *
+ * @param devices                   Out parameter. Array of phone_audio_device_t
+ * @param devices_count             Out parameter. Number of devices available in the system.
+ *                                  The value of devices_count might be smaller after the function returned depending
+ *                                  on the \p filter parameter.
+ *                                  Can be retrieved via \p phone_get_audio_devices_count.
+ * @param max_driver_name_length    Maximum length of the audio drivers name.
+ *                                  Can be retrieved via \p phone_get_audio_device_driver_name_length.
+ * @param max_device_name_length    Maximum length of the audio devices name.
+ *                                  Can be retrieved via \p phone_get_audio_device_info_name_length.
+ * @param filter                    Filter the devices that should be returned. \p device_filter_t
+ */
 PHONE_EXPORT phone_status_t
 phone_get_audio_devices(audio_device_info_t *devices, size_t *devices_count, size_t max_driver_name_length,
                         size_t max_device_name_length, device_filter_t filter);

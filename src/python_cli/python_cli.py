@@ -133,8 +133,8 @@ while command != 'q':
             device_filter = int(input("do you want a filter?: "))
         except ValueError:
             device_filter = DEVICE_FILTER_NONE
-        for idx, device in enumerate(phone_get_audio_device_names(device_filter)):
-            print(f"{idx} - {device}")
+        for device in phone_get_audio_devices(device_filter):
+            print(f"{device.id} - {device.driver}/{device.name} ({device.input_count}/{device.output_count})")
         print()
     elif command == 'D':
         capture_device = int(input("please enter desired capture device: "))
