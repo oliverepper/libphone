@@ -21,7 +21,7 @@ struct app_state {
             std::cout << incoming_message.value().substr(0, 10) + "... " << std::endl;
         auto answer_after = phone.call_answer_after(call_index);
         if (answer_after.has_value()) {
-            // TODO: push this in another thread, we need phone_register_thread, first.
+            // FIXME: push this in another thread, need phone_register_thread, first.
             std::cout << "Will auto-answer call for you" << std::endl;
             std::this_thread::sleep_for(std::chrono::seconds(answer_after.value()));
             phone.answer_call(call_index);
@@ -39,7 +39,7 @@ struct app_state {
             std::cout << incoming_message.value().substr(0, 10) + "... " << std::endl;
         auto answer_after = phone.call_answer_after(call_id);
         if (answer_after.has_value()) {
-            // TODO: push this in another thread, we need phone_register_thread, first.
+            // FIXME: push this in another thread, need phone_register_thread, first.
             std::cout << "Will auto-answer call for you" << std::endl;
             std::this_thread::sleep_for(std::chrono::seconds(answer_after.value()));
             phone.answer_call(call_id);

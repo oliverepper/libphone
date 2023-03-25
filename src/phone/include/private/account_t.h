@@ -34,8 +34,11 @@ public:
             auto call_info_key = pj_str((char *)"Call-Info");
             auto call_info_header = static_cast<pjsip_generic_string_hdr *>(pjsip_msg_find_hdr_by_name(rx_data->msg_info.msg, &call_info_key,
                                                                                                        nullptr));
-
             while (call_info_header != nullptr) {
+                /* IDEA maybe I should save the SERVER, too?
+                 *  Call-Info: <sip:SERVER>;answer-after=0
+                 *  std::optional<std::pair> answer-after
+                 */
                 do {
                     auto answer_after_key = pj_str((char *)"answer-after");
                     char *pos = pj_stristr(&call_info_header->hvalue, &answer_after_key);

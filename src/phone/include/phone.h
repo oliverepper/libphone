@@ -68,12 +68,15 @@ PHONE_EXPORT phone_status_t phone_get_audio_devices(audio_device_info_t *devices
 PHONE_EXPORT phone_status_t phone_set_audio_devices(int capture_device, int playback_device);
 
 /**
- * Check if the SIP INVITE had a Call-Info header that included a value like this: \a \<sip:SERVER\>;answer-after=0.
- * If so the value will be returned via the out parameter \a answer-after.
+ * Check if the SIP INVITE had a \p Call-Info header that included a value like this:
+ * <pre>
+ *  Call-Info: \<sip:SERVER\>;answer-after=0
+ * </pre>
+ * If so the value will be returned via the out parameter \p answer-after.
  *
  * @param instance      phone instance
  * @param call_index    the call index
- * @param answer_after  out parameter for the \a answer-after value. -1 if no \a answer-after value exists.
+ * @param answer_after  out parameter for the \p answer-after value. -1 if no \p answer-after value exists.
  *
  * @return              phone_status_t
  */
