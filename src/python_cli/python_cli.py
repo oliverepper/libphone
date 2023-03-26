@@ -82,7 +82,7 @@ if phone_configure_opus(phone, opus_channel_count, opus_complexity, opus_sample_
 if phone_connect(phone, sipserver, username, password) != PHONE_STATUS_SUCCESS:
     die(phone)
 if phone_set_audio_devices(0, 1) != PHONE_STATUS_SUCCESS:
-    die(phone)
+    print(phone_last_error(), file=sys.stderr)
 
 print(helptext)
 
