@@ -39,7 +39,7 @@ namespace phone {
         return states[state];
     }
 
-    struct audio_device_info {
+    struct audio_device_info_t {
         int id;
         std::string driver;
         std::string name;
@@ -84,8 +84,13 @@ public:
     PHONE_EXPORT static void set_log_level(int level);
 
     PHONE_EXPORT static void refresh_audio_devices();
-    PHONE_EXPORT static std::vector<phone::audio_device_info> get_audio_devices();
+    PHONE_EXPORT static std::vector<phone::audio_device_info_t> get_audio_devices();
     PHONE_EXPORT static void set_audio_devices(int capture_index, int playback_index);
+
+    PHONE_EXPORT std::optional<std::string> call_incoming_message(int call_index);
+    PHONE_EXPORT std::optional<std::string> call_incoming_message(const std::string& call_id);
+    PHONE_EXPORT std::optional<int> call_answer_after(int call_index);
+    PHONE_EXPORT std::optional<int> call_answer_after(const std::string& call_id);
 
 private:
     void create_tls_transport_with_srv_lookup();

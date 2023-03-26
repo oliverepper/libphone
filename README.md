@@ -8,9 +8,12 @@ libphone is a library that sits on top of [PJSIP project](https://github.com/pjs
   * [Overview](#overview)
   * [Usage](#usage)
     * [Callbacks](#callbacks)
+  * [Two ways to reference a call](#two-ways-to-reference-a-call)
   * [CLI Demo Phone](#cli-demo-phone)
   * [Compatibility with SIP providers](#compatibility-with-sip-providers)
     * [1und1 configuration](#1und1-configuration)
+  * [Handling of audio devices](#handling-of-audio-devices)
+  * [Call-Info answer-after](#call-info-answer-after)
   * [Binaries](#binaries)
   * [Build instructions for Linux](#build-instructions-for-linux)
   * [Build instructions for macOS](#build-instructions-for-macos)
@@ -53,6 +56,21 @@ phone_register_on_incoming_call_callback(phone, { callId, ctx in
         me.current_call_id = callId
     }
 }, Unmanaged.passRetained(self).toOpaque())
+```
+
+## Two ways to reference a call
+Since version 0.2.0 libphone can reference a call via index or id. So every API call that references a call exists in two versions. One that takes an int parameter that is the call-index or a string that represents the call id. You can register callbacks that deliver one or the other to you.
+
+```c
+void phone_register_on_incoming_call_index_callback(phone_t instance, void (*cb)(int call_index, void *ctx), void *ctx);
+void phone_register_on_incoming_call_id_callback(phone_t instance, void (*cb)(const char *call_id, void *ctx), void *ctx);
+```
+
+Or to hang up a call, for example:
+
+```c
+phone_status_t phone_hangup_call_index(phone_t instance, int call_index);
+phone_status_t phone_hangup_call_id(phone_t instance, const char *call_id);
 ```
 
 ## CLI Demo Phone
@@ -109,13 +127,59 @@ buddy               = "+491804100100"
 
 If you provide nameservers the library will use SRV lookup which is not supported by 1und1. Providing no nameservers the library will fall back to use the getaddr call to resolv just the sip-servers ip address.
 
+## Handling of audio devices
+
+You can select the desired audio capture and audio playback device at any time. To list all the devices available in your system you can call:
+
+```c
+phone_status_t phone_get_audio_devices(audio_device_info_t *devices, size_t *devices_count, size_t max_driver_name_length, size_t max_device_name_length, device_filter_t filter);
+```
+
+You can iterate over the resulting array and print out all the device information:
+
+```python
+for device in phone_get_audio_devices(device_filter):
+    print(f"{device.id} - {device.driver}/{device.name} ({device.input_count}/{device.output_count})")
+```
+
+![CLI Demo Phone Audio List](python_cli_list_audio_devices.png)
+
+To select capture and playback device use the function `phone_set_audio_devices`:
+
+```c
+phone_status_t phone_set_audio_devices(int capture_device, int playback_device);
+```
+
+## Call-Info answer-after
+
+There are certain information from the incoming SIP-INVITE that are saved in the call. The `answer-after` value is one of them. You can check if the INVITE had a header like this:
+
+```pre
+Call-Info: <sip:SERVER>;answer-after=SECONDS
+```
+
+ and receive the `SECONDS` via:
+
+```c
+phone_status_t phone_call_answer_after_index(phone_t instance, int call_index, int *answer_after);
+```
+or
+```c
+phone_status_t phone_call_answer_after_id(phone_t instance, const char *call_id, int *answer_after);
+```
+
+You can wrap that in a more pleasant call for your language of choice.
+Python example:
+
+```python
+answer_after = phone_call_answer_after_index(phone, call_index)
+if answer_after >= 0:
+  print(f"will auto answer call after {answer_after} seconds")
+```
+
 ## Binaries
 
-If you want to try this out I maintain the following binary distributions:
-
-- [libphone.0.0.1-macos-universal.zip](https://oliver-epper.de/libphone.0.0.1-macos-universal.zip) (signed and notarized, ready to go)
-- [libphone.0.0.1-ubuntu22.04-aarch64.tgz](https://oliver-epper.de/libphone.0.0.1-ubuntu22.04-aarch64.tgz)
-- [libphone.0.0.1-ubuntu22.04-x86_64.tgz](https://oliver-epper.de/libphone.0.0.1-ubuntu22.04-x86_64.tgz)
+I maintain binaries for macOS (signed, notarized and ready to go) and Ubuntu. You can get them from the GitHub release page, or my website [libphone](https://oliver-epper.de/apps/libphone/).
 
 Depending on your type of Ubuntu installation you might need to install the following as dependencies:
 

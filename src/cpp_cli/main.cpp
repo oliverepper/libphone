@@ -3,6 +3,8 @@
 #include <iostream>
 #include <thread>
 
+auto password_function = []() { return PASSWORD; };
+
 struct app_state {
     phone_instance_t phone;
     std::string last_call_id;
@@ -14,14 +16,34 @@ struct app_state {
                   << " – Incoming call index: " << last_call_index
                   << ", call id: " << phone.get_call_id(last_call_index)
                   << std::endl;
+        auto incoming_message = phone.call_incoming_message(call_index);
+        if (incoming_message.has_value())
+            std::cout << incoming_message.value().substr(0, 10) + "... " << std::endl;
+        auto answer_after = phone.call_answer_after(call_index);
+        if (answer_after.has_value()) {
+            // FIXME: push this in another thread, need phone_register_thread, first.
+            std::cout << "Will auto-answer call for you" << std::endl;
+            std::this_thread::sleep_for(std::chrono::seconds(answer_after.value()));
+            phone.answer_call(call_index);
+        }
     }
 
-    void on_incoming_call_cb(std::string call_id) {
-        last_call_id = std::move(call_id);
+    void on_incoming_call_cb(const std::string& call_id) {
+        last_call_id = call_id;
         std::cout << std::this_thread::get_id()
                   << " - Incoming call id: " << last_call_id
                   << ", call index: " << phone.get_call_index(last_call_id)
                   << std::endl;
+        auto incoming_message = phone.call_incoming_message(call_id);
+        if (incoming_message.has_value())
+            std::cout << incoming_message.value().substr(0, 10) + "... " << std::endl;
+        auto answer_after = phone.call_answer_after(call_id);
+        if (answer_after.has_value()) {
+            // FIXME: push this in another thread, need phone_register_thread, first.
+            std::cout << "Will auto-answer call for you" << std::endl;
+            std::this_thread::sleep_for(std::chrono::seconds(answer_after.value()));
+            phone.answer_call(call_id);
+        }
     }
 
     [[maybe_unused]] static void on_call_state_with_index_cb(int call_index, int state) {
@@ -43,8 +65,8 @@ auto main() -> int {
         state.phone.register_on_incoming_call_callback([&state](int call_index) {
             state.on_incoming_call_cb(call_index);
         });
-        state.phone.register_on_incoming_call_callback([&state](std::string call_id) {
-            state.on_incoming_call_cb(std::move(call_id));
+        state.phone.register_on_incoming_call_callback([&state](const std::string& call_id) {
+            state.on_incoming_call_cb(call_id);
         });
         state.phone.register_on_call_state_callback(app_state::on_call_state_with_index_cb);
         state.phone.register_on_call_state_callback(app_state::on_call_state_with_id_cb);
@@ -53,7 +75,7 @@ auto main() -> int {
         state.phone.configure_opus();
 
         // connect
-        state.phone.connect("tel.t-online.de", "+4965191899543");
+        state.phone.connect(SERVER, USER, PASSWORD_FUNCTION);
 
         // repl
         char command = 'q';
@@ -72,7 +94,7 @@ auto main() -> int {
                 std::cin >> number;
                 state.phone.make_call(number);
             } else if (command == 'C') {
-                state.phone.make_call("+491804100100");
+                state.phone.make_call(BUDDY_NUMBER);
             } else if (command == 'a') {
                 int call_index;
                 std::cout << "please enter call index: ";

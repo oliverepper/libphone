@@ -155,11 +155,11 @@ int phone_instance_t::get_call_index(const std::string& call_id) {
     }
 }
 
-std::vector<phone::audio_device_info> phone_instance_t::get_audio_devices() {
-    std::vector<phone::audio_device_info> result{pjmedia_aud_dev_count()};
+std::vector<phone::audio_device_info_t> phone_instance_t::get_audio_devices() {
+    std::vector<phone::audio_device_info_t> result{pjmedia_aud_dev_count()};
 
     int index = 0;
-    for (phone::audio_device_info& i : result) {
+    for (phone::audio_device_info_t& i : result) {
         pjmedia_aud_dev_info info;
         auto status = pjmedia_aud_dev_get_info(index, &info);
         if (status != PJ_SUCCESS) {
@@ -196,4 +196,36 @@ void phone_instance_t::set_audio_devices(int capture_index, int playback_index) 
 
 void phone_instance_t::refresh_audio_devices() {
     pjmedia_aud_dev_refresh();
+}
+
+std::optional<std::string> phone_instance_t::call_incoming_message(int call_index) {
+    try {
+        return m_account->call_incoming_message(call_index);
+    } catch (const std::invalid_argument& e) {
+        throw phone::exception{e.what()};
+    }
+}
+
+std::optional<std::string> phone_instance_t::call_incoming_message(const std::string& call_id) {
+    try {
+        return m_account->call_incoming_message(call_id);
+    } catch (const std::invalid_argument& e) {
+        throw phone::exception{e.what()};
+    }
+}
+
+std::optional<int> phone_instance_t::call_answer_after(int call_index) {
+    try {
+        return m_account->call_answer_after(call_index);
+    } catch (const std::invalid_argument& e) {
+        throw phone::exception{e.what()};
+    }
+}
+
+std::optional<int> phone_instance_t::call_answer_after(const std::string& call_id) {
+    try {
+        return m_account->call_answer_after(call_id);
+    } catch (const std::invalid_argument& e) {
+        throw phone::exception{e.what()};
+    }
 }

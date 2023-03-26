@@ -3,6 +3,7 @@
 #include <phone/version.h>
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 
 void die(phone_t instance) {
     phone_destroy(instance);
@@ -21,10 +22,17 @@ void on_incoming_call_with_index_cb(int call_index, __attribute__((unused)) void
     s->last_call_index = call_index;
 
     char call_id_buffer[128] = {0};
-    if (phone_get_call_id(s->phone, 100, call_id_buffer, sizeof(call_id_buffer)) != PHONE_STATUS_SUCCESS)
+    if (phone_get_call_id(s->phone, call_index, call_id_buffer, sizeof(call_id_buffer)) != PHONE_STATUS_SUCCESS)
         fprintf(stderr, "%s\n", phone_last_error());
 
     printf("Incoming call index: %d, id: %s\n", call_index, call_id_buffer);
+
+    int answer_after;
+    phone_call_answer_after_index(s->phone, call_index, &answer_after);
+    if (answer_after >= 0) {
+        sleep(answer_after);
+        phone_answer_call_index(s->phone, call_index);
+    }
 }
 
 void on_incoming_call_with_id_cb(const char *call_id, __attribute__((unused)) void *ctx) {
@@ -35,6 +43,13 @@ void on_incoming_call_with_id_cb(const char *call_id, __attribute__((unused)) vo
         fprintf(stderr, "%s\n", phone_last_error());
 
     printf("Incoming call id: %s, index: %d\n", call_id, s->last_call_index);
+
+    int answer_after;
+    phone_call_answer_after_id(s->phone, call_id, &answer_after);
+    if (answer_after >= 0) {
+        sleep(answer_after);
+        phone_answer_call_id(s->phone, call_id);
+    }
 }
 
 void on_call_state_with_index_cb(int call_index, int state, void *ctx) {
@@ -48,10 +63,11 @@ void on_call_state_with_index_cb(int call_index, int state, void *ctx) {
 }
 
 void on_call_state_with_id_cb(const char* call_id, int state, void *ctx) {
-    char buffer[64];
-    phone_state_name(buffer, sizeof(buffer), state);
     struct app_state *s = (struct app_state*)ctx;
     strncpy(s->last_call_id, call_id, sizeof(s->last_call_id));
+
+    char buffer[64];
+    phone_state_name(buffer, sizeof(buffer), state);
     printf("Call %s – state: %s\n", call_id, buffer);
 }
 
@@ -82,9 +98,7 @@ int main() {
         die(state->phone);
 
     // connect
-    if (phone_connect(state->phone,
-                      "tel.t-online.de",
-                      "+4965191899543", NULL) != PHONE_STATUS_SUCCESS)
+    if (phone_connect(state->phone, SERVER, USER, PASSWORD) != PHONE_STATUS_SUCCESS)
         die(state->phone);
 
     // repl
@@ -115,7 +129,7 @@ int main() {
                 break;
             case 'C':
                 clear_input_buffer();
-                if (phone_make_call(state->phone, "+491804100100") != PHONE_STATUS_SUCCESS)
+                if (phone_make_call(state->phone, BUDDY_NUMBER) != PHONE_STATUS_SUCCESS)
                     fprintf(stderr, "%s\n", phone_last_error());
                 break;
             case 'a':
@@ -176,21 +190,25 @@ int main() {
                 {
                     phone_refresh_audio_devices();
                     size_t count = phone_get_audio_devices_count();
-                    size_t max_device_name_length = phone_get_audio_device_info_name_length();
-                    char *device_names[count];
-                    char data[count][max_device_name_length];
+                    size_t max_driver_name_length = phone_get_audio_device_driver_name_length() + 1; // +1 for zero termination
+                    size_t max_device_name_length = phone_get_audio_device_info_name_length() + 1; // +1 for zero termination
+
+                    audio_device_info_t devices[count];
+                    char driver_names[count][max_driver_name_length];
+                    char device_names[count][max_device_name_length];
 
                     int i;
                     for (i = 0; i < count; i++) {
-                        device_names[i] = data[i];
-                        memset(data[i], 0, sizeof(max_device_name_length));
+                        devices[i].driver = driver_names[i];
+                        devices[i].name = device_names[i];
                     }
 
-                    if (phone_get_audio_device_names(device_names, &count, max_device_name_length, DEVICE_FILTER_NONE) != PHONE_STATUS_SUCCESS)
+                    if (phone_get_audio_devices(devices, &count, max_driver_name_length, max_device_name_length,
+                                                DEVICE_FILTER_NONE) != PHONE_STATUS_SUCCESS)
                         fprintf(stderr, "%s\n", phone_last_error());
 
                     for (i = 0; i < count; i++) {
-                        printf("%d - %s\n", i, device_names[i]);
+                        printf("%d - %s/%s (%d/%d)\n", devices[i].id, devices[i].driver, devices[i].name, devices[i].input_count, devices[i].output_count);
                     }
                 }
                 break;
