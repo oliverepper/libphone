@@ -202,7 +202,7 @@ size_t phone_get_audio_device_driver_name_length(void) {
             );
     return max_length;
 #else
-    auto lens = std::views::transform(phone_instance_t::get_audio_devices(), [](phone::audio_device_info_t info){
+    auto lens = std::views::transform(phone_instance_t::get_audio_devices(), [](const phone::audio_device_info_t& info){
         return info.driver.length();
     });
     return std::ranges::max(lens);

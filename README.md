@@ -8,9 +8,12 @@ libphone is a library that sits on top of [PJSIP project](https://github.com/pjs
   * [Overview](#overview)
   * [Usage](#usage)
     * [Callbacks](#callbacks)
+  * [Two ways to reference a call](#two-ways-to-reference-a-call)
   * [CLI Demo Phone](#cli-demo-phone)
   * [Compatibility with SIP providers](#compatibility-with-sip-providers)
     * [1und1 configuration](#1und1-configuration)
+  * [Handling of audio devices](#handling-of-audio-devices)
+  * [Call-Info answer-after](#call-info-answer-after)
   * [Binaries](#binaries)
   * [Build instructions for Linux](#build-instructions-for-linux)
   * [Build instructions for macOS](#build-instructions-for-macos)
@@ -56,14 +59,14 @@ phone_register_on_incoming_call_callback(phone, { callId, ctx in
 ```
 
 ## Two ways to reference a call
-Since version 0.2.0 libphone can reference a call via index or id. So every API call that references a call exists in two versions. One that takes an int parameter that is the call-index or a string that represents the call id. Consequently you can register callbacks that deliver one or the other to you.
+Since version 0.2.0 libphone can reference a call via index or id. So every API call that references a call exists in two versions. One that takes an int parameter that is the call-index or a string that represents the call id. You can register callbacks that deliver one or the other to you.
 
 ```c
 void phone_register_on_incoming_call_index_callback(phone_t instance, void (*cb)(int call_index, void *ctx), void *ctx);
 void phone_register_on_incoming_call_id_callback(phone_t instance, void (*cb)(const char *call_id, void *ctx), void *ctx);
 ```
 
-Or to hangup a call, for example:
+Or to hang up a call, for example:
 
 ```c
 phone_status_t phone_hangup_call_index(phone_t instance, int call_index);
@@ -147,7 +150,7 @@ To select capture and playback device use the function `phone_set_audio_devices`
 phone_status_t phone_set_audio_devices(int capture_device, int playback_device);
 ```
 
-## answer-after
+## Call-Info answer-after
 
 There are certain information from the incoming SIP-INVITE that are saved in the call. The `answer-after` value is one of them. You can check if the INVITE had a header like this:
 
