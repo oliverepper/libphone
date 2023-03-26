@@ -37,7 +37,7 @@ void on_incoming_call_with_index_cb(int call_index, __attribute__((unused)) void
 
 void on_incoming_call_with_id_cb(const char *call_id, __attribute__((unused)) void *ctx) {
     struct app_state *s = (struct app_state*)ctx;
-    strlcpy(s->last_call_id, call_id, sizeof(s->last_call_id));
+    strncpy(s->last_call_id, call_id, sizeof(s->last_call_id));
 
     if (phone_get_call_index(s->phone, call_id, &s->last_call_index) != PHONE_STATUS_SUCCESS)
         fprintf(stderr, "%s\n", phone_last_error());
@@ -64,7 +64,7 @@ void on_call_state_with_index_cb(int call_index, int state, void *ctx) {
 
 void on_call_state_with_id_cb(const char* call_id, int state, void *ctx) {
     struct app_state *s = (struct app_state*)ctx;
-    strlcpy(s->last_call_id, call_id, sizeof(s->last_call_id));
+    strncpy(s->last_call_id, call_id, sizeof(s->last_call_id));
 
     char buffer[64];
     phone_state_name(buffer, sizeof(buffer), state);

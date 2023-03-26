@@ -20,7 +20,7 @@ phone_t phone_create(const char *user_agent,
     try {
         return new phone_instance_t{user_agent, _nameserver, _stunserver};
     } catch (const phone::exception& e) {
-        strlcpy(global_last_error, e.what(), sizeof(global_last_error));
+        strncpy(global_last_error, e.what(), sizeof(global_last_error));
         return nullptr;
     }
 }
@@ -69,7 +69,7 @@ phone_status_t PHONE_EXPORT phone_configure_opus(phone_t instance, int channel_c
     try {
         instance->configure_opus(channel_count, complexity, sample_rate);
     } catch (const phone::exception& e) {
-        strlcpy(global_last_error, e.what(), sizeof(global_last_error));
+        strncpy(global_last_error, e.what(), sizeof(global_last_error));
         return PHONE_STATUS_FAILURE;
     }
     return PHONE_STATUS_SUCCESS;
@@ -83,7 +83,7 @@ phone_status_t phone_connect(phone_t instance, const char *server, const char *u
             instance->connect(server, user);
         }
     } catch (const phone::exception& e) {
-        strlcpy(global_last_error, e.what(), sizeof(global_last_error));
+        strncpy(global_last_error, e.what(), sizeof(global_last_error));
         return PHONE_STATUS_FAILURE;
     }
     return PHONE_STATUS_SUCCESS;
@@ -93,7 +93,7 @@ phone_status_t phone_make_call(phone_t instance, const char *uri) {
     try {
         instance->make_call(uri);
     } catch (const phone::exception& e) {
-        strlcpy(global_last_error, e.what(), sizeof(global_last_error));
+        strncpy(global_last_error, e.what(), sizeof(global_last_error));
         return PHONE_STATUS_FAILURE;
     }
     return PHONE_STATUS_SUCCESS;
@@ -107,7 +107,7 @@ phone_status_t phone_answer_call_index(phone_t instance, int call_index) {
     try {
         instance->answer_call(call_index);
     } catch (const phone::exception& e) {
-        strlcpy(global_last_error, e.what(), sizeof(global_last_error));
+        strncpy(global_last_error, e.what(), sizeof(global_last_error));
         return PHONE_STATUS_FAILURE;
     }
     return PHONE_STATUS_SUCCESS;
@@ -117,7 +117,7 @@ phone_status_t phone_answer_call_id(phone_t instance, const char *call_id) {
     try {
         instance->answer_call(call_id);
     } catch (const phone::exception& e) {
-        strlcpy(global_last_error, e.what(), sizeof(global_last_error));
+        strncpy(global_last_error, e.what(), sizeof(global_last_error));
         return EXIT_FAILURE;
     }
     return PHONE_STATUS_SUCCESS;
@@ -132,7 +132,7 @@ phone_status_t phone_hangup_call_index(phone_t instance, int call_index) {
     try {
         instance->hangup_call(call_index);
     } catch (const phone::exception& e) {
-        strlcpy(global_last_error, e.what(), sizeof(global_last_error));
+        strncpy(global_last_error, e.what(), sizeof(global_last_error));
         return PHONE_STATUS_FAILURE;
     }
     return PHONE_STATUS_SUCCESS;
@@ -142,7 +142,7 @@ phone_status_t phone_hangup_call_id(phone_t instance, const char *call_id) {
     try {
         instance->hangup_call(call_id);
     } catch (const phone::exception& e) {
-        strlcpy(global_last_error, e.what(), sizeof(global_last_error));
+        strncpy(global_last_error, e.what(), sizeof(global_last_error));
         return PHONE_STATUS_FAILURE;
     }
     return PHONE_STATUS_SUCCESS;
@@ -155,9 +155,9 @@ void phone_hangup_calls(phone_t instance) {
 phone_status_t phone_get_call_id(phone_t instance, int call_index, char *out, size_t size) {
     try {
         auto id = instance->get_call_id(call_index);
-        strlcpy(out, id.c_str(), size);
+        strncpy(out, id.c_str(), size);
     } catch (const phone::exception& e) {
-        strlcpy(global_last_error, e.what(), sizeof(global_last_error));
+        strncpy(global_last_error, e.what(), sizeof(global_last_error));
         return PHONE_STATUS_FAILURE;
     }
     return PHONE_STATUS_SUCCESS;
@@ -167,7 +167,7 @@ phone_status_t phone_get_call_index(phone_t instance, const char *call_id, int *
     try {
         *out = instance->get_call_index(call_id);
     } catch (const phone::exception& e) {
-        strlcpy(global_last_error, e.what(), sizeof(global_last_error));
+        strncpy(global_last_error, e.what(), sizeof(global_last_error));
         return PHONE_STATUS_FAILURE;
     }
     return PHONE_STATUS_SUCCESS;
@@ -178,7 +178,7 @@ const char* phone_last_error(void) {
 }
 
 void phone_state_name(char *buffer, size_t buffer_size, int state) {
-    strlcpy(buffer, std::string{phone::state_name(state)}.c_str(), buffer_size);
+    strncpy(buffer, std::string{phone::state_name(state)}.c_str(), buffer_size);
 }
 
 void phone_refresh_audio_devices(void) {
@@ -230,7 +230,7 @@ phone_status_t phone_get_audio_device_names(char **device_names, size_t *devices
     try {
         devices = phone_instance_t::get_audio_devices();
     } catch (const phone::exception& e) {
-        strlcpy(global_last_error, e.what(), sizeof(global_last_error));
+        strncpy(global_last_error, e.what(), sizeof(global_last_error));
         return PHONE_STATUS_FAILURE;
     }
 
@@ -239,7 +239,7 @@ phone_status_t phone_get_audio_device_names(char **device_names, size_t *devices
     int i = 0;
     for (const auto& e : devices) {
         if (i < *devices_count) {
-            strlcpy(device_names[i], e.name.c_str(), max_device_name_length);
+            strncpy(device_names[i], e.name.c_str(), max_device_name_length);
             ++i;
         }
     }
@@ -267,7 +267,7 @@ phone_get_audio_devices(audio_device_info_t *devices, size_t *devices_count, siz
     try {
         _devices = phone_instance_t::get_audio_devices();
     } catch (const phone::exception& e) {
-        strlcpy(global_last_error, e.what(), std::size(global_last_error));
+        strncpy(global_last_error, e.what(), std::size(global_last_error));
         return PHONE_STATUS_FAILURE;
     }
 
@@ -275,9 +275,9 @@ phone_get_audio_devices(audio_device_info_t *devices, size_t *devices_count, siz
     for (const auto& e : _devices | std::views::filter(pred)) {
         if (i < *devices_count) {
             devices[i].id = e.id;
-            strlcpy(devices[i].driver, e.driver.c_str(), max_driver_name_length);
+            strncpy(devices[i].driver, e.driver.c_str(), max_driver_name_length);
             devices[i].driver[max_driver_name_length - 1] = '\0';
-            strlcpy(devices[i].name, e.name.c_str(), max_device_name_length);
+            strncpy(devices[i].name, e.name.c_str(), max_device_name_length);
             devices[i].name[max_device_name_length - 1] = '\0';
             devices[i].input_count = e.input_count;
             devices[i].output_count = e.output_count;
@@ -292,7 +292,7 @@ phone_status_t phone_set_audio_devices(int capture_device, int playback_device) 
     try {
         phone_instance_t::set_audio_devices(capture_device, playback_device);
     } catch (const phone::exception& e) {
-        strlcpy(global_last_error, e.what(), sizeof(global_last_error));
+        strncpy(global_last_error, e.what(), sizeof(global_last_error));
         return PHONE_STATUS_FAILURE;
     }
     return PHONE_STATUS_SUCCESS;
@@ -305,7 +305,7 @@ phone_status_t phone_call_answer_after_index(phone_t instance, int call_index, i
         if (call_answer_after.has_value())
             *answer_after = call_answer_after.value();
     } catch (const phone::exception& e) {
-        strlcpy(global_last_error, e.what(), sizeof(global_last_error));
+        strncpy(global_last_error, e.what(), sizeof(global_last_error));
         return PHONE_STATUS_FAILURE;
     }
     return PHONE_STATUS_SUCCESS;
@@ -318,7 +318,7 @@ phone_status_t phone_call_answer_after_id(phone_t instance, const char *call_id,
         if (call_answer_after.has_value())
             *answer_after = call_answer_after.value();
     } catch (const phone::exception& e) {
-        strlcpy(global_last_error, e.what(), sizeof(global_last_error));
+        strncpy(global_last_error, e.what(), sizeof(global_last_error));
         return PHONE_STATUS_FAILURE;
     }
     return PHONE_STATUS_SUCCESS;
