@@ -58,7 +58,7 @@ PHONE_EXPORT phone_status_t phone_hangup_call_id(phone_t instance, const char *c
 
 PHONE_EXPORT void phone_hangup_calls(phone_t instance);
 
-PHONE_EXPORT phone_status_t phone_get_call_id(phone_t instance, int call_index, char *out, size_t size);
+PHONE_EXPORT phone_status_t phone_get_call_id(phone_t instance, int call_index, char *call_id, size_t size);
 PHONE_EXPORT phone_status_t phone_get_call_index(phone_t instance, const char *call_id, int *out);
 
 PHONE_EXPORT void phone_refresh_audio_devices(void);
@@ -103,7 +103,7 @@ PHONE_EXPORT phone_status_t phone_call_answer_after_index(phone_t instance, int 
 PHONE_EXPORT phone_status_t phone_call_answer_after_id(phone_t instance, const char *call_id, int *answer_after);
 
 PHONE_EXPORT const char* phone_last_error(void);
-PHONE_EXPORT void phone_state_name(char *buffer, size_t buffer_size, int state);
+PHONE_EXPORT void phone_state_name(char *state_name, size_t buffer_size, int state);
 PHONE_EXPORT void phone_set_log_level(int level);
 
 #ifdef __cplusplus

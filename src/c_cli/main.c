@@ -63,10 +63,11 @@ void on_call_state_with_index_cb(int call_index, int state, void *ctx) {
 }
 
 void on_call_state_with_id_cb(const char* call_id, int state, void *ctx) {
-    char buffer[64];
-    phone_state_name(buffer, sizeof(buffer), state);
     struct app_state *s = (struct app_state*)ctx;
     strncpy(s->last_call_id, call_id, sizeof(s->last_call_id));
+
+    char buffer[64];
+    phone_state_name(buffer, sizeof(buffer), state);
     printf("Call %s – state: %s\n", call_id, buffer);
 }
 
@@ -189,8 +190,8 @@ int main() {
                 {
                     phone_refresh_audio_devices();
                     size_t count = phone_get_audio_devices_count();
-                    size_t max_driver_name_length = phone_get_audio_device_driver_name_length() + 1;
-                    size_t max_device_name_length = phone_get_audio_device_info_name_length() + 1;
+                    size_t max_driver_name_length = phone_get_audio_device_driver_name_length() + 1; // +1 for zero termination
+                    size_t max_device_name_length = phone_get_audio_device_info_name_length() + 1; // +1 for zero termination
 
                     audio_device_info_t devices[count];
                     char driver_names[count][max_driver_name_length];

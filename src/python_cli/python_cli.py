@@ -82,7 +82,7 @@ if phone_configure_opus(phone, opus_channel_count, opus_complexity, opus_sample_
 if phone_connect(phone, sipserver, username, password) != PHONE_STATUS_SUCCESS:
     die(phone)
 if phone_set_audio_devices(0, 1) != PHONE_STATUS_SUCCESS:
-    die(phone)
+    print(phone_last_error(), file=sys.stderr)
 
 print(helptext)
 
@@ -96,27 +96,27 @@ while command != 'q':
     command = input()
     if command == 'C':
         if phone_make_call(phone, buddy) != PHONE_STATUS_SUCCESS:
-            print(phone_last_error())
+            print(phone_last_error(), file=sys.stderr)
     elif command == 'c':
         number = input("please enter number: ")
         if phone_make_call(phone, number) != PHONE_STATUS_SUCCESS:
-            print(phone_last_error())
+            print(phone_last_error(), file=sys.stderr)
     elif command == 'a':
         call_id = int(input("please enter call id: "))
         if phone_answer_call(phone, call_id) != PHONE_STATUS_SUCCESS:
-            print(phone_last_error())
+            print(phone_last_error(), file=sys.stderr)
     elif command == 'A':
         call_id = input("please enter call id: ")
         if (phone_answer_call_id(phone, call_id)) != PHONE_STATUS_SUCCESS:
-            print(phone_last_error())
+            print(phone_last_error(), file=sys.stderr)
     elif command == 'h':
         call_id = int(input("please enter call id: "))
         if phone_hangup_call(phone, call_id) != PHONE_STATUS_SUCCESS:
-            print(phone_last_error())
+            print(phone_last_error(), file=sys.stderr)
     elif command == 'H':
         call_id = input("please enter call id: ")
         if phone_hangup_call_id(phone, call_id) != PHONE_STATUS_SUCCESS:
-            print(phone_last_error())
+            print(phone_last_error(), file=sys.stderr)
     elif command == 'e':
         phone_hangup_calls(phone)
     elif command == 'l':
@@ -132,6 +132,7 @@ while command != 'q':
         try:
             device_filter = int(input("do you want a filter?: "))
         except ValueError:
+            print("no a valid input – will use DEVICE_FILTER_NONE", file=sys.stderr)
             device_filter = DEVICE_FILTER_NONE
         for device in phone_get_audio_devices(device_filter):
             print(f"{device.id} - {device.driver}/{device.name} ({device.input_count}/{device.output_count})")
@@ -140,7 +141,7 @@ while command != 'q':
         capture_device = int(input("please enter desired capture device: "))
         playback_device = int(input("please enter desired playback device: "))
         if phone_set_audio_devices(capture_device, playback_device) != PHONE_STATUS_SUCCESS:
-            print(phone_last_error())
+            print(phone_last_error(), file=sys.stderr)
 
 print("shutting down...")
 phone_destroy(phone)

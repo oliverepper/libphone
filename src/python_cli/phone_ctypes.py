@@ -233,7 +233,7 @@ def phone_get_audio_device_names(device_filter):
     if not DEVICE_FILTER_NONE <= device_filter <= DEVICE_FILTER_OUTPUT:
         device_filter = DEVICE_FILTER_NONE
     c_count = c_size_t(phone_get_audio_devices_count())
-    max_device_name_length = phone_get_audio_device_info_name_length()
+    max_device_name_length = phone_get_audio_device_info_name_length() + 1  # +1 for zero termination
     device_names = (c_char_p * c_count.value)()
 
     for i in range(c_count.value):
@@ -270,8 +270,8 @@ def phone_get_audio_devices(device_filter):
     if not DEVICE_FILTER_NONE <= device_filter <= DEVICE_FILTER_OUTPUT:
         device_filter = DEVICE_FILTER_NONE
     c_count = c_size_t(phone_get_audio_devices_count())
-    max_device_driver_name_length = phone_get_audio_device_driver_name_length() + 1
-    max_device_name_length = phone_get_audio_device_info_name_length() + 1
+    max_device_driver_name_length = phone_get_audio_device_driver_name_length() + 1  # +1 for zero termination
+    max_device_name_length = phone_get_audio_device_info_name_length() + 1  # +1 for zero termination
     devices = (c_phone_audio_device_info_t * c_count.value)()
 
     for i in range(c_count.value):
@@ -325,7 +325,7 @@ def phone_last_error():
     __phone_last_error = libphone.phone_last_error
     __phone_last_error.restype = c_char_p
     __phone_last_error.argtypes = None
-    print("ERROR: " + __phone_last_error().decode('utf-8'))
+    return __phone_last_error().decode('utf-8')
 
 
 # PHONE_EXPORT void phone_state_name(char *buffer, size_t buffer_size, int state);
@@ -387,7 +387,7 @@ def phone_git_description():
 
 def die(instance):
     phone_destroy(instance)
-    phone_last_error()
+    print(phone_last_error(), file=sys.stderr)
     exit(1)
 
 
