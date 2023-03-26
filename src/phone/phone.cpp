@@ -4,6 +4,11 @@
 #include <vector>
 #include <cstring>
 #include <ranges>
+#include <algorithm>
+#include <numeric>
+#ifdef __linux__
+#include <bsd/string.h>
+#endif
 
 char global_last_error[1024] = "no error";
 
@@ -189,10 +194,22 @@ size_t phone_get_audio_device_info_name_length(void) {
 }
 
 size_t phone_get_audio_device_driver_name_length(void) {
-    auto lens = std::views::transform(phone_instance_t::get_audio_devices(), [](const phone::audio_device_info_t& info){
+#ifdef __linux__
+    auto audio_devices = phone_instance_t::get_audio_devices();
+    auto max_length = std::transform_reduce(
+            std::begin(audio_devices),
+            std::end(audio_devices),
+            size_t{0},
+            [](size_t a, size_t b) { return std::max(a, b); },
+            [](const phone::audio_device_info_t& info) { return info.driver.length(); }
+            );
+    return max_length;
+#else
+    auto lens = std::views::transform(phone_instance_t::get_audio_devices(), [](phone::audio_device_info_t info){
         return info.driver.length();
     });
     return std::ranges::max(lens);
+#endif
 }
 
 phone_status_t phone_get_audio_device_names(char **device_names, size_t *devices_count, size_t max_device_name_length, device_filter_t filter) {
