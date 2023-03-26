@@ -6,9 +6,6 @@
 #include <ranges>
 #include <algorithm>
 #include <numeric>
-#ifdef __linux__
-#include <bsd/string.h>
-#endif
 
 char global_last_error[1024] = "no error";
 
