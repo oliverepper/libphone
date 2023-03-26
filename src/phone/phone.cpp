@@ -152,10 +152,10 @@ void phone_hangup_calls(phone_t instance) {
     instance->hangup_calls();
 }
 
-phone_status_t phone_get_call_id(phone_t instance, int call_index, char *out, size_t size) {
+phone_status_t phone_get_call_id(phone_t instance, int call_index, char *call_id, size_t size) {
     try {
         auto id = instance->get_call_id(call_index);
-        strncpy(out, id.c_str(), size);
+        strncpy(call_id, id.c_str(), size);
     } catch (const phone::exception& e) {
         strncpy(global_last_error, e.what(), sizeof(global_last_error));
         return PHONE_STATUS_FAILURE;
@@ -177,8 +177,8 @@ const char* phone_last_error(void) {
     return global_last_error;
 }
 
-void phone_state_name(char *buffer, size_t buffer_size, int state) {
-    strncpy(buffer, std::string{phone::state_name(state)}.c_str(), buffer_size);
+void phone_state_name(char *state_name, size_t buffer_size, int state) {
+    strncpy(state_name, phone::state_name(state).data(), buffer_size);
 }
 
 void phone_refresh_audio_devices(void) {
