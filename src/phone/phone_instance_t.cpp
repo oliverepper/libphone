@@ -231,7 +231,11 @@ std::optional<int> phone_instance_t::call_answer_after(const std::string& call_i
 }
 
 void phone_instance_t::register_thread(const std::string &name) {
-    m_ep->libRegisterThread(name);
+    try {
+        m_ep->libRegisterThread(name);
+    } catch (const pj::Error& e) {
+        throw phone::exception{e.info()};
+    }
 }
 
 bool phone_instance_t::is_thread_registered() {

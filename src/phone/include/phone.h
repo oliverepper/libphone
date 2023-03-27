@@ -106,6 +106,9 @@ PHONE_EXPORT const char* phone_last_error(void);
 PHONE_EXPORT void phone_state_name(char *state_name, size_t buffer_size, int state);
 PHONE_EXPORT void phone_set_log_level(int level);
 
+PHONE_EXPORT phone_status_t phone_register_thread(phone_t instance, const char *name);
+PHONE_EXPORT int phone_is_thread_registered(phone_t instance);
+
 #ifdef __cplusplus
 }
 #endif
