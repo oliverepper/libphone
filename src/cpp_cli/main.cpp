@@ -28,7 +28,11 @@ struct app_state {
             task_system.async([=](){
                 assert(phone.is_thread_registered() == true);
                 std::this_thread::sleep_for(std::chrono::seconds(answer_after.value()));
-                phone.answer_call(call_index);
+                try {
+                    phone.answer_call(call_index);
+                } catch (const phone::exception& e) {
+                    std::cerr << "In callback: " << e.what() << std::endl;
+                }
             });
         }
     }
@@ -48,7 +52,11 @@ struct app_state {
             task_system.async([=]() {
                 assert(phone.is_thread_registered() == true);
                 std::this_thread::sleep_for(std::chrono::seconds(answer_after.value()));
-                phone.answer_call(call_id);
+                try {
+                    phone.answer_call(call_id);
+                } catch (const phone::exception& e) {
+                    std::cerr << "In callback: " << e.what() << std::endl;
+                }
             });
         }
     }
@@ -94,58 +102,63 @@ auto main() -> int {
         std::cout << std::endl;
 
         do {
-            std::cin >> command;
-            if (command == 'c') {
-                std::string number;
-                std::cout << "please enter number: ";
-                std::cin >> number;
-                state.phone.make_call(number);
-            } else if (command == 'C') {
-                state.phone.make_call(BUDDY_NUMBER);
-            } else if (command == 'a') {
-                int call_index;
-                std::cout << "please enter call index: ";
-                std::cin >> call_index;
-                state.phone.answer_call(call_index);
-            } else if (command == 'A') {
-                std::string call_id;
-                std::cout << "please enter call id: ";
-                std::cin >> call_id;
-                state.phone.answer_call(call_id);
-            } else if (command == 'h') {
-                int call_index;
-                std::cout << "please enter call index: ";
-                std::cin >> call_index;
-                state.phone.hangup_call(call_index);
-            } else if (command == 'H') {
-                std::string call_id;
-                std::cout << "please enter call id: ";
-                std::cin >> call_id;
-                state.phone.hangup_call(call_id);
-            } else if (command == 'e') {
-                state.phone.hangup_calls();
-            } else if (command == 'l') {
-                int level;
-                std::cout << "please enter desired log level 0..6: ";
-                std::cin >> level;
-                phone_instance_t::set_log_level(level);
-            } else if (command == 'd') {
-                phone_instance_t::refresh_audio_devices();
-                for (const auto& e : phone_instance_t::get_audio_devices()) {
-                    std::cout << e.id << " - " << e.driver << "/" << e.name << " (" << e.input_count << "/" << e.output_count << ")" << std::endl;
+            try {
+                std::cin >> command;
+                if (command == 'c') {
+                    std::string number;
+                    std::cout << "please enter number: ";
+                    std::cin >> number;
+                    state.phone.make_call(number);
+                } else if (command == 'C') {
+                    state.phone.make_call(BUDDY_NUMBER);
+                } else if (command == 'a') {
+                    int call_index;
+                    std::cout << "please enter call index: ";
+                    std::cin >> call_index;
+                    state.phone.answer_call(call_index);
+                } else if (command == 'A') {
+                    std::string call_id;
+                    std::cout << "please enter call id: ";
+                    std::cin >> call_id;
+                    state.phone.answer_call(call_id);
+                } else if (command == 'h') {
+                    int call_index;
+                    std::cout << "please enter call index: ";
+                    std::cin >> call_index;
+                    state.phone.hangup_call(call_index);
+                } else if (command == 'H') {
+                    std::string call_id;
+                    std::cout << "please enter call id: ";
+                    std::cin >> call_id;
+                    state.phone.hangup_call(call_id);
+                } else if (command == 'e') {
+                    state.phone.hangup_calls();
+                } else if (command == 'l') {
+                    int level;
+                    std::cout << "please enter desired log level 0..6: ";
+                    std::cin >> level;
+                    phone_instance_t::set_log_level(level);
+                } else if (command == 'd') {
+                    phone_instance_t::refresh_audio_devices();
+                    for (const auto &e: phone_instance_t::get_audio_devices()) {
+                        std::cout << e.id << " - " << e.driver << "/" << e.name << " (" << e.input_count << "/"
+                                  << e.output_count << ")" << std::endl;
+                    }
+                } else if (command == 'D') {
+                    int capture_index;
+                    int playback_index;
+                    std::cout << "please enter desired capture device: ";
+                    std::cin >> capture_index;
+                    std::cout << "please enter desired playback device: ";
+                    std::cin >> playback_index;
+                    phone_instance_t::set_audio_devices(capture_index, playback_index);
                 }
-            } else if (command == 'D') {
-                int capture_index;
-                int playback_index;
-                std::cout << "please enter desired capture device: ";
-                std::cin >> capture_index;
-                std::cout << "please enter desired playback device: ";
-                std::cin >> playback_index;
-                phone_instance_t::set_audio_devices(capture_index, playback_index);
+            } catch (const phone::exception& e) {
+                std::cerr << "Error: " << e.what() << std::endl;
             }
         } while (command != 'q');
     } catch (const phone::exception &e) {
-        std::cerr << e.what() << std::endl;
+        std::cerr << "Error: " << e.what() << std::endl;
         return 1;
     }
 
