@@ -5,6 +5,7 @@
 #ifndef PHONE_HELPER_H
 #define PHONE_HELPER_H
 
+#include <phone.h>
 #include <stdio.h>
 #include <string.h>
 #include <limits.h>
@@ -47,5 +48,10 @@ int read_int(int *in) {
     return 0;
 }
 
+void die(phone_t instance) {
+    phone_destroy(instance);
+    fprintf(stderr, "%s\n", phone_last_error());
+    exit(EXIT_FAILURE);
+}
 
 #endif //PHONE_HELPER_H

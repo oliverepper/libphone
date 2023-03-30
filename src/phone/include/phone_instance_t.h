@@ -92,6 +92,9 @@ public:
     PHONE_EXPORT std::optional<int> call_answer_after(int call_index);
     PHONE_EXPORT std::optional<int> call_answer_after(const std::string& call_id);
 
+    PHONE_EXPORT void register_thread(const std::string& name);
+    PHONE_EXPORT bool is_thread_registered();
+
 private:
     void create_tls_transport_with_srv_lookup();
     std::unique_ptr<pj::Endpoint> m_ep;

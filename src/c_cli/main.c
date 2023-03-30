@@ -5,12 +5,6 @@
 #include <string.h>
 #include <unistd.h>
 
-void die(phone_t instance) {
-    phone_destroy(instance);
-    fprintf(stderr, "%s\n", phone_last_error());
-    exit(EXIT_FAILURE);
-}
-
 struct app_state {
     phone_t phone;
     int last_call_index;
@@ -77,11 +71,14 @@ int main() {
     state->last_call_index = -1;
     memset(state->last_call_id, 0, sizeof(state->last_call_id));
 
+    // create phone in app state
     const char *nameserver[] = {"217.237.148.22", "217.237.150.51"};
     const char *stunserver[] = {"stun.t-online.de"};
     state->phone = phone_create("Cli Phone in C", nameserver, 2, stunserver, 1);
     if (!state->phone)
         die(state->phone);
+
+    // logging
     phone_set_log_level(0);
 
     // callbacks
@@ -232,5 +229,6 @@ int main() {
     } while (command != 'q' && command != EOF);
     printf("shutting down...\n");
     phone_destroy(state->phone);
+
     return 0;
 }

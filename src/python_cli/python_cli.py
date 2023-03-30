@@ -132,7 +132,7 @@ while command != 'q':
         try:
             device_filter = int(input("do you want a filter?: "))
         except ValueError:
-            print("no a valid input – will use DEVICE_FILTER_NONE", file=sys.stderr)
+            print("no valid input – will use DEVICE_FILTER_NONE", file=sys.stderr)
             device_filter = DEVICE_FILTER_NONE
         for device in phone_get_audio_devices(device_filter):
             print(f"{device.id} - {device.driver}/{device.name} ({device.input_count}/{device.output_count})")

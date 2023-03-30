@@ -33,4 +33,4 @@ endif()
 
 add_subdirectory(src bin)
 
-install(TARGETS phone_sharedlib)
+install(TARGETS phone_sharedlib cpp_cli)
