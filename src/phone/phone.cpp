@@ -5,7 +5,9 @@
 #include <cstring>
 #include <ranges>
 #include <algorithm>
+#ifdef __linux__
 #include <numeric>
+#endif
 
 char global_last_error[1024] = "no error";
 

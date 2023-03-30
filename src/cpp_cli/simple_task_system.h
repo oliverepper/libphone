@@ -26,7 +26,7 @@ class simple_task_system {
     }
 
 public:
-    simple_task_system(phone_instance_t *phone) : m_phone_ptr(phone) {
+    explicit simple_task_system(phone_instance_t *phone) : m_phone_ptr(phone) {
         for (unsigned n = 0; n != m_count; ++n)
             m_threads.emplace_back([&]{ run(n); });
     }
