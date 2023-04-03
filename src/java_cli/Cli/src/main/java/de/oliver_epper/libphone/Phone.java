@@ -151,11 +151,12 @@ public class Phone {
     static final PhoneLibrary CPHONE;
 
     static {
+        String nativeLibDir = System.getProperty("native-libs", "");
         String osName = System.getProperty("os.name").toLowerCase();
         if (osName.contains("mac")) {
-            CPHONE = Native.load("libphone.0.dylib", PhoneLibrary.class);
+            CPHONE = Native.load(nativeLibDir + "libphone.0.dylib", PhoneLibrary.class);
         } else if (osName.contains("linux")) {
-            CPHONE = Native.load("libphone.so.0", PhoneLibrary.class);
+            CPHONE = Native.load(nativeLibDir + "libphone.so.0", PhoneLibrary.class);
         } else {
             throw new RuntimeException("Unsupported OS: " + osName);
         }
