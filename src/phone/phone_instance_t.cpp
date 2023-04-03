@@ -15,6 +15,7 @@ phone_instance_t::phone_instance_t(std::string user_agent, std::vector<std::stri
     try {
         m_ep->libCreate();
         m_ep->libInit(ep_cfg);
+        m_ep->libStart();
     } catch (const pj::Error& e) {
         throw phone::exception{e.info()};
     }
@@ -78,7 +79,6 @@ void phone_instance_t::connect(std::string server, const std::string& user, std:
     create_tls_transport_with_srv_lookup();
 
     try {
-        m_ep->libStart();
         m_account->create(acc_cfg, true);
     } catch (const pj::Error &e) {
         throw phone::exception{e.info()};
