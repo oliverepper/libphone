@@ -50,7 +50,7 @@ set(phone_PUBLIC_HEADERS
         ${CMAKE_CURRENT_SOURCE_DIR}/include/phone_instance_t.h
         ${CMAKE_CURRENT_BINARY_DIR}/phone_export.h)
 
-add_library(phone_sharedlib SHARED)
+add_library(phone_sharedlib SHARED dummy.cpp)
 set_target_properties(phone_sharedlib PROPERTIES
     OUTPUT_NAME "phone"
     VERSION ${CMAKE_PROJECT_VERSION}
