@@ -1,4 +1,3 @@
-import org.gradle.internal.classpath.Instrumented
 
 plugins {
     id("java")
