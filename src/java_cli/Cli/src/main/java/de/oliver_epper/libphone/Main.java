@@ -37,6 +37,8 @@ public class Main {
                         };
 
                         executor.submit(answer);
+                    } else {
+                        // FIXME: start ringing
                     }
                 } catch (PhoneException e) {
                     e.printStackTrace();
@@ -58,6 +60,8 @@ public class Main {
                         };
 
                         executor.submit(answer);
+                    } else {
+                        // FIXME: start_ringing
                     }
                 } catch (PhoneException e) {
                     e.printStackTrace();
