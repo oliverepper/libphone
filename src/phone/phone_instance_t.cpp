@@ -115,6 +115,22 @@ void phone_instance_t::answer_call(std::string call_id) {
     }
 }
 
+void phone_instance_t::start_ringing_call(int id) {
+    try {
+        m_account->start_ringing_call(id);
+    } catch (const pj::Error &e) {
+        throw phone::exception{e.info()};
+    }
+}
+
+void phone_instance_t::start_ringing_call(std::string call_id) {
+    try {
+        m_account->start_ringing_call(std::move(call_id));
+    } catch (const pj::Error& e) {
+        throw phone::exception{e.info()};
+    }
+}
+
 void phone_instance_t::hangup_call(int call_id) {
     try {
         m_account->hangup_call(call_id);

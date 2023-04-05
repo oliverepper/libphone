@@ -74,6 +74,8 @@ public:
     PHONE_EXPORT void make_call(const std::string& uri);
     PHONE_EXPORT void answer_call(int call_index);
     PHONE_EXPORT void answer_call(std::string call_id);
+    PHONE_EXPORT void start_ringing_call(int call_index);
+    PHONE_EXPORT void start_ringing_call(std::string call_id);
     PHONE_EXPORT void hangup_call(int call_index);
     PHONE_EXPORT void hangup_call(std::string call_id);
     PHONE_EXPORT void hangup_calls() noexcept;

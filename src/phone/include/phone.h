@@ -52,6 +52,9 @@ PHONE_DEPRECATED_EXPORT phone_status_t phone_answer_call(phone_t instance, int c
 PHONE_EXPORT phone_status_t phone_answer_call_index(phone_t instance, int call_index);
 PHONE_EXPORT phone_status_t phone_answer_call_id(phone_t instance, const char *call_id);
 
+PHONE_EXPORT phone_status_t phone_start_ringing_call_index(phone_t instance, int call_index);
+PHONE_EXPORT phone_status_t phone_start_ringing_call_id(phone_t instance, const char *call_id);
+
 PHONE_DEPRECATED_EXPORT phone_status_t phone_hangup_call(phone_t instance, int call_id);
 PHONE_EXPORT phone_status_t phone_hangup_call_index(phone_t instance, int call_index);
 PHONE_EXPORT phone_status_t phone_hangup_call_id(phone_t instance, const char *call_id);

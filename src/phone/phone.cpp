@@ -122,6 +122,25 @@ phone_status_t phone_answer_call_id(phone_t instance, const char *call_id) {
     return PHONE_STATUS_SUCCESS;
 }
 
+phone_status_t phone_start_ringing_call_index(phone_t instance, int call_index) {
+    try {
+        instance->start_ringing_call(call_index);
+    } catch (const phone::exception& e) {
+        strncpy(global_last_error, e.what(), sizeof(global_last_error));
+        return PHONE_STATUS_FAILURE;
+    }
+    return PHONE_STATUS_SUCCESS;
+}
+
+phone_status_t phone_start_ringing_call_id(phone_t instance, const char *call_id) {
+    try {
+        instance->start_ringing_call(call_id);
+    } catch (const phone::exception& e) {
+        strncpy(global_last_error, e.what(), sizeof(global_last_error));
+        return EXIT_FAILURE;
+    }
+    return PHONE_STATUS_SUCCESS;
+}
 
 phone_status_t phone_hangup_call(phone_t instance, int call_id) {
     return phone_hangup_call_index(instance, call_id);

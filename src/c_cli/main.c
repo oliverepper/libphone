@@ -26,6 +26,8 @@ void on_incoming_call_with_index_cb(int call_index, __attribute__((unused)) void
     if (answer_after >= 0) {
         sleep(answer_after);
         phone_answer_call_index(s->phone, call_index);
+    } else {
+        phone_start_ringing_call_index(s->phone, call_index);
     }
 }
 
@@ -43,6 +45,8 @@ void on_incoming_call_with_id_cb(const char *call_id, __attribute__((unused)) vo
     if (answer_after >= 0) {
         sleep(answer_after);
         phone_answer_call_id(s->phone, call_id);
+    } else {
+        phone_start_ringing_call_id(s->phone, call_id);
     }
 }
 

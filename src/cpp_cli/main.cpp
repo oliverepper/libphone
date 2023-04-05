@@ -34,6 +34,8 @@ struct app_state {
                     std::cerr << "In callback: " << e.what() << std::endl;
                 }
             });
+        } else {
+            phone.start_ringing_call(call_index);
         }
     }
 
@@ -58,6 +60,8 @@ struct app_state {
                     std::cerr << "In callback: " << e.what() << std::endl;
                 }
             });
+        } else {
+            phone.start_ringing_call(call_id);
         }
     }
 

@@ -94,6 +94,16 @@ public:
     }
 
     template<typename ID>
+    void start_ringing_call(ID id) {
+        typename std::vector<std::unique_ptr<call_t>>::iterator it = call_for(id); //NOLINT(modernize-use-auto)
+        if (it != std::end(m_calls)) {
+            pj::CallOpParam prm;
+            prm.statusCode = PJSIP_SC_RINGING;
+            (*it)->answer(prm);
+        }
+    }
+
+    template<typename ID>
     void hangup_call(ID id) {
         typename std::vector<std::unique_ptr<call_t>>::iterator it = call_for(id); //NOLINT(modernize-use-auto)
         if (it != std::end(m_calls)) {
