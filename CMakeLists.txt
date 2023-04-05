@@ -8,6 +8,11 @@ set(CMAKE_C_VISIBILITY_PRESET hidden)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN true)
 
+if(NOT CMAKE_PREFIX_PATH)
+    set(CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/installed/pjproject/macos-arm64"
+            CACHE STRING "Path to pjproject dependency")
+endif()
+
 include(GNUInstallDirs)
 
 file(RELATIVE_PATH pathToLibs
