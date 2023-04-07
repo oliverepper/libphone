@@ -20,7 +20,8 @@ public class Main {
 
             Runnable register = () -> phone.registerThread("Test");
 
-            executor.submit(register);
+            var registration = executor.submit(register);
+            registration.get();
 
             phone.registerOnIncomingCallIndexCallback((callIndex, ctx) -> {
                 try {
