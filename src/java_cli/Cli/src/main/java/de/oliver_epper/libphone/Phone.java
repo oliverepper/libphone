@@ -7,7 +7,6 @@ import com.sun.jna.ptr.LongByReference;
 import java.util.Arrays;
 import java.util.List;
 
-@SuppressWarnings("ALL")
 public class Phone {
     static final int PHONE_STATUS_SUCCESS=0;
     static final int PHONE_STATUS_FAILURE=1;
@@ -25,7 +24,7 @@ public class Phone {
         INPUT_DEVICES(1),
         OUPUT_DEVICES(2);
 
-        int val;
+        final int val;
 
         DeviceFilter(int val) {
             this.val = val;
@@ -85,6 +84,11 @@ public class Phone {
         int phone_answer_call_index(Pointer phone, int call_index);
         // PHONE_EXPORT phone_status_t phone_answer_call_id(phone_t instance, const char *call_id);
         int phone_answer_call_id(Pointer phone, String call_id);
+
+        // PHONE_EXPORT phone_status_t phone_start_ringing_call_index(phone_t instance, int call_index);
+        int phone_start_ringing_call_index(Pointer instance, int callIndex);
+        // PHONE_EXPORT phone_status_t phone_start_ringing_call_id(phone_t instance, const char *call_id);
+        int phone_start_ringing_call_id(Pointer instance, String CallId);
 
         // PHONE_DEPRECATED_EXPORT phone_status_t phone_hangup_call(phone_t instance, int call_id);
         // PHONE_EXPORT phone_status_t phone_hangup_call_index(phone_t instance, int call_index);
@@ -261,6 +265,18 @@ public class Phone {
 
     void answer(String callId) throws PhoneException {
         if (CPHONE.phone_answer_call_id(phone, callId) != PHONE_STATUS_SUCCESS) {
+            throw new PhoneException(lastError());
+        }
+    }
+
+    void startRinging(int callIndex) throws PhoneException {
+        if (CPHONE.phone_start_ringing_call_index(phone, callIndex) != PHONE_STATUS_SUCCESS) {
+            throw new PhoneException(lastError());
+        }
+    }
+
+    void startRinging(String callId) throws PhoneException {
+        if (CPHONE.phone_start_ringing_call_id(phone, callId) != PHONE_STATUS_SUCCESS) {
             throw new PhoneException(lastError());
         }
     }

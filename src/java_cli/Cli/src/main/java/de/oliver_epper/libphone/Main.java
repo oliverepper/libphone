@@ -39,7 +39,7 @@ public class Main {
 
                         executor.submit(answer);
                     } else {
-                        // FIXME: start ringing
+                        phone.startRinging(callIndex);
                     }
                 } catch (PhoneException e) {
                     e.printStackTrace();
@@ -62,7 +62,7 @@ public class Main {
 
                         executor.submit(answer);
                     } else {
-                        // FIXME: start_ringing
+                        phone.startRinging(callId);
                     }
                 } catch (PhoneException e) {
                     e.printStackTrace();
