@@ -39,6 +39,19 @@ namespace phone {
         return states[state];
     }
 
+    constexpr std::array<std::pair<int, std::string_view>, 2> status {{
+        {200, "OK"},
+        {403, "FORBIDDEN"}
+//        {593, "SERVICE UNAVAILABE"}
+    }};
+
+    inline std::string status_name(int code) noexcept {
+        auto it = std::find_if(std::begin(status), std::end(status), [code](const auto& pair) {
+            return pair.first == code;
+        });
+        return (it != std::end(status)) ? std::string{it->second} : std::to_string(code);
+    }
+
     struct audio_device_info_t {
         int id;
         std::string driver;
@@ -61,6 +74,8 @@ public:
     phone_instance_t& operator=(const phone_instance_t& instance) = delete;
     phone_instance_t(phone_instance_t&& instance) = delete;
     phone_instance_t& operator=(phone_instance_t&& instance) = delete;
+
+    PHONE_EXPORT void register_on_registration_state_callback(const std::function<void(bool, int)>& callback);
 
     PHONE_EXPORT void register_on_call_state_callback(const std::function<void(int, int)>& callback);
     PHONE_EXPORT void register_on_call_state_callback(const std::function<void(std::string, int)>& callback);

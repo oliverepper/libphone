@@ -11,6 +11,16 @@ struct app_state {
     char last_call_id[128];
 };
 
+void on_registration_state(int is_registered, int registration_state, __attribute__((unused)) void *ctx) {
+    char buffer[64];
+    phone_status_name(buffer, sizeof(buffer), registration_state);
+    if (is_registered) {
+        printf("phone registered: %s\n", buffer);
+    } else {
+        printf("phone unregistered: %s\n", buffer);
+    }
+}
+
 void on_incoming_call_with_index_cb(int call_index, __attribute__((unused)) void *ctx) {
     struct app_state *s = (struct app_state*)ctx;
     s->last_call_index = call_index;
@@ -69,7 +79,6 @@ void on_call_state_with_id_cb(const char* call_id, int state, void *ctx) {
     printf("Call %s – state: %s\n", call_id, buffer);
 }
 
-
 int main() {
     struct app_state *state = malloc(sizeof(struct app_state));
     state->last_call_index = -1;
@@ -86,6 +95,8 @@ int main() {
     phone_set_log_level(0);
 
     // callbacks
+    phone_register_on_registration_state_callback(state->phone, on_registration_state, NULL);
+
     phone_register_on_incoming_call_callback(state->phone, on_incoming_call_with_index_cb, state);
     phone_register_on_incoming_call_index_callback(state->phone, on_incoming_call_with_index_cb, state);
     phone_register_on_incoming_call_id_callback(state->phone, on_incoming_call_with_id_cb, state);

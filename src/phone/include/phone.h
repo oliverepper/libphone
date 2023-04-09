@@ -35,6 +35,8 @@ PHONE_EXPORT phone_t phone_create(const char *user_agent,
                                   const char * const stunserver[], size_t stunserver_count);
 PHONE_EXPORT void phone_destroy(phone_t instance);
 
+PHONE_EXPORT void phone_register_on_registration_state_callback(phone_t instance, void (*cb)(int is_registered, int registration_state, void *ctx), void *ctx);
+
 PHONE_DEPRECATED_EXPORT void phone_register_on_incoming_call_callback(phone_t instance, void (*cb)(int call_id, void *ctx), void *ctx);
 PHONE_EXPORT void phone_register_on_incoming_call_index_callback(phone_t instance, void (*cb)(int call_index, void *ctx), void *ctx);
 PHONE_EXPORT void phone_register_on_incoming_call_id_callback(phone_t instance, void (*cb)(const char *call_id, void *ctx), void *ctx);
@@ -106,7 +108,8 @@ PHONE_EXPORT phone_status_t phone_call_answer_after_index(phone_t instance, int 
 PHONE_EXPORT phone_status_t phone_call_answer_after_id(phone_t instance, const char *call_id, int *answer_after);
 
 PHONE_EXPORT const char* phone_last_error(void);
-PHONE_EXPORT void phone_state_name(char *state_name, size_t buffer_size, int state);
+PHONE_EXPORT void phone_state_name(char *out, size_t buffer_size, int state);
+PHONE_EXPORT void phone_status_name(char *out, size_t buffer_size, int code);
 PHONE_EXPORT void phone_set_log_level(int level);
 
 PHONE_EXPORT phone_status_t phone_register_thread(phone_t instance, const char *name);

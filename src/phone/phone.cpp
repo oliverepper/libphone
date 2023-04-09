@@ -24,12 +24,18 @@ phone_t phone_create(const char *user_agent,
     }
 }
 
+void phone_register_on_registration_state_callback(phone_t instance, void (*cb)(int, int, void *), void *ctx) {
+    instance->register_on_registration_state_callback([cb, ctx](bool is_registered, int registration_state) {
+        cb(is_registered, registration_state, ctx);
+    });
+}
+
 void phone_register_on_call_state_callback(phone_t instance, void (*cb)(int, int, void *), void *ctx) {
     phone_register_on_call_state_index_callback(instance, cb, ctx);
 }
 
 void phone_register_on_call_state_index_callback(phone_t instance, void (*cb)(int, int, void *), void *ctx) {
-    instance->register_on_call_state_callback([cb, ctx](int call_index, int state){
+    instance->register_on_call_state_callback([cb, ctx](int call_index, int state) {
         cb(call_index, state, ctx);
     });
 }
@@ -195,8 +201,12 @@ const char* phone_last_error(void) {
     return global_last_error;
 }
 
-void phone_state_name(char *state_name, size_t buffer_size, int state) {
-    strncpy(state_name, phone::state_name(state).data(), buffer_size);
+void phone_state_name(char *out, size_t buffer_size, int state) {
+    strncpy(out, phone::state_name(state).data(), buffer_size);
+}
+
+void phone_status_name(char *out, size_t buffer_size, int code) {
+    strncpy(out, phone::status_name(code).data(), buffer_size);
 }
 
 void phone_refresh_audio_devices(void) {
@@ -356,3 +366,4 @@ phone_status_t phone_register_thread(phone_t instance, const char *name) {
 int phone_is_thread_registered(phone_t instance) {
     return instance->is_thread_registered();
 }
+
