@@ -202,11 +202,15 @@ const char* phone_last_error(void) {
 }
 
 void phone_state_name(char *out, size_t buffer_size, int state) {
-    strncpy(out, phone::state_name(state).data(), buffer_size);
+    phone_call_state_name(out, buffer_size, state);
 }
 
 void phone_status_name(char *out, size_t buffer_size, int code) {
     strncpy(out, phone::status_name(code).data(), buffer_size);
+}
+
+void phone_call_state_name(char *out, size_t buffer_size, int state) {
+    strncpy(out, phone::call_state_name(state).data(), buffer_size);
 }
 
 void phone_refresh_audio_devices(void) {
@@ -366,4 +370,5 @@ phone_status_t phone_register_thread(phone_t instance, const char *name) {
 int phone_is_thread_registered(phone_t instance) {
     return instance->is_thread_registered();
 }
+
 

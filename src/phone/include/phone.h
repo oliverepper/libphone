@@ -108,8 +108,36 @@ PHONE_EXPORT phone_status_t phone_call_answer_after_index(phone_t instance, int 
 PHONE_EXPORT phone_status_t phone_call_answer_after_id(phone_t instance, const char *call_id, int *answer_after);
 
 PHONE_EXPORT const char* phone_last_error(void);
-PHONE_EXPORT void phone_state_name(char *out, size_t buffer_size, int state);
 PHONE_EXPORT void phone_status_name(char *out, size_t buffer_size, int code);
+
+/**
+ * @brief Get the human-readable name for a given phone call state.
+ *
+ * This function retrieves the human-readable name for the provided phone call
+ * state and stores it in the provided output buffer.
+ *
+ * @param[out] out Pointer to the output buffer where the state name will be stored.
+ * @param[in] buffer_size Size of the output buffer in bytes.
+ * @param[in] state Numeric value of the phone call state.
+ *
+ * @note Use this function instead of the deprecated phone_state_name().
+ */
+PHONE_EXPORT void phone_call_state_name(char *out, size_t buffer_size, int state);
+
+/**
+ * @brief Get the human-readable name for a given phone state (deprecated).
+ *
+ * This function retrieves the human-readable name for the provided phone state
+ * and stores it in the provided output buffer. It is deprecated and the
+ * phone_call_state_name() function should be used instead.
+ *
+ * @deprecated This function is deprecated, use phone_call_state_name() instead.
+ *
+ * @param[out] out Pointer to the output buffer where the state name will be stored.
+ * @param[in] buffer_size Size of the output buffer in bytes.
+ * @param[in] state Numeric value of the phone state.
+ */
+PHONE_DEPRECATED_EXPORT void phone_state_name(char *out, size_t buffer_size, int state);
 PHONE_EXPORT void phone_set_log_level(int level);
 
 PHONE_EXPORT phone_status_t phone_register_thread(phone_t instance, const char *name);

@@ -23,7 +23,7 @@ namespace phone {
         std::string m_message;
     };
 
-    constexpr std::string_view states[] = {
+    constexpr std::string_view call_states[] = {
             "NULL",
             "CALLING",
             "INCOMING",
@@ -33,19 +33,22 @@ namespace phone {
             "DISCONNECTED"
     };
 
-    constexpr std::string_view state_name(int state) noexcept {
-        constexpr auto count = sizeof(states) / sizeof(states[0]);
+    PHONE_EXPORT constexpr std::string_view call_state_name(int state) noexcept {
+        constexpr auto count = sizeof(call_states) / sizeof(call_states[0]);
         if (state >= count) return "UNKNOWN STATE";
-        return states[state];
+        return call_states[state];
+    }
+
+    PHONE_DEPRECATED_EXPORT constexpr std::string_view state_name(int state) noexcept {
+        return call_state_name(state);
     }
 
     constexpr std::array<std::pair<int, std::string_view>, 2> status {{
         {200, "OK"},
         {403, "FORBIDDEN"}
-//        {593, "SERVICE UNAVAILABE"}
     }};
 
-    inline std::string status_name(int code) noexcept {
+    PHONE_EXPORT inline std::string status_name(int code) noexcept {
         auto it = std::find_if(std::begin(status), std::end(status), [code](const auto& pair) {
             return pair.first == code;
         });
