@@ -5,17 +5,21 @@
 #include <string.h>
 #include <unistd.h>
 
-void die(phone_t instance) {
-    phone_destroy(instance);
-    fprintf(stderr, "%s\n", phone_last_error());
-    exit(EXIT_FAILURE);
-}
-
 struct app_state {
     phone_t phone;
     int last_call_index;
     char last_call_id[128];
 };
+
+void on_registration_state(int is_registered, int registration_state, __attribute__((unused)) void *ctx) {
+    char buffer[64];
+    phone_status_name(buffer, sizeof(buffer), registration_state);
+    if (is_registered) {
+        printf("phone registered: %s\n", buffer);
+    } else {
+        printf("phone unregistered: %s\n", buffer);
+    }
+}
 
 void on_incoming_call_with_index_cb(int call_index, __attribute__((unused)) void *ctx) {
     struct app_state *s = (struct app_state*)ctx;
@@ -32,6 +36,8 @@ void on_incoming_call_with_index_cb(int call_index, __attribute__((unused)) void
     if (answer_after >= 0) {
         sleep(answer_after);
         phone_answer_call_index(s->phone, call_index);
+    } else {
+        phone_start_ringing_call_index(s->phone, call_index);
     }
 }
 
@@ -49,6 +55,8 @@ void on_incoming_call_with_id_cb(const char *call_id, __attribute__((unused)) vo
     if (answer_after >= 0) {
         sleep(answer_after);
         phone_answer_call_id(s->phone, call_id);
+    } else {
+        phone_start_ringing_call_id(s->phone, call_id);
     }
 }
 
@@ -57,7 +65,7 @@ void on_call_state_with_index_cb(int call_index, int state, void *ctx) {
     s->last_call_index = call_index;
 
     char call_state_buffer[64] = {0};
-    phone_state_name(call_state_buffer, sizeof(call_state_buffer), state);
+    phone_call_state_name(call_state_buffer, sizeof(call_state_buffer), state);
 
     printf("Call %d – state: %s\n", call_index, call_state_buffer);
 }
@@ -67,29 +75,31 @@ void on_call_state_with_id_cb(const char* call_id, int state, void *ctx) {
     strncpy(s->last_call_id, call_id, sizeof(s->last_call_id));
 
     char buffer[64];
-    phone_state_name(buffer, sizeof(buffer), state);
+    phone_call_state_name(buffer, sizeof(buffer), state);
     printf("Call %s – state: %s\n", call_id, buffer);
 }
-
 
 int main() {
     struct app_state *state = malloc(sizeof(struct app_state));
     state->last_call_index = -1;
     memset(state->last_call_id, 0, sizeof(state->last_call_id));
 
+    // create phone in app state
     const char *nameserver[] = {"217.237.148.22", "217.237.150.51"};
     const char *stunserver[] = {"stun.t-online.de"};
     state->phone = phone_create("Cli Phone in C", nameserver, 2, stunserver, 1);
     if (!state->phone)
         die(state->phone);
+
+    // logging
     phone_set_log_level(0);
 
     // callbacks
-    phone_register_on_incoming_call_callback(state->phone, on_incoming_call_with_index_cb, state);
+    phone_register_on_registration_state_callback(state->phone, on_registration_state, NULL);
+
     phone_register_on_incoming_call_index_callback(state->phone, on_incoming_call_with_index_cb, state);
     phone_register_on_incoming_call_id_callback(state->phone, on_incoming_call_with_id_cb, state);
 
-    phone_register_on_call_state_callback(state->phone, on_call_state_with_index_cb, state);
     phone_register_on_call_state_index_callback(state->phone, on_call_state_with_index_cb, state);
     phone_register_on_call_state_id_callback(state->phone, on_call_state_with_id_cb, state);
 
@@ -138,7 +148,7 @@ int main() {
                     int call_index;
                     printf("please enter call index: ");
                     if (read_int(&call_index) != 0) break;
-                    if (phone_answer_call(state->phone, call_index) != PHONE_STATUS_SUCCESS)
+                    if (phone_answer_call_index(state->phone, call_index) != PHONE_STATUS_SUCCESS)
                         fprintf(stderr, "%s\n", phone_last_error());
                 }
                 break;
@@ -158,7 +168,7 @@ int main() {
                     int call_index;
                     printf("please enter call index: ");
                     if (read_int(&call_index) != 0) break;
-                    if (phone_hangup_call(state->phone, call_index) != PHONE_STATUS_SUCCESS)
+                    if (phone_hangup_call_index(state->phone, call_index) != PHONE_STATUS_SUCCESS)
                         fprintf(stderr, "%s\n", phone_last_error());
                 }
                 break;
@@ -232,5 +242,6 @@ int main() {
     } while (command != 'q' && command != EOF);
     printf("shutting down...\n");
     phone_destroy(state->phone);
+
     return 0;
 }

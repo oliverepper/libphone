@@ -6,6 +6,7 @@
 
 class account_t : public pj::Account {
 public:
+    std::optional<std::function<void(bool, int)>> on_registration_state;
     std::optional<std::function<void(int)>> on_incoming_call_with_index;
     std::optional<std::function<void(std::string)>> on_incoming_call_with_id;
     std::optional<std::function<void(int, int)>> on_call_state_with_index;
@@ -18,6 +19,7 @@ public:
         } else {
             PJ_LOG(3,(__BASE_FILE__, "unregister code: %d", prm.code));
         }
+        if (on_registration_state.has_value()) on_registration_state.value()(info.regIsActive, prm.code);
     }
 
     void onIncomingCall(pj::OnIncomingCallParam &prm) override {
@@ -89,6 +91,16 @@ public:
         if (it != std::end(m_calls)) {
             pj::CallOpParam prm;
             prm.statusCode = PJSIP_SC_OK;
+            (*it)->answer(prm);
+        }
+    }
+
+    template<typename ID>
+    void start_ringing_call(ID id) {
+        typename std::vector<std::unique_ptr<call_t>>::iterator it = call_for(id); //NOLINT(modernize-use-auto)
+        if (it != std::end(m_calls)) {
+            pj::CallOpParam prm;
+            prm.statusCode = PJSIP_SC_RINGING;
             (*it)->answer(prm);
         }
     }

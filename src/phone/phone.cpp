@@ -5,7 +5,9 @@
 #include <cstring>
 #include <ranges>
 #include <algorithm>
+#ifdef __linux__
 #include <numeric>
+#endif
 
 char global_last_error[1024] = "no error";
 
@@ -22,12 +24,18 @@ phone_t phone_create(const char *user_agent,
     }
 }
 
+void phone_register_on_registration_state_callback(phone_t instance, void (*cb)(int, int, void *), void *ctx) {
+    instance->register_on_registration_state_callback([cb, ctx](bool is_registered, int registration_state) {
+        cb(is_registered, registration_state, ctx);
+    });
+}
+
 void phone_register_on_call_state_callback(phone_t instance, void (*cb)(int, int, void *), void *ctx) {
     phone_register_on_call_state_index_callback(instance, cb, ctx);
 }
 
 void phone_register_on_call_state_index_callback(phone_t instance, void (*cb)(int, int, void *), void *ctx) {
-    instance->register_on_call_state_callback([cb, ctx](int call_index, int state){
+    instance->register_on_call_state_callback([cb, ctx](int call_index, int state) {
         cb(call_index, state, ctx);
     });
 }
@@ -120,6 +128,25 @@ phone_status_t phone_answer_call_id(phone_t instance, const char *call_id) {
     return PHONE_STATUS_SUCCESS;
 }
 
+phone_status_t phone_start_ringing_call_index(phone_t instance, int call_index) {
+    try {
+        instance->start_ringing_call(call_index);
+    } catch (const phone::exception& e) {
+        strncpy(global_last_error, e.what(), sizeof(global_last_error));
+        return PHONE_STATUS_FAILURE;
+    }
+    return PHONE_STATUS_SUCCESS;
+}
+
+phone_status_t phone_start_ringing_call_id(phone_t instance, const char *call_id) {
+    try {
+        instance->start_ringing_call(call_id);
+    } catch (const phone::exception& e) {
+        strncpy(global_last_error, e.what(), sizeof(global_last_error));
+        return EXIT_FAILURE;
+    }
+    return PHONE_STATUS_SUCCESS;
+}
 
 phone_status_t phone_hangup_call(phone_t instance, int call_id) {
     return phone_hangup_call_index(instance, call_id);
@@ -174,8 +201,16 @@ const char* phone_last_error(void) {
     return global_last_error;
 }
 
-void phone_state_name(char *state_name, size_t buffer_size, int state) {
-    strncpy(state_name, phone::state_name(state).data(), buffer_size);
+void phone_state_name(char *out, size_t buffer_size, int state) {
+    phone_call_state_name(out, buffer_size, state);
+}
+
+void phone_status_name(char *out, size_t buffer_size, int code) {
+    strncpy(out, phone::status_name(code).data(), buffer_size);
+}
+
+void phone_call_state_name(char *out, size_t buffer_size, int state) {
+    strncpy(out, phone::call_state_name(state).data(), buffer_size);
 }
 
 void phone_refresh_audio_devices(void) {
@@ -320,3 +355,20 @@ phone_status_t phone_call_answer_after_id(phone_t instance, const char *call_id,
     }
     return PHONE_STATUS_SUCCESS;
 }
+
+phone_status_t phone_register_thread(phone_t instance, const char *name) {
+    try {
+        instance->register_thread(name);
+    } catch (const phone::exception& e) {
+        strncpy(global_last_error, e.what(), sizeof(global_last_error));
+        return PHONE_STATUS_FAILURE;
+    }
+
+    return PHONE_STATUS_SUCCESS;
+}
+
+int phone_is_thread_registered(phone_t instance) {
+    return instance->is_thread_registered();
+}
+
+

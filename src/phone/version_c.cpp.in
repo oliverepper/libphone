@@ -2,19 +2,19 @@
 #include <phone/version.h>
 #include <cstring>
 
-unsigned phone_version_major() {
+unsigned phone_version_major(void) {
     return @phone_VERSION_MAJOR@;
 }
 
-unsigned phone_version_minor() {
+unsigned phone_version_minor(void) {
     return @phone_VERSION_MINOR@ + 0;
 }
 
-unsigned phone_version_patch() {
+unsigned phone_version_patch(void) {
     return @phone_VERSION_PATCH@ + 0;
 }
 
-unsigned phone_version_tweak() {
+unsigned phone_version_tweak(void) {
     return @phone_VERSION_TWEAK@ + 0;
 }
 

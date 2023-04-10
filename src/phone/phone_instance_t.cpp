@@ -25,6 +25,10 @@ phone_instance_t::~phone_instance_t() {
     m_ep->libDestroy();
 }
 
+void phone_instance_t::register_on_registration_state_callback(const std::function<void(bool, int)> &callback) {
+    m_account->on_registration_state = callback;
+}
+
 void phone_instance_t::register_on_call_state_callback(const std::function<void(int, int)>& callback) {
     m_account->on_call_state_with_index = callback;
 }
@@ -110,6 +114,22 @@ void phone_instance_t::answer_call(int id) {
 void phone_instance_t::answer_call(std::string call_id) {
     try {
         m_account->answer_call(std::move(call_id));
+    } catch (const pj::Error& e) {
+        throw phone::exception{e.info()};
+    }
+}
+
+void phone_instance_t::start_ringing_call(int id) {
+    try {
+        m_account->start_ringing_call(id);
+    } catch (const pj::Error &e) {
+        throw phone::exception{e.info()};
+    }
+}
+
+void phone_instance_t::start_ringing_call(std::string call_id) {
+    try {
+        m_account->start_ringing_call(std::move(call_id));
     } catch (const pj::Error& e) {
         throw phone::exception{e.info()};
     }
@@ -228,4 +248,16 @@ std::optional<int> phone_instance_t::call_answer_after(const std::string& call_i
     } catch (const std::invalid_argument& e) {
         throw phone::exception{e.what()};
     }
+}
+
+void phone_instance_t::register_thread(const std::string &name) {
+    try {
+        m_ep->libRegisterThread(name);
+    } catch (const pj::Error& e) {
+        throw phone::exception{e.info()};
+    }
+}
+
+bool phone_instance_t::is_thread_registered() {
+    return m_ep->libIsThreadRegistered();
 }
