@@ -160,6 +160,21 @@ __phone_hangup_call_index.restype = c_int
 __phone_hangup_call_index.argtypes = [c_void_p, c_int]
 
 
+# PHONE_EXPORT phone_status_t phone_start_ringing_call_index(phone_t instance, int call_index);
+phone_start_ringing_call_index = libphone.phone_start_ringing_call_index
+phone_start_ringing_call_index.restype = c_int
+phone_start_ringing_call_index.argtypes = [c_void_p, c_int]
+
+
+# PHONE_EXPORT phone_status_t phone_start_ringing_call_id(phone_t instance, const char *call_id);
+def phone_start_ringing_call_id(phone, call_id):
+    __phone_start_ringing_call_id = libphone.phone_start_ringing_call_id
+    __phone_start_ringing_call_id.restype = c_int
+    __phone_start_ringing_call_id.argtypes = [c_void_p, c_char_p]
+    c_call_id = c_char_p(call_id.encode('utf-8'))
+    return __phone_start_ringing_call_id(phone, c_call_id)
+
+
 # PHONE_EXPORT phone_status_t phone_hangup_call_id(phone_t instance, const char *call_id);
 def phone_hangup_call_id(phone, call_id):
     __phone_hangup_call_id = libphone.phone_hangup_call_id

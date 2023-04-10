@@ -44,6 +44,8 @@ def on_incoming_call_index_cb(call_index, ctx):
         print(f"will auto answer call after {answer_after} seconds")
         time.sleep(answer_after)
         phone_answer_call(phone, call_index)
+    else:
+        phone_start_ringing_call_index(phone, call_index)
 
 
 @CFUNCTYPE(None, c_char_p, c_void_p)
@@ -57,6 +59,8 @@ def on_incoming_call_id_cb(call_id, ctx):
         print(f"will auto answer call after {answer_after} seconds")
         time.sleep(answer_after)
         phone_answer_call_id(phone, call_id.decode('utf-8'))
+    else:
+        phone_start_ringing_call_id(phone, call_id.decode('utf-8'))
 
 
 # noinspection PyShadowingNames,PyUnusedLocal
