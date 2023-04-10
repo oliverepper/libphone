@@ -23,6 +23,14 @@ public class Main {
             var registration = executor.submit(register);
             registration.get();
 
+            phone.registerOnRegistrationStateCallback((isRegistered, registrationState, ctx) -> {
+                if (isRegistered) {
+                    System.out.println("phone is registered: " + Phone.describeStatus((registrationState)));
+                } else {
+                    System.out.println("phone is not registered: " + Phone.describeStatus(registrationState));
+                }
+            });
+
             phone.registerOnIncomingCallIndexCallback((callIndex, ctx) -> {
                 try {
                     System.out.println("Incoming call: " + callIndex + " - with id: " + phone.getCallId(callIndex));
