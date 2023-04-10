@@ -3,15 +3,23 @@
 #include <phone/version.hpp>
 #include <iostream>
 #include <thread>
-#include <future>
+#include <cassert>
 
-auto password_function = []() { return PASSWORD; };
+[[maybe_unused]] auto password_function = []() { return std::string{PASSWORD}; };
 
 struct app_state {
     phone_instance_t phone;
     std::string last_call_id;
     int last_call_index;
     simple_task_system task_system{&phone};
+
+    [[maybe_unused]] static void on_registration_state(bool is_registered, int registration_state) {
+        if (is_registered) {
+            std::cout << "phone registered: " << phone::status_name(registration_state) << std::endl;
+        } else {
+            std::cout << "phone unregistered: " << phone::status_name(registration_state) << std::endl;
+        }
+    }
 
     void on_incoming_call_cb(int call_index) {
         last_call_index = call_index;
@@ -25,7 +33,7 @@ struct app_state {
         auto answer_after = phone.call_answer_after(call_index);
         if (answer_after.has_value()) {
             std::cout << "Will auto-answer call for you" << std::endl;
-            task_system.async([=](){
+            task_system.async([this, answer_after, call_index](){
                 assert(phone.is_thread_registered() == true);
                 std::this_thread::sleep_for(std::chrono::seconds(answer_after.value()));
                 try {
@@ -51,7 +59,7 @@ struct app_state {
         auto answer_after = phone.call_answer_after(call_id);
         std::cout << "Will auto-answer call for you" << std::endl;
         if (answer_after.has_value()) {
-            task_system.async([=]() {
+            task_system.async([this, answer_after, call_id]() {
                 assert(phone.is_thread_registered() == true);
                 std::this_thread::sleep_for(std::chrono::seconds(answer_after.value()));
                 try {
@@ -66,11 +74,11 @@ struct app_state {
     }
 
     [[maybe_unused]] static void on_call_state_with_index_cb(int call_index, int state) {
-        std::cout << "Update for call index: " << call_index << " – state: " << phone::state_name(state) << std::endl;
+        std::cout << "Update for call index: " << call_index << " – state: " << phone::call_state_name(state) << std::endl;
     }
 
     [[maybe_unused]] static void on_call_state_with_id_cb(const std::string& call_id, int state) {
-        std::cout << "Update for call id: " << call_id << " – state: " << phone::state_name(state) << std::endl;
+        std::cout << "Update for call id: " << call_id << " – state: " << phone::call_state_name(state) << std::endl;
     }
 };
 
@@ -81,6 +89,9 @@ auto main() -> int {
         phone_instance_t::set_log_level(0);
 
         // callbacks
+        state.phone.register_on_registration_state_callback([](bool is_registered, int registration_state) {
+            app_state::on_registration_state(is_registered, registration_state);
+        });
         state.phone.register_on_incoming_call_callback([&state](int call_index) {
             state.on_incoming_call_cb(call_index);
         });

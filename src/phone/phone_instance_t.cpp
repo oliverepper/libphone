@@ -25,6 +25,10 @@ phone_instance_t::~phone_instance_t() {
     m_ep->libDestroy();
 }
 
+void phone_instance_t::register_on_registration_state_callback(const std::function<void(bool, int)> &callback) {
+    m_account->on_registration_state = callback;
+}
+
 void phone_instance_t::register_on_call_state_callback(const std::function<void(int, int)>& callback) {
     m_account->on_call_state_with_index = callback;
 }

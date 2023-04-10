@@ -75,6 +75,12 @@ phone_destroy.restype = None
 phone_destroy.argtypes = [c_void_p]
 
 
+# PHONE_EXPORT void phone_register_on_registration_state_callback(phone_t instance, void (*cb)(int is_registered, int registration_state, void *ctx), void *ctx);
+phone_register_on_registration_state_callback = libphone.phone_register_on_registration_state_callback
+phone_register_on_registration_state_callback.restype = None
+phone_register_on_registration_state_callback.argtypes = [c_void_p, c_void_p, c_void_p]
+
+
 # PHONE_EXPORT void phone_register_on_incoming_call_index_callback(phone_t instance, void (*cb)(int call_index, void *ctx), void *ctx);
 phone_register_on_incoming_call_index_callback = libphone.phone_register_on_incoming_call_index_callback
 phone_register_on_incoming_call_index_callback.restype = None
@@ -158,6 +164,21 @@ phone_answer_call = __phone_answer_call_index
 __phone_hangup_call_index = libphone.phone_hangup_call
 __phone_hangup_call_index.restype = c_int
 __phone_hangup_call_index.argtypes = [c_void_p, c_int]
+
+
+# PHONE_EXPORT phone_status_t phone_start_ringing_call_index(phone_t instance, int call_index);
+phone_start_ringing_call_index = libphone.phone_start_ringing_call_index
+phone_start_ringing_call_index.restype = c_int
+phone_start_ringing_call_index.argtypes = [c_void_p, c_int]
+
+
+# PHONE_EXPORT phone_status_t phone_start_ringing_call_id(phone_t instance, const char *call_id);
+def phone_start_ringing_call_id(phone, call_id):
+    __phone_start_ringing_call_id = libphone.phone_start_ringing_call_id
+    __phone_start_ringing_call_id.restype = c_int
+    __phone_start_ringing_call_id.argtypes = [c_void_p, c_char_p]
+    c_call_id = c_char_p(call_id.encode('utf-8'))
+    return __phone_start_ringing_call_id(phone, c_call_id)
 
 
 # PHONE_EXPORT phone_status_t phone_hangup_call_id(phone_t instance, const char *call_id);
@@ -328,13 +349,23 @@ def phone_last_error():
     return __phone_last_error().decode('utf-8')
 
 
-# PHONE_EXPORT void phone_state_name(char *buffer, size_t buffer_size, int state);
-def phone_state_name(state):
-    __phone_state_name = libphone.phone_state_name
-    __phone_state_name.restype = None
-    __phone_state_name.argtypes = [c_char_p, c_size_t, c_int]
+# PHONE_EXPORT void phone_status_name(char *out, size_t buffer_size, int code);
+def phone_status_name(state):
+    __phone_status_name = libphone.phone_status_name
+    __phone_status_name.restype = None
+    __phone_status_name.argtypes = [c_char_p, c_size_t, c_int]
     buffer = create_string_buffer(64)
-    __phone_state_name(buffer, len(buffer), state)
+    __phone_status_name(buffer, len(buffer), state)
+    return buffer.value.decode()
+
+
+# PHONE_EXPORT void phone_call_state_name(char *out, size_t buffer_size, int state);
+def phone_call_state_name(state):
+    __phone_call_state_name = libphone.phone_call_state_name
+    __phone_call_state_name.restype = None
+    __phone_call_state_name.argtypes = [c_char_p, c_size_t, c_int]
+    buffer = create_string_buffer(64)
+    __phone_call_state_name(buffer, len(buffer), state)
     return buffer.value.decode()
 
 

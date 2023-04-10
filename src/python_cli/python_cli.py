@@ -14,7 +14,7 @@ useragent           = "Python CLI Phone"
 nameservers         = ["217.237.148.22", "217.237.150.51"]
 stunservers         = ["stun.t-online.de"]
 sipserver           = "tel.t-online.de"
-username            = "+49..."
+username            = "+4965191899543"
 password            = None
 opus_channel_count  = 1
 opus_complexity     = 8
@@ -33,6 +33,14 @@ phone_set_log_level(0)
 
 
 # callbacks
+@CFUNCTYPE(None, c_int, c_int, c_void_p)
+def on_registration_state_cb(is_registered, registration_state, ctx):
+    if is_registered:
+        print(f"phone is registered {phone_status_name(registration_state)}")
+    else:
+        print(f"phone is not registered {phone_status_name(registration_state)}")
+
+
 # noinspection PyShadowingNames,PyUnusedLocal
 @CFUNCTYPE(None, c_int, c_void_p)
 def on_incoming_call_index_cb(call_index, ctx):
@@ -44,6 +52,8 @@ def on_incoming_call_index_cb(call_index, ctx):
         print(f"will auto answer call after {answer_after} seconds")
         time.sleep(answer_after)
         phone_answer_call(phone, call_index)
+    else:
+        phone_start_ringing_call_index(phone, call_index)
 
 
 @CFUNCTYPE(None, c_char_p, c_void_p)
@@ -57,20 +67,22 @@ def on_incoming_call_id_cb(call_id, ctx):
         print(f"will auto answer call after {answer_after} seconds")
         time.sleep(answer_after)
         phone_answer_call_id(phone, call_id.decode('utf-8'))
+    else:
+        phone_start_ringing_call_id(phone, call_id.decode('utf-8'))
 
 
 # noinspection PyShadowingNames,PyUnusedLocal
 @CFUNCTYPE(None, c_int, c_int, c_void_p)
 def on_call_state_index_cb(call_index, state, ctx):
-    print(f"Call index: {call_index} and id: {phone_get_call_id(phone, call_index)} – state: {phone_state_name(state)}")
+    print(f"Call index: {call_index} and id: {phone_get_call_id(phone, call_index)} – state: {phone_call_state_name(state)}")
 
 
 # noinspection PyShadowingNames,PyUnusedLocal
 @CFUNCTYPE(None, c_char_p, c_int, c_void_p)
 def on_call_state_id_cb(call_id, state, ctx):
-    print(f"Call id: {call_id.decode('utf-8')} and index: {phone_get_call_index(phone, call_id)} – state: {phone_state_name(state)}")
+    print(f"Call id: {call_id.decode('utf-8')} and index: {phone_get_call_index(phone, call_id)} – state: {phone_call_state_name(state)}")
 
-
+phone_register_on_registration_state_callback(phone, on_registration_state_cb, None)
 phone_register_on_incoming_call_index_callback(phone, on_incoming_call_index_cb, None)
 phone_register_on_incoming_call_id_callback(phone, on_incoming_call_id_cb, None)
 phone_register_on_call_state_index_callback(phone, on_call_state_index_cb, None)

@@ -20,7 +20,16 @@ public class Main {
 
             Runnable register = () -> phone.registerThread("Test");
 
-            executor.submit(register);
+            var registration = executor.submit(register);
+            registration.get();
+
+            phone.registerOnRegistrationStateCallback((isRegistered, registrationState, ctx) -> {
+                if (isRegistered) {
+                    System.out.println("phone is registered: " + Phone.describeStatus((registrationState)));
+                } else {
+                    System.out.println("phone is not registered: " + Phone.describeStatus(registrationState));
+                }
+            });
 
             phone.registerOnIncomingCallIndexCallback((callIndex, ctx) -> {
                 try {
@@ -37,6 +46,8 @@ public class Main {
                         };
 
                         executor.submit(answer);
+                    } else {
+                        phone.startRinging(callIndex);
                     }
                 } catch (PhoneException e) {
                     e.printStackTrace();
@@ -58,6 +69,8 @@ public class Main {
                         };
 
                         executor.submit(answer);
+                    } else {
+                        phone.startRinging(callId);
                     }
                 } catch (PhoneException e) {
                     e.printStackTrace();

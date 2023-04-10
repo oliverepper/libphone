@@ -7,7 +7,6 @@ import com.sun.jna.ptr.LongByReference;
 import java.util.Arrays;
 import java.util.List;
 
-@SuppressWarnings("ALL")
 public class Phone {
     static final int PHONE_STATUS_SUCCESS=0;
     static final int PHONE_STATUS_FAILURE=1;
@@ -25,7 +24,7 @@ public class Phone {
         INPUT_DEVICES(1),
         OUPUT_DEVICES(2);
 
-        int val;
+        final int val;
 
         DeviceFilter(int val) {
             this.val = val;
@@ -37,6 +36,10 @@ public class Phone {
     }
 
     private interface PhoneLibrary extends Library {
+        interface RegistrationStateCallback extends Callback {
+            void onRegistrationState(boolean isRegistered, int registrationState, Pointer ctx);
+        }
+
         interface IncomingCallIndexCallback extends Callback {
             void onIncomingCallIndexCallback(int callIndex, Pointer ctx);
         }
@@ -58,6 +61,9 @@ public class Phone {
 
         // PHONE_EXPORT void phone_destroy(phone_t instance);
         void phone_destroy(Pointer instance);
+
+        // PHONE_EXPORT void phone_register_on_registration_state_callback(phone_t instance, void (*cb)(int is_registered, int registration_state, void *ctx), void *ctx);
+        void phone_register_on_registration_state_callback(Pointer instance, RegistrationStateCallback cb, Pointer ctx);
 
         // PHONE_DEPRECATED_EXPORT void phone_register_on_incoming_call_callback(phone_t instance, void (*cb)(int call_id, void *ctx), void *ctx);
         // PHONE_EXPORT void phone_register_on_incoming_call_index_callback(phone_t instance, void (*cb)(int call_index, void *ctx), void *ctx);
@@ -85,6 +91,11 @@ public class Phone {
         int phone_answer_call_index(Pointer phone, int call_index);
         // PHONE_EXPORT phone_status_t phone_answer_call_id(phone_t instance, const char *call_id);
         int phone_answer_call_id(Pointer phone, String call_id);
+
+        // PHONE_EXPORT phone_status_t phone_start_ringing_call_index(phone_t instance, int call_index);
+        int phone_start_ringing_call_index(Pointer instance, int callIndex);
+        // PHONE_EXPORT phone_status_t phone_start_ringing_call_id(phone_t instance, const char *call_id);
+        int phone_start_ringing_call_id(Pointer instance, String CallId);
 
         // PHONE_DEPRECATED_EXPORT phone_status_t phone_hangup_call(phone_t instance, int call_id);
         // PHONE_EXPORT phone_status_t phone_hangup_call_index(phone_t instance, int call_index);
@@ -122,8 +133,11 @@ public class Phone {
         // PHONE_EXPORT const char* phone_last_error(void);
         String phone_last_error();
 
+        // PHONE_EXPORT void phone_status_name(char *out, size_t buffer_size, int code);
+        void phone_status_name(byte[] out, NativeLong buffer_size, int state);
+
         // PHONE_EXPORT void phone_state_name(char *state_name, size_t buffer_size, int state);
-        void phone_state_name(byte[] state_name, NativeLong buffer_size, int state);
+        void phone_call_state_name(byte[] state_name, NativeLong buffer_size, int state);
 
         // PHONE_EXPORT void phone_set_log_level(int level);
         void phone_set_log_level(int level);
@@ -161,9 +175,15 @@ public class Phone {
         }
     }
 
+    static String describeStatus(int code) {
+        byte[] buffer = new byte[32];
+        CPHONE.phone_status_name(buffer, new NativeLong(buffer.length), code);
+        return Native.toString(buffer);
+    }
+
     static String getState(int state) {
         byte[] buffer = new byte[32];
-        CPHONE.phone_state_name(buffer, new NativeLong(buffer.length), state);
+        CPHONE.phone_call_state_name(buffer, new NativeLong(buffer.length), state);
         return Native.toString(buffer);
     }
 
@@ -206,8 +226,12 @@ public class Phone {
         }
     }
 
+    void registerOnRegistrationStateCallback(PhoneLibrary.RegistrationStateCallback cb) {
+        CPHONE.phone_register_on_registration_state_callback(phone, cb, null);
+    }
+
     void registerOnIncomingCallIndexCallback(PhoneLibrary.IncomingCallIndexCallback cb) {
-        CPHONE.phone_register_on_incoming_call_index_callback(phone, cb, this.phone.getPointer(0));
+        CPHONE.phone_register_on_incoming_call_index_callback(phone, cb, null);
     }
 
     void registerOnIncomingCallIdCallback(PhoneLibrary.IncomingCallIdCallback cb) {
@@ -261,6 +285,18 @@ public class Phone {
 
     void answer(String callId) throws PhoneException {
         if (CPHONE.phone_answer_call_id(phone, callId) != PHONE_STATUS_SUCCESS) {
+            throw new PhoneException(lastError());
+        }
+    }
+
+    void startRinging(int callIndex) throws PhoneException {
+        if (CPHONE.phone_start_ringing_call_index(phone, callIndex) != PHONE_STATUS_SUCCESS) {
+            throw new PhoneException(lastError());
+        }
+    }
+
+    void startRinging(String callId) throws PhoneException {
+        if (CPHONE.phone_start_ringing_call_id(phone, callId) != PHONE_STATUS_SUCCESS) {
             throw new PhoneException(lastError());
         }
     }
