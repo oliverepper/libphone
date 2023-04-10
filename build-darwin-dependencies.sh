@@ -13,6 +13,7 @@ sh ../scripts/build-pjproject-simulator-x86_64.sh "$(pwd)/../installed"
 
 sh ../scripts/build-pjproject-macos-arm64.sh "$(pwd)/../installed"
 sh ../scripts/build-pjproject-macos-x86_64.sh "$(pwd)/../installed"
+sh ../scripts/create-pjproject-macos-universal.sh "$(pwd)/../installed"
 
 sh ../scripts/build-pjproject-catalyst-arm64.sh "$(pwd)/../installed"
 sh ../scripts/build-pjproject-catalyst-x86_64.sh "$(pwd)/../installed"
