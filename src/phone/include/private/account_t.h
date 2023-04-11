@@ -7,7 +7,7 @@
 namespace phone {
     template<typename T>
     concept CallID = std::is_same_v<T, int> || std::is_same_v<T, std::string>;
-};
+}
 
 class account_t : public pj::Account {
 public:

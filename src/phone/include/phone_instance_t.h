@@ -10,7 +10,6 @@
 
 namespace pj {
 class Endpoint;
-class EpConfig;
 } //namespace pj
 
 class account_t;
