@@ -4,6 +4,11 @@
 #include "call_t.h"
 #include <pjsua2.hpp>
 
+namespace phone {
+    template<typename T>
+    concept CallID = std::is_same_v<T, int> || std::is_same_v<T, std::string>;
+};
+
 class account_t : public pj::Account {
 public:
     std::optional<std::function<void(bool, int)>> on_registration_state;
@@ -78,15 +83,13 @@ public:
         m_calls.back()->makeCall(uri, prm);
     }
 
-    template<typename ID>
-    auto call_for(ID id) {
+    auto call_for(phone::CallID auto id) {
         return std::find_if(std::begin(m_calls), std::end(m_calls), [&id](const auto& element) {
             return static_cast<decltype(id)>(*element) == id;
         });
     }
 
-    template<typename ID>
-    void answer_call(ID id) {
+    void answer_call(phone::CallID auto id) {
         typename std::vector<std::unique_ptr<call_t>>::iterator it = call_for(id); //NOLINT(modernize-use-auto)
         if (it != std::end(m_calls)) {
             pj::CallOpParam prm;
@@ -95,8 +98,7 @@ public:
         }
     }
 
-    template<typename ID>
-    void start_ringing_call(ID id) {
+    void start_ringing_call(phone::CallID auto id) {
         typename std::vector<std::unique_ptr<call_t>>::iterator it = call_for(id); //NOLINT(modernize-use-auto)
         if (it != std::end(m_calls)) {
             pj::CallOpParam prm;
@@ -105,14 +107,47 @@ public:
         }
     }
 
-    template<typename ID>
-    void hangup_call(ID id) {
+    void hangup_call(phone::CallID auto id) {
         typename std::vector<std::unique_ptr<call_t>>::iterator it = call_for(id); //NOLINT(modernize-use-auto)
         if (it != std::end(m_calls)) {
             pj::CallOpParam prm;
             prm.statusCode = PJSIP_SC_DECLINE;
             (*it)->hangup(prm);
         }
+    }
+
+    std::optional<std::string> call_incoming_message(phone::CallID auto id) {
+        typename std::vector<std::unique_ptr<call_t>>::iterator it = call_for(id); //NOLINT(modernize-use-auto)
+        if (it != std::end(m_calls)) {
+            return (*it)->incoming_message;
+        }
+        if constexpr (std::is_same_v<decltype(id), int>) {
+            throw std::invalid_argument{"no call for index: <" + std::to_string(id) + ">"};
+        } else if constexpr (std::is_same_v<decltype(id), std::string>) {
+            throw std::invalid_argument{"no call for id: <" + id + ">"};
+        }
+    }
+
+    std::optional<int> call_answer_after(phone::CallID auto id) {
+        typename std::vector<std::unique_ptr<call_t>>::iterator it = call_for(id); //NOLINT(modernize-use-auto)
+        if (it != std::end(m_calls)) {
+            return (*it)->answer_after;
+        }
+        if constexpr (std::is_same_v<decltype(id), int>) {
+            throw std::invalid_argument{"no call for index: <" + std::to_string(id) + ">"};
+        } else if constexpr (std::is_same_v<decltype(id), std::string>) {
+            throw std::invalid_argument{"no call for id: <" + id + ">"};
+        }
+    }
+
+    void delete_call(int call_index) {
+        PJ_LOG(3,(__BASE_FILE__, "Going to delete call: %d", call_index));
+        auto it = call_for(call_index);
+        if (it != std::end(m_calls)) { m_calls.erase(it); }
+    }
+
+    void hangup_calls() noexcept {
+        m_calls.clear();
     }
 
     std::string get_call_id(int call_index) {
@@ -129,48 +164,6 @@ public:
             return static_cast<int>(*it->get()); //NOLINT(readability-redundant-smartptr-get)
         }
         throw std::invalid_argument{"no call for id: <" + call_id + ">"};
-    }
-
-    std::optional<std::string> call_incoming_message(int call_index) {
-        typename std::vector<std::unique_ptr<call_t>>::iterator it = call_for(call_index); //NOLINT(modernize-use-auto)
-        if (it != std::end(m_calls)) {
-            return (*it)->incoming_message;
-        }
-        throw std::invalid_argument{"no call for index: <" + std::to_string(call_index) + ">"};
-    }
-
-    std::optional<std::string> call_incoming_message(const std::string& call_id) {
-        typename std::vector<std::unique_ptr<call_t>>::iterator it = call_for(call_id); //NOLINT(modernize-use-auto)
-        if (it != std::end(m_calls)) {
-            return (*it)->incoming_message;
-        }
-        throw std::invalid_argument{"no call for id: <" + call_id + ">"};
-    }
-
-    std::optional<int> call_answer_after(int call_index) {
-        typename std::vector<std::unique_ptr<call_t>>::iterator it = call_for(call_index); //NOLINT(modernize-use-auto)
-        if (it != std::end(m_calls)) {
-            return (*it)->answer_after;
-        }
-        throw std::invalid_argument{"no call for index: <" + std::to_string(call_index) + ">"};
-    }
-
-    std::optional<int> call_answer_after(const std::string& call_id) {
-        typename std::vector<std::unique_ptr<call_t>>::iterator it = call_for(call_id); //NOLINT(modernize-use-auto)
-        if (it != std::end(m_calls)) {
-            return (*it)->answer_after;
-        }
-        throw std::invalid_argument{"no call for id: <" + call_id + ">"};
-    }
-
-    void delete_call(int call_index) {
-        PJ_LOG(3,(__BASE_FILE__, "Going to delete call: %d", call_index));
-        auto it = call_for(call_index);
-        if (it != std::end(m_calls)) { m_calls.erase(it); }
-    }
-
-    void hangup_calls() noexcept {
-        m_calls.clear();
     }
 
 private:

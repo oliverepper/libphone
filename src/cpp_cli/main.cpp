@@ -27,9 +27,11 @@ struct app_state {
                   << " – Incoming call index: " << last_call_index
                   << ", call id: " << phone.get_call_id(last_call_index)
                   << std::endl;
+
         auto incoming_message = phone.call_incoming_message(call_index);
         if (incoming_message.has_value())
-            std::cout << incoming_message.value().substr(0, 10) + "... " << std::endl;
+            std::cout << incoming_message.value().substr(0, 64) + "... " << std::endl;
+
         auto answer_after = phone.call_answer_after(call_index);
         if (answer_after.has_value()) {
             std::cout << "Will auto-answer call for you" << std::endl;
@@ -53,9 +55,11 @@ struct app_state {
                   << " - Incoming call id: " << last_call_id
                   << ", call index: " << phone.get_call_index(last_call_id)
                   << std::endl;
+
         auto incoming_message = phone.call_incoming_message(call_id);
         if (incoming_message.has_value())
-            std::cout << incoming_message.value().substr(0, 10) + "... " << std::endl;
+            std::cout << incoming_message.value().substr(0, 64) + "... " << std::endl;
+
         auto answer_after = phone.call_answer_after(call_id);
         std::cout << "Will auto-answer call for you" << std::endl;
         if (answer_after.has_value()) {
