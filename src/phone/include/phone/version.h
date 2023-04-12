@@ -2,7 +2,7 @@
 #define PHONE_VERSION_H
 
 #include <phone_export.h>
-#include <stddef.h>
+#include <stddef.h> //NOLINT deprecated-headers
 
 #ifdef __cplusplus
 extern "C"

@@ -267,7 +267,7 @@ def phone_get_audio_device_names(device_filter):
 
 
 # PHONE_EXPORT phone_status_t phone_get_audio_devices(audio_device_info_t *devices, size_t *devices_count, size_t max_driver_name_length, size_t max_device_name_length, device_filter_t filter);
-class phone_audio_device_info:
+class PhoneAudioDeviceInfo:
     def __init__(self, id, driver, name, input_count, output_count):
         self.id = id
         self.driver = driver
@@ -277,7 +277,7 @@ class phone_audio_device_info:
 
 
 def phone_get_audio_devices(device_filter):
-    class c_phone_audio_device_info_t(Structure):
+    class CPhoneAudioDeviceInfoT(Structure):
         _fields_ = [
             ('id', c_int),
             ('driver', c_char_p),
@@ -287,13 +287,13 @@ def phone_get_audio_devices(device_filter):
         ]
     __phone_get_audio_devices = libphone.phone_get_audio_devices
     __phone_get_audio_devices.restype = c_int
-    __phone_get_audio_devices.argtypes = [POINTER(c_phone_audio_device_info_t), POINTER(c_size_t), c_size_t, c_size_t, device_filter_t]
+    __phone_get_audio_devices.argtypes = [POINTER(CPhoneAudioDeviceInfoT), POINTER(c_size_t), c_size_t, c_size_t, device_filter_t]
     if not DEVICE_FILTER_NONE <= device_filter <= DEVICE_FILTER_OUTPUT:
         device_filter = DEVICE_FILTER_NONE
     c_count = c_size_t(phone_get_audio_devices_count())
     max_device_driver_name_length = phone_get_audio_device_driver_name_length() + 1  # +1 for zero termination
     max_device_name_length = phone_get_audio_device_info_name_length() + 1  # +1 for zero termination
-    devices = (c_phone_audio_device_info_t * c_count.value)()
+    devices = (CPhoneAudioDeviceInfoT * c_count.value)()
 
     for i in range(c_count.value):
         devices[i].driver = cast(create_string_buffer(max_device_driver_name_length), c_char_p)
@@ -303,7 +303,7 @@ def phone_get_audio_devices(device_filter):
         raise Exception(phone_last_error())
 
     def to_python(c_phone_audio_device_info):
-        return phone_audio_device_info(
+        return PhoneAudioDeviceInfo(
             c_phone_audio_device_info.id,
             c_phone_audio_device_info.driver.decode('utf-8'),
             c_phone_audio_device_info.name.decode('utf-8'),

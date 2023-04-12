@@ -82,6 +82,7 @@ def on_call_state_index_cb(call_index, state, ctx):
 def on_call_state_id_cb(call_id, state, ctx):
     print(f"Call id: {call_id.decode('utf-8')} and index: {phone_get_call_index(phone, call_id)} – state: {phone_call_state_name(state)}")
 
+
 phone_register_on_registration_state_callback(phone, on_registration_state_cb, None)
 phone_register_on_incoming_call_index_callback(phone, on_incoming_call_index_cb, None)
 phone_register_on_incoming_call_id_callback(phone, on_incoming_call_id_cb, None)

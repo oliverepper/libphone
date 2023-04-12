@@ -1,7 +1,7 @@
 #!/bin/bash
 # Oliver Epper <oliver.epper@gmail.com>
 
-source "$(dirname $0)"/build-pjproject-darwin-base.sh
+source "$(dirname "$0")"/build-pjproject-darwin-base.sh
 
 PREFIX="${PREFIX}/catalyst-arm64"
 rm -rf "${PREFIX}"
