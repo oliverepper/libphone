@@ -57,11 +57,11 @@ void phone_instance_t::configure_opus(int channel_count, int complexity, int sam
     }
 }
 
-void phone_instance_t::create_tls_transport_with_srv_lookup() {
+void create_tls_transport_with_srv_lookup(pj::Endpoint &endpoint) {
     pj::TransportConfig t_cfg;
     t_cfg.port = 0;
     try {
-        m_ep->transportCreate(PJSIP_TRANSPORT_TLS, t_cfg);
+        endpoint.transportCreate(PJSIP_TRANSPORT_TLS, t_cfg);
     } catch (const pj::Error &e) {
         throw phone::exception{e.info()};
     }
@@ -80,7 +80,7 @@ void phone_instance_t::connect(std::string server, const std::string& user, std:
     acc_cfg.sipConfig.authCreds.push_back(cred_info);
     acc_cfg.regConfig.registrarUri = "sip:" + m_server.value() + ";transport=TLS";
 
-    create_tls_transport_with_srv_lookup();
+    create_tls_transport_with_srv_lookup(*m_ep);
 
     try {
         m_account->create(acc_cfg, true);
