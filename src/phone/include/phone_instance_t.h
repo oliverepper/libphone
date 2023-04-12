@@ -115,7 +115,6 @@ public:
     PHONE_EXPORT bool is_thread_registered();
 
 private:
-//    void create_tls_transport_with_srv_lookup();
     std::unique_ptr<pj::Endpoint> m_ep;
     std::unique_ptr<account_t> m_account;
     std::optional<std::string> m_server;

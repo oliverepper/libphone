@@ -3,9 +3,10 @@
 #include <pjsua2.hpp>
 #include <vector>
 
-phone_instance_t::phone_instance_t(std::string user_agent, std::vector<std::string> nameserver,
-                                   std::vector<std::string> stunserver) : m_ep{std::make_unique<pj::Endpoint>()},
-                                                                          m_account{std::make_unique<account_t>()} {
+phone_instance_t::phone_instance_t(std::string user_agent,
+                                   std::vector<std::string> nameserver,
+                                   std::vector<std::string> stunserver)
+: m_ep{std::make_unique<pj::Endpoint>()}, m_account{std::make_unique<account_t>()} {
     pj::EpConfig ep_cfg{};
     ep_cfg.uaConfig.userAgent = std::move(user_agent);
     ep_cfg.uaConfig.nameserver = std::move(nameserver);
