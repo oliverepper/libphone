@@ -69,6 +69,21 @@ def phone_create(user_agent, nameservers, stunservers):
     return __phone_create(c_user_agent, c_nameservers, len(nameservers), c_stunservers, len(stunservers))
 
 
+# PHONE_EXPORT phone_t phone_create_with_system_nameserver(const char *user_agent,
+#                                   const char * const stunserver[], size_t stunserver_count);
+def phone_create_with_system_nameserver(user_agent, stunservers):
+    __phone_create_with_system_nameserver = libphone.phone_create_with_system_nameserver
+    __phone_create_with_system_nameserver.restype = c_void_p
+    __phone_create_with_system_nameserver.argtypes = [c_char_p, POINTER(c_char_p), c_size_t]
+    c_user_agent = c_char_p(user_agent.encode('utf-8'))
+
+    c_stunservers = (c_char_p * len(stunservers))()
+    for i in range(len(stunservers)):
+        c_stunservers[i] = c_char_p(stunservers[i].encode('utf-8'))
+
+    return __phone_create_with_system_nameserver(c_user_agent, c_stunservers, len(stunservers))
+
+
 # PHONE_EXPORT void phone_destroy(phone_t instance);
 phone_destroy = libphone.phone_destroy
 phone_destroy.restype = None
