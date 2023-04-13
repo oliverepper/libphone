@@ -59,6 +59,9 @@ public class Phone {
         // PHONE_EXPORT phone_t phone_create(const char *user_agent, const char * const nameserver[], size_t nameserver_count, const char * const stunserver[], size_t stunserver_count);
         Pointer phone_create(String userAgent, String[] nameServers, NativeLong nameServerLength, String[] stunServers, NativeLong stunServerLength);
 
+        // PHONE_EXPORT phone_t phone_create_with_system_nameserver(const char *user_agent, const char * const stunserver[], size_t stunserver_count);
+        Pointer phone_create_with_system_nameserver(String userAgent, String[] stunServers, NativeLong stunServerLength);
+
         // PHONE_EXPORT void phone_destroy(phone_t instance);
         void phone_destroy(Pointer instance);
 
@@ -199,6 +202,13 @@ public class Phone {
 
     public Phone(String userAgent, String[] nameservers, String[] stunservers) throws PhoneException {
         this.phone = CPHONE.phone_create(userAgent, nameservers, new NativeLong(nameservers.length), stunservers, new NativeLong(stunservers.length));
+        if(this.phone == null) {
+            throw new PhoneException(lastError());
+        }
+    }
+
+    public Phone(String userAgent, String[] stunservers) throws PhoneException {
+        this.phone = CPHONE.phone_create_with_system_nameserver(userAgent, stunservers, new NativeLong(stunservers.length));
         if(this.phone == null) {
             throw new PhoneException(lastError());
         }
