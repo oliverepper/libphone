@@ -1,5 +1,6 @@
 #include "phone_instance_t.h"
 #include "private/account_t.h"
+#include "private/nameserver.h"
 #include <pjsua2.hpp>
 #include <vector>
 
@@ -21,6 +22,9 @@ phone_instance_t::phone_instance_t(std::string user_agent,
         throw phone::exception{e.info()};
     }
 }
+
+phone_instance_t::phone_instance_t(std::string user_agent, std::vector<std::string> stunserver)
+: phone_instance_t(user_agent, system_nameserver(), stunserver) {}
 
 phone_instance_t::~phone_instance_t() {
     m_ep->libDestroy();

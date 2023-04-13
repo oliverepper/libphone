@@ -69,6 +69,9 @@ public:
                                            std::vector<std::string> nameserver,
                                            std::vector<std::string> stunserver);
 
+    explicit PHONE_EXPORT phone_instance_t(std::string user_agent,
+                                           std::vector<std::string> stunserver);
+
     PHONE_EXPORT ~phone_instance_t();
 
     phone_instance_t() = delete;

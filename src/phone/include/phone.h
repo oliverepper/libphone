@@ -33,6 +33,9 @@ typedef struct {
 PHONE_EXPORT phone_t phone_create(const char *user_agent,
                                   const char * const nameserver[], size_t nameserver_count,
                                   const char * const stunserver[], size_t stunserver_count);
+PHONE_EXPORT phone_t phone_create_with_system_nameserver(const char *user_agent,
+                                  const char * const stunserver[], size_t stunserver_count);
+
 PHONE_EXPORT void phone_destroy(phone_t instance);
 
 PHONE_EXPORT void phone_register_on_registration_state_callback(phone_t instance, void (*cb)(int is_registered, int registration_state, void *ctx), void *ctx);

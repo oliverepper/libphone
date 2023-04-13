@@ -24,6 +24,17 @@ phone_t phone_create(const char *user_agent,
     }
 }
 
+phone_t
+phone_create_with_system_nameserver(const char *user_agent, const char *const *stunserver, size_t stunserver_count) {
+    const std::vector<std::string> _stunserver(stunserver, stunserver + stunserver_count);
+    try {
+        return new phone_instance_t{user_agent,_stunserver};
+    } catch (const phone::exception& e) {
+        strncpy(global_last_error, e.what(), sizeof(global_last_error));
+        return nullptr;
+    }
+}
+
 void phone_register_on_registration_state_callback(phone_t instance, void (*cb)(int, int, void *), void *ctx) {
     instance->register_on_registration_state_callback([cb, ctx](bool is_registered, int registration_state) {
         cb(is_registered, registration_state, ctx);
@@ -370,5 +381,3 @@ phone_status_t phone_register_thread(phone_t instance, const char *name) {
 int phone_is_thread_registered(phone_t instance) {
     return instance->is_thread_registered();
 }
-
-

@@ -89,7 +89,11 @@ struct app_state {
 auto main() -> int {
     try {
         app_state state{
-                phone_instance_t{"Cli Phone in C++", {"217.237.148.22", "217.237.150.51"}, {"stun.t-online.de"}}};
+                phone_instance_t{
+                    "Cli Phone in C++",
+                    {"stun.t-online.de"}
+                }};
+
         phone_instance_t::set_log_level(0);
 
         // callbacks
