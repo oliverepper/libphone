@@ -24,7 +24,7 @@ phone_instance_t::phone_instance_t(std::string user_agent,
 }
 
 phone_instance_t::phone_instance_t(std::string user_agent, std::vector<std::string> stunserver)
-: phone_instance_t(user_agent, system_nameserver(), stunserver) {}
+: phone_instance_t(std::move(user_agent), system_nameserver(), std::move(stunserver)) {}
 
 phone_instance_t::~phone_instance_t() {
     m_ep->libDestroy();
