@@ -7,16 +7,13 @@ public class Main {
     public static void main(String[] args) {
         var executor = Executors.newFixedThreadPool(1);
 
-        var nameservers = new String[2];
-        nameservers[0] = "217.237.148.22";
-        nameservers[1] = "217.237.150.51";
         var stunservers = new String[1];
         stunservers[0] = "stun.t-online.de";
 
         final Phone phone;
 
         try {
-            phone = new Phone("Java Cli ☕️", nameservers, stunservers);
+            phone = new Phone("Java Cli ☕️", stunservers);
 
             Runnable register = () -> phone.registerThread("Test");
 

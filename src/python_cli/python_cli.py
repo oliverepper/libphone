@@ -11,7 +11,6 @@ sys.path.insert(0, os.path.join(current_dir, '..', 'share'))
 from phone_ctypes import *
 
 useragent           = "Python CLI Phone"
-nameservers         = ["217.237.148.22", "217.237.150.51"]
 stunservers         = ["stun.t-online.de"]
 sipserver           = "tel.t-online.de"
 username            = "+49..."
@@ -26,7 +25,7 @@ if '...' in username:
     exit(1)
 
 
-phone = phone_create(useragent, nameservers, stunservers)
+phone = phone_create_with_system_nameserver(useragent, stunservers)
 if phone is None:
     die(phone)
 phone_set_log_level(0)

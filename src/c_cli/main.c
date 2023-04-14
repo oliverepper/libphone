@@ -85,9 +85,8 @@ int main() {
     memset(state->last_call_id, 0, sizeof(state->last_call_id));
 
     // create phone in app state
-    const char *nameserver[] = {"217.237.148.22", "217.237.150.51"};
     const char *stunserver[] = {"stun.t-online.de"};
-    state->phone = phone_create("Cli Phone in C", nameserver, 2, stunserver, 1);
+    state->phone = phone_create_with_system_nameserver("Cli Phone in C", stunserver, 1);
     if (!state->phone)
         die(state->phone);
 
