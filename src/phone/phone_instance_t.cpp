@@ -156,6 +156,24 @@ void phone_instance_t::hangup_call(std::string call_id) {
     }
 }
 
+void phone_instance_t::dtmf(int call_index, const std::string &digits) {
+    try {
+        m_account->dial_dtmf_in_call(call_index, digits);
+    } catch (const pj::Error& e) {
+        throw phone::exception{e.info()};
+    }
+
+}
+
+void phone_instance_t::dtmf(std::string call_id, const std::string &digits) {
+    try {
+        m_account->dial_dtmf_in_call(std::move(call_id), digits);
+    } catch (const pj::Error& e) {
+        throw phone::exception{e.info()};
+    }
+
+}
+
 void phone_instance_t::hangup_calls() noexcept {
     m_account->hangup_calls();
 }
@@ -266,3 +284,4 @@ void phone_instance_t::register_thread(const std::string &name) {
 bool phone_instance_t::is_thread_registered() {
     return m_ep->libIsThreadRegistered();
 }
+

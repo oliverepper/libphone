@@ -98,6 +98,8 @@ public:
     PHONE_EXPORT void start_ringing_call(std::string call_id);
     PHONE_EXPORT void hangup_call(int call_index);
     PHONE_EXPORT void hangup_call(std::string call_id);
+    PHONE_EXPORT void dtmf(int call_index, const std::string& digits);
+    PHONE_EXPORT void dtmf(std::string call_id, const std::string& digits);
     PHONE_EXPORT void hangup_calls() noexcept;
 
     PHONE_EXPORT std::string get_call_id(int call_index);

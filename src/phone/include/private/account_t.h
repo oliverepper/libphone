@@ -126,6 +126,11 @@ public:
         call->hangup(prm);
     }
 
+    void dial_dtmf_in_call(phone::CallID auto id, const std::string& digits) {
+        call_t *call = find_call(id);
+        call->dialDtmf(digits);
+    }
+
     std::optional<std::string> call_incoming_message(phone::CallID auto id) {
         call_t *call = find_call(id);
         return call->incoming_message;
