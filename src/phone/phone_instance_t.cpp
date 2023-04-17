@@ -1,6 +1,7 @@
 #include "phone_instance_t.h"
 #include "private/account_t.h"
 #include "private/nameserver.h"
+#include "private/tones.h"
 #include <pjsua2.hpp>
 #include <vector>
 
@@ -21,12 +22,20 @@ phone_instance_t::phone_instance_t(std::string user_agent,
     } catch (const pj::Error& e) {
         throw phone::exception{e.info()};
     }
+
+    m_call_waiting_tone_generator = std::make_unique<pj::ToneGenerator>();
+    m_call_waiting_tone_generator->createToneGenerator();
+
+    m_dtmf_tone_generator = std::make_unique<pj::ToneGenerator>();
+    m_dtmf_tone_generator->createToneGenerator();
+    m_dtmf_tone_generator->startTransmit(m_ep->audDevManager().getPlaybackDevMedia());
 }
 
 phone_instance_t::phone_instance_t(std::string user_agent, std::vector<std::string> stunserver)
 : phone_instance_t(std::move(user_agent), system_nameserver(), std::move(stunserver)) {}
 
 phone_instance_t::~phone_instance_t() {
+    m_dtmf_tone_generator->stopTransmit(m_ep->audDevManager().getPlaybackDevMedia());
     m_ep->libDestroy();
 }
 
@@ -156,6 +165,24 @@ void phone_instance_t::hangup_call(std::string call_id) {
     }
 }
 
+void phone_instance_t::dtmf(int call_index, const std::string &digits) {
+    try {
+        m_account->dial_dtmf(call_index, digits);
+        play_tones(m_dtmf_tone_generator.get(), m_ep->audDevManager().getPlaybackDevMedia(), digits);
+    } catch (const pj::Error& e) {
+        throw phone::exception{e.info()};
+    }
+}
+
+void phone_instance_t::dtmf(std::string call_id, const std::string &digits) {
+    try {
+        m_account->dial_dtmf(std::move(call_id), digits);
+        play_tones(m_dtmf_tone_generator.get(), m_ep->audDevManager().getPlaybackDevMedia(), digits);
+    } catch (const pj::Error& e) {
+        throw phone::exception{e.info()};
+    }
+}
+
 void phone_instance_t::hangup_calls() noexcept {
     m_account->hangup_calls();
 }
@@ -266,3 +293,13 @@ void phone_instance_t::register_thread(const std::string &name) {
 bool phone_instance_t::is_thread_registered() {
     return m_ep->libIsThreadRegistered();
 }
+
+void phone_instance_t::play_call_waiting() {
+    m_call_waiting_tone_generator->startTransmit(m_ep->audDevManager().getPlaybackDevMedia());
+    m_call_waiting_tone_generator->play(call_waiting_sequence(), true);
+}
+
+void phone_instance_t::stop_call_waiting() {
+    m_call_waiting_tone_generator->stopTransmit(m_ep->audDevManager().getPlaybackDevMedia());
+}
+
