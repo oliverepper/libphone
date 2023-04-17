@@ -10,6 +10,7 @@
 
 namespace pj {
 class Endpoint;
+class ToneGenerator;
 } //namespace pj
 
 class account_t;
@@ -119,10 +120,15 @@ public:
     PHONE_EXPORT void register_thread(const std::string& name);
     PHONE_EXPORT bool is_thread_registered();
 
+    PHONE_EXPORT void play_call_waiting();
+    PHONE_EXPORT void stop_call_waiting();
+
 private:
     std::unique_ptr<pj::Endpoint> m_ep;
     std::unique_ptr<account_t> m_account;
     std::optional<std::string> m_server;
+    std::unique_ptr<pj::ToneGenerator> m_call_waiting_tone_generator;
+    std::unique_ptr<pj::ToneGenerator> m_dtmf_tone_generator;
 };
 
 #endif //PHONE_INSTANCE_T_H

@@ -126,7 +126,7 @@ public:
         call->hangup(prm);
     }
 
-    void dial_dtmf_in_call(phone::CallID auto id, const std::string& digits) {
+    void dial_dtmf(phone::CallID auto id, const std::string& digits) {
         call_t *call = find_call(id);
         call->dialDtmf(digits);
     }

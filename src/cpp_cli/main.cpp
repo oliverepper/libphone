@@ -194,6 +194,12 @@ auto main() -> int {
                     if (state.last_call_index != -1) {
                         state.phone.dtmf(state.last_call_index, dtmf_digits);
                     }
+                } else if (command == 'b') {
+                    std::cout << "playing call waiting" << std::endl;
+                    state.phone.play_call_waiting();
+                } else if (command == 'B') {
+                    std::cout << "stop call waiting" << std::endl;
+                    state.phone.stop_call_waiting();
                 }
             } catch (const phone::exception& e) {
                 std::cerr << "Error: " << e.what() << std::endl;
