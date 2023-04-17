@@ -102,7 +102,13 @@ auto main() -> int {
                     {"stun.t-online.de"}
                 }};
 
+        // set log level
         phone_instance_t::set_log_level(0);
+
+        // and log function
+        state.phone.set_log_function([](int level, std::string_view message, long thread_id, std::string_view thread_name){
+            std::cout << message;
+        });
 
         // callbacks
         state.phone.register_on_registration_state_callback([](bool is_registered, int registration_state) {
@@ -200,6 +206,11 @@ auto main() -> int {
                 } else if (command == 'B') {
                     std::cout << "stop call waiting" << std::endl;
                     state.phone.stop_call_waiting();
+                } else if (command == '#') {
+                    std::cout << "call count: " << state.phone.get_call_count() << std::endl;
+                } else if (command == 'i') {
+                    std::cout << "handle ip change" << std::endl;
+                    phone_instance_t::handle_ip_change();
                 }
             } catch (const phone::exception& e) {
                 std::cerr << "Error: " << e.what() << std::endl;

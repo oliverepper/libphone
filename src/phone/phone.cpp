@@ -187,6 +187,26 @@ void phone_hangup_calls(phone_t instance) {
     instance->hangup_calls();
 }
 
+phone_status_t phone_play_dtmf_call_index(phone_t instance, int call_index, const char *digits) {
+    try {
+        instance->dtmf(call_index, digits);
+    } catch (const phone::exception& e) {
+        strncpy(global_last_error, e.what(), sizeof(global_last_error));
+        return PHONE_STATUS_FAILURE;
+    }
+    return PHONE_STATUS_SUCCESS;
+}
+
+phone_status_t phone_play_dtmf_call_id(phone_t instance, const char *call_id, const char *digits) {
+    try {
+        instance->dtmf(call_id, digits);
+    } catch (const phone::exception& e) {
+        strncpy(global_last_error, e.what(), sizeof(global_last_error));
+        return PHONE_STATUS_FAILURE;
+    }
+    return PHONE_STATUS_SUCCESS;
+}
+
 phone_status_t phone_get_call_id(phone_t instance, int call_index, char *call_id, size_t size) {
     try {
         auto id = instance->get_call_id(call_index);
@@ -380,4 +400,47 @@ phone_status_t phone_register_thread(phone_t instance, const char *name) {
 
 int phone_is_thread_registered(phone_t instance) {
     return instance->is_thread_registered();
+}
+
+phone_status_t phone_play_call_waiting(phone_t instance) {
+    try {
+        instance->play_call_waiting();
+    } catch (const phone::exception& e) {
+        strncpy(global_last_error, e.what(), sizeof(global_last_error));
+        return PHONE_STATUS_FAILURE;
+    }
+
+    return PHONE_STATUS_SUCCESS;
+}
+
+phone_status_t phone_stop_call_waiting(phone_t instance) {
+    try {
+        instance->stop_call_waiting();
+    } catch (const phone::exception& e) {
+        strncpy(global_last_error, e.what(), sizeof(global_last_error));
+        return PHONE_STATUS_FAILURE;
+    }
+
+    return PHONE_STATUS_SUCCESS;
+}
+
+unsigned phone_get_call_count(phone_t instance) {
+    return instance->get_call_count();
+}
+
+void phone_set_log_function(phone_t instance, void (*fn)(int, const char *, long, const char *)) {
+    instance->set_log_function([fn](int level, std::string_view message, long thread_id, std::string_view thread_name){
+        fn(level, message.data(), thread_id, thread_name.data());
+    });
+}
+
+phone_status_t phone_handle_ip_change(void) {
+    try {
+        phone_instance_t::handle_ip_change();
+    } catch (const phone::exception& e) {
+        strncpy(global_last_error, e.what(), sizeof(global_last_error));
+        return PHONE_STATUS_FAILURE;
+    }
+
+    return PHONE_STATUS_SUCCESS;
 }

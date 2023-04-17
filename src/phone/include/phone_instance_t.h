@@ -14,6 +14,7 @@ class ToneGenerator;
 } //namespace pj
 
 class account_t;
+class log_writer_t;
 
 namespace phone {
     struct PHONE_EXPORT exception : public std::exception {
@@ -99,29 +100,34 @@ public:
     PHONE_EXPORT void start_ringing_call(std::string call_id);
     PHONE_EXPORT void hangup_call(int call_index);
     PHONE_EXPORT void hangup_call(std::string call_id);
-    PHONE_EXPORT void dtmf(int call_index, const std::string& digits);
-    PHONE_EXPORT void dtmf(std::string call_id, const std::string& digits);
+    PHONE_EXPORT void dtmf(int call_index, const std::string& digits) const;
+    PHONE_EXPORT void dtmf(std::string call_id, const std::string& digits) const;
     PHONE_EXPORT void hangup_calls() noexcept;
 
-    PHONE_EXPORT std::string get_call_id(int call_index);
-    PHONE_EXPORT int get_call_index(const std::string& call_id);
+    [[nodiscard]] PHONE_EXPORT std::string get_call_id(int call_index) const;
+    [[nodiscard]] PHONE_EXPORT int get_call_index(const std::string& call_id) const;
 
     PHONE_EXPORT static void set_log_level(int level);
+    PHONE_EXPORT void set_log_function(const std::function<void(int, std::string_view message, long thread_id, std::string_view thread_name)>& log_function);
 
     PHONE_EXPORT static void refresh_audio_devices();
-    PHONE_EXPORT static std::vector<phone::audio_device_info_t> get_audio_devices();
+    [[nodiscard]] PHONE_EXPORT static std::vector<phone::audio_device_info_t> get_audio_devices();
     PHONE_EXPORT static void set_audio_devices(int capture_index, int playback_index);
 
-    PHONE_EXPORT std::optional<std::string> call_incoming_message(int call_index);
-    PHONE_EXPORT std::optional<std::string> call_incoming_message(const std::string& call_id);
-    PHONE_EXPORT std::optional<int> call_answer_after(int call_index);
-    PHONE_EXPORT std::optional<int> call_answer_after(const std::string& call_id);
+    [[nodiscard]] PHONE_EXPORT std::optional<std::string> call_incoming_message(int call_index) const;
+    [[nodiscard]] PHONE_EXPORT std::optional<std::string> call_incoming_message(const std::string& call_id) const;
+    [[nodiscard]] PHONE_EXPORT std::optional<int> call_answer_after(int call_index) const;
+    [[nodiscard]] PHONE_EXPORT std::optional<int> call_answer_after(const std::string& call_id) const;
 
     PHONE_EXPORT void register_thread(const std::string& name);
-    PHONE_EXPORT bool is_thread_registered();
+    [[nodiscard]] PHONE_EXPORT bool is_thread_registered() const;
 
-    PHONE_EXPORT void play_call_waiting();
-    PHONE_EXPORT void stop_call_waiting();
+    PHONE_EXPORT void play_call_waiting() const;
+    PHONE_EXPORT void stop_call_waiting() const;
+
+    [[nodiscard]] PHONE_EXPORT int get_call_count();
+
+    PHONE_EXPORT static void handle_ip_change();
 
 private:
     std::unique_ptr<pj::Endpoint> m_ep;
@@ -129,6 +135,9 @@ private:
     std::optional<std::string> m_server;
     std::unique_ptr<pj::ToneGenerator> m_call_waiting_tone_generator;
     std::unique_ptr<pj::ToneGenerator> m_dtmf_tone_generator;
+    // FIXME: hopefully pjsip fixes the assumption about beeing the owner of the *log_writer_t
+    // https://github.com/pjsip/pjproject/issues/3511
+    log_writer_t *m_log_writer;
 };
 
 #endif //PHONE_INSTANCE_T_H
