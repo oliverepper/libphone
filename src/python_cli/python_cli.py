@@ -31,6 +31,11 @@ if phone is None:
 phone_set_log_level(0)
 
 
+@CFUNCTYPE(None, c_int, c_char_p, c_long, c_char_p)
+def log_function(level, message, thread_id, thread_name):
+    print(f"-> {message.decode('utf-8')}", end='')
+
+
 # callbacks
 @CFUNCTYPE(None, c_int, c_int, c_void_p)
 def on_registration_state_cb(is_registered, registration_state, ctx):
@@ -82,6 +87,7 @@ def on_call_state_id_cb(call_id, state, ctx):
     print(f"Call id: {call_id.decode('utf-8')} and index: {phone_get_call_index(phone, call_id)} – state: {phone_call_state_name(state)}")
 
 
+phone_set_log_function(phone, log_function)
 phone_register_on_registration_state_callback(phone, on_registration_state_cb, None)
 phone_register_on_incoming_call_index_callback(phone, on_incoming_call_index_cb, None)
 phone_register_on_incoming_call_id_callback(phone, on_incoming_call_id_cb, None)
@@ -154,6 +160,32 @@ while command != 'q':
         playback_device = int(input("please enter desired playback device: "))
         if phone_set_audio_devices(capture_device, playback_device) != PHONE_STATUS_SUCCESS:
             print(phone_last_error(), file=sys.stderr)
+    elif command == 'p':
+        call_index = int(input("please enter call index: "))
+        digits = input("please enter DTMF digits: ")
+        try:
+            phone_play_dtmf_call_index(phone, call_index, digits)
+        except Exception as e:
+            print(e)
+    elif command == 'P':
+        call_id = input("Please enter call id: ")
+        digits = input("Please enter DTMF digits: ")
+        try:
+            phone_play_dtmf_call_id(phone, call_id, digits)
+        except Exception as e:
+            print(e)
+    elif command == 'b':
+        print("play call waiting")
+        phone_play_call_waiting(phone)
+    elif command == 'B':
+        print("stop call waiting")
+        phone_stop_call_waiting(phone)
+    elif command == '#':
+        print(f"number of calls: {phone_get_call_count(phone)}")
+    elif command == 'i':
+        print("handling ip change")
+        phone_handle_ip_change(phone)
+
 
 print("shutting down...")
 phone_destroy(phone)
