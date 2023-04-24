@@ -7,21 +7,22 @@ public class Main {
     public static void main(String[] args) {
         var executor = Executors.newFixedThreadPool(1);
 
-        var nameservers = new String[2];
-        nameservers[0] = "217.237.148.22";
-        nameservers[1] = "217.237.150.51";
         var stunservers = new String[1];
         stunservers[0] = "stun.t-online.de";
 
         final Phone phone;
 
         try {
-            phone = new Phone("Java Cli ☕️", nameservers, stunservers);
+            phone = new Phone("Java Cli ☕️", stunservers);
 
             Runnable register = () -> phone.registerThread("Test");
 
             var registration = executor.submit(register);
             registration.get();
+
+            phone.setLogFunction((int level, String message, long threadId, String threadName) -> {
+                System.out.println(message);
+            });
 
             phone.registerOnRegistrationStateCallback((isRegistered, registrationState, ctx) -> {
                 if (isRegistered) {
@@ -192,6 +193,38 @@ public class Main {
                             e.printStackTrace();
                         }
                     }
+                    case 'p' -> {
+                        scanner.nextLine();
+                        System.out.println("Please enter call index: ");
+                        var callIndex = scanner.nextInt();
+                        scanner.nextLine();
+                        System.out.println("Please enter desired DTMF digits: ");
+                        var digits = scanner.nextLine();
+                        try {
+                            phone.dtmf(callIndex, digits);
+                        } catch (PhoneException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    case 'b' -> {
+                        System.out.println("Play call waiting");
+                        phone.playCallWaiting();
+                    }
+                    case 'B' -> {
+                        System.out.println("Stop call waiting");
+                        phone.stopCallWaiting();
+                    }
+                    case '#' -> {
+                        System.out.println("Call count: " + phone.callCount());
+                    }
+                    case 'i' -> {
+                        System.out.println("Handle IP change");
+                        try {
+                            phone.handleIpChange();
+                        } catch (PhoneException e) {
+                            e.printStackTrace();
+                        }
+                    }
                     default -> System.out.println("""
                         c - call a number
                         C - call Time Announcement of Telekom Germany
@@ -203,6 +236,11 @@ public class Main {
                         l - change log level
                         d - list audio devices
                         D - change audio devices
+                        p - play DTMF
+                        b - play call waiting
+                        B - stop call waiting
+                        # - call count
+                        i - handle IP change
                         q - quit
                         """);
                 }

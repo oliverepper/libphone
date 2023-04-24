@@ -33,6 +33,9 @@ typedef struct {
 PHONE_EXPORT phone_t phone_create(const char *user_agent,
                                   const char * const nameserver[], size_t nameserver_count,
                                   const char * const stunserver[], size_t stunserver_count);
+PHONE_EXPORT phone_t phone_create_with_system_nameserver(const char *user_agent,
+                                  const char * const stunserver[], size_t stunserver_count);
+
 PHONE_EXPORT void phone_destroy(phone_t instance);
 
 PHONE_EXPORT void phone_register_on_registration_state_callback(phone_t instance, void (*cb)(int is_registered, int registration_state, void *ctx), void *ctx);
@@ -60,6 +63,9 @@ PHONE_EXPORT phone_status_t phone_start_ringing_call_id(phone_t instance, const 
 PHONE_DEPRECATED_EXPORT phone_status_t phone_hangup_call(phone_t instance, int call_id);
 PHONE_EXPORT phone_status_t phone_hangup_call_index(phone_t instance, int call_index);
 PHONE_EXPORT phone_status_t phone_hangup_call_id(phone_t instance, const char *call_id);
+
+PHONE_EXPORT phone_status_t phone_play_dtmf_call_index(phone_t instance, int call_index, const char *digits);
+PHONE_EXPORT phone_status_t phone_play_dtmf_call_id(phone_t instance, const char *call_id, const char *digits);
 
 PHONE_EXPORT void phone_hangup_calls(phone_t instance);
 
@@ -139,9 +145,17 @@ PHONE_EXPORT void phone_call_state_name(char *out, size_t buffer_size, int state
  */
 PHONE_DEPRECATED_EXPORT void phone_state_name(char *out, size_t buffer_size, int state);
 PHONE_EXPORT void phone_set_log_level(int level);
+PHONE_EXPORT void phone_set_log_function(phone_t instance, void (*fn)(int level, const char *message, long thread_id, const char *thread_name));
 
 PHONE_EXPORT phone_status_t phone_register_thread(phone_t instance, const char *name);
 PHONE_EXPORT int phone_is_thread_registered(phone_t instance);
+
+PHONE_EXPORT phone_status_t phone_play_call_waiting(phone_t instance);
+PHONE_EXPORT phone_status_t phone_stop_call_waiting(phone_t instance);
+
+PHONE_EXPORT unsigned phone_get_call_count(phone_t instance);
+
+PHONE_EXPORT phone_status_t phone_handle_ip_change(void);
 
 #ifdef __cplusplus
 }

@@ -1,6 +1,7 @@
 # libphone
 
-libphone is a library that sits on top of [PJSIP project](https://github.com/pjsip/pjproject) and tries to make it very simple to build a softphone. libphone provides a C++ and a C-API. Included with the library is a Python script that demonstrates the API [python_cli.py](src/python_cli/python_cli.py). You can download one of the [binaries](#binaries) and just enter your SIP credentials if you want to test things out.
+libphone is a library that sits on top of [PJSIP project](https://github.com/pjsip/pjproject) and tries to make it very simple to build a softphone. libphone provides a C++ and a C-API. Included with the library is a Python script that demonstrates the API [python_cli.py](src/python_cli/python_cli.py). You can download one of the [binaries](#binaries) and just enter your SIP credentials if you want to test things out. Included with the library you can also find usage example in C, C++ and Java using the C-API via JNA.
+
 
 ## Overview
 <!-- TOC -->
@@ -14,10 +15,13 @@ libphone is a library that sits on top of [PJSIP project](https://github.com/pjs
     * [1und1 configuration](#1und1-configuration)
   * [Handling of audio devices](#handling-of-audio-devices)
   * [Call-Info answer-after](#call-info-answer-after)
+  * [DTMF](#dtmf)
+  * [Handle IP address change](#handle-ip-address-change)
   * [Binaries](#binaries)
   * [Build instructions for Linux](#build-instructions-for-linux)
   * [Build instructions for macOS](#build-instructions-for-macos)
 <!-- TOC -->
+
 
 ## Usage
 
@@ -27,7 +31,14 @@ You can create a phone with
 phone = phone_create("☎️", ["194.25.0.69","194.25.0.79"], "stun.t-online.de")
 ```
 
-and connect the phone to your server via:
+Starting with libphone-0.7.0 there's an additional API `phone_create_with_system_nameserver` which gives you three
+possibilities to configure the system:
+
+1. use getaddr resolving of hostnames. If you want the behavior give the system an empty array of nameservers.
+2. use the nameservers of the system for SRV lookups.
+3. provide the nameservers for SRV lookups.
+
+Once created connect the phone to your server via:
 
 ```python
 phone_connect(phone, "tel.t-online.de", "your_sip_username", "your_sip_password")
@@ -47,6 +58,8 @@ phone_register_on_call_state_callback(phone, on_call_state, None)
 ```
 
 The third parameter to the callback functions is required if you want to use the C-API with an object-oriented programming language like Swift:
+
+Since 0.6.0 there is a callback for the registration state and since 0.7.0 you can register your own log function.
 
 ```swift
 phone_register_on_incoming_call_callback(phone, { callId, ctx in
@@ -177,6 +190,14 @@ if answer_after >= 0:
   print(f"will auto answer call after {answer_after} seconds")
 ```
 
+## DTMF
+Since 0.7.0 you can send (and play) DTMF digits in a call. The sending is done via RFC2833. Sound is played locally to the user to provide auditory feedback.
+
+
+## Handle IP address change
+Since 0.7.0 there is an API call `phone_handle_ip_change`.
+
+
 ## Binaries
 
 I maintain binaries for macOS (signed, notarized and ready to go) and Ubuntu. You can get them from the GitHub release page, or my website [libphone](https://oliver-epper.de/apps/libphone/).
@@ -259,8 +280,15 @@ cmake --build build-libphone --config Release --target install
 
 ## Build instructions for macOS
 
-You can use my already prebuild package `pjproject-apple-platforms`. Install it with the following commands:
+Begining with libphone-0.7.0 there is a shell-script `build-darwin-dependencies.sh` which should build all required dependencies (opus, sdl, pjproject) for:
 
+- iOS
+- iOS simulator running on arm64 and x86_64
+- catalyst running on arm64 and x86_64
+- macOS running on arm64 and x86_64
+- macOS universal
+
+For a quick test the old way does still work:
 ```shell
 brew tap oliverepper/made
 brew install pjproject-apple-platforms

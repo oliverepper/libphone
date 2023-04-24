@@ -37,13 +37,15 @@ generate_export_header(phone BASE_NAME "phone")
 
 target_compile_options(phone PUBLIC ${PJPROJECT_CFLAGS})
 
+find_library(RESOLV_LIBRARY resolv)
+
 target_include_directories(phone
         PUBLIC
         include
         ${CMAKE_CURRENT_BINARY_DIR}
         PRIVATE
         include/phone)
-target_link_libraries(phone PRIVATE ${PJPROJECT_LINK_LIBRARIES})
+target_link_libraries(phone PRIVATE ${PJPROJECT_LINK_LIBRARIES} ${RESOLV_LIBRARY})
 
 set(phone_PUBLIC_HEADERS
         ${CMAKE_CURRENT_SOURCE_DIR}/include/phone.h

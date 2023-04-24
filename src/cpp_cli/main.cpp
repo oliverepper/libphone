@@ -10,7 +10,7 @@
 struct app_state {
     phone_instance_t phone;
     std::string last_call_id;
-    int last_call_index;
+    int last_call_index = -1;
     simple_task_system task_system{&phone};
 
     [[maybe_unused]] static void on_registration_state(bool is_registered, int registration_state) {
@@ -77,20 +77,38 @@ struct app_state {
         }
     }
 
-    [[maybe_unused]] static void on_call_state_with_index_cb(int call_index, int state) {
+    void on_call_state_with_index_cb(int call_index, int state) {
+        last_call_index = call_index;
         std::cout << "Update for call index: " << call_index << " – state: " << phone::call_state_name(state) << std::endl;
+        if (phone::call_state_name(state) == "DISCONNECTED") {
+            last_call_index = -1;
+        }
     }
 
-    [[maybe_unused]] static void on_call_state_with_id_cb(const std::string& call_id, int state) {
+    void on_call_state_with_id_cb(const std::string& call_id, int state) {
+        last_call_id = call_id;
         std::cout << "Update for call id: " << call_id << " – state: " << phone::call_state_name(state) << std::endl;
+        if (phone::call_state_name(state) == "DISCONNECTED") {
+            last_call_id = "";
+        }
     }
 };
 
 auto main() -> int {
     try {
         app_state state{
-                phone_instance_t{"Cli Phone in C++", {"217.237.148.22", "217.237.150.51"}, {"stun.t-online.de"}}};
+                phone_instance_t{
+                    "Cli Phone in C++",
+                    {"stun.t-online.de"}
+                }};
+
+        // set log level
         phone_instance_t::set_log_level(0);
+
+        // and log function
+        state.phone.set_log_function([](int level, std::string_view message, long thread_id, std::string_view thread_name){
+            std::cout << message;
+        });
 
         // callbacks
         state.phone.register_on_registration_state_callback([](bool is_registered, int registration_state) {
@@ -102,8 +120,12 @@ auto main() -> int {
         state.phone.register_on_incoming_call_callback([&state](const std::string& call_id) {
             state.on_incoming_call_cb(call_id);
         });
-        state.phone.register_on_call_state_callback(app_state::on_call_state_with_index_cb);
-        state.phone.register_on_call_state_callback(app_state::on_call_state_with_id_cb);
+        state.phone.register_on_call_state_callback([&state](int call_index, int call_state) {
+            state.on_call_state_with_index_cb(call_index, call_state);
+        });
+        state.phone.register_on_call_state_callback([&state](const std::string& call_id, int call_state) {
+            state.on_call_state_with_id_cb(call_id, call_state);
+        });
 
         // opus
         state.phone.configure_opus();
@@ -171,6 +193,24 @@ auto main() -> int {
                     std::cout << "please enter desired playback device: ";
                     std::cin >> playback_index;
                     phone_instance_t::set_audio_devices(capture_index, playback_index);
+                } else if (command == 'p') {
+                    std::cout << "please enter dtmf characters: ";
+                    std::string dtmf_digits;
+                    std::cin >> dtmf_digits;
+                    if (state.last_call_index != -1) {
+                        state.phone.dtmf(state.last_call_index, dtmf_digits);
+                    }
+                } else if (command == 'b') {
+                    std::cout << "playing call waiting" << std::endl;
+                    state.phone.play_call_waiting();
+                } else if (command == 'B') {
+                    std::cout << "stop call waiting" << std::endl;
+                    state.phone.stop_call_waiting();
+                } else if (command == '#') {
+                    std::cout << "call count: " << state.phone.get_call_count() << std::endl;
+                } else if (command == 'i') {
+                    std::cout << "handle ip change" << std::endl;
+                    phone_instance_t::handle_ip_change();
                 }
             } catch (const phone::exception& e) {
                 std::cerr << "Error: " << e.what() << std::endl;

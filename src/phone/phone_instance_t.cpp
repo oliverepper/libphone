@@ -1,27 +1,51 @@
 #include "phone_instance_t.h"
 #include "private/account_t.h"
+#include "private/system_nameserver.h"
+#include "private/tone_generator_helper.h"
+#include "private/log_writer_t.h"
 #include <pjsua2.hpp>
 #include <vector>
 
-phone_instance_t::phone_instance_t(std::string user_agent, std::vector<std::string> nameserver,
-                                   std::vector<std::string> stunserver) : m_ep{std::make_unique<pj::Endpoint>()},
-                                                                          m_account{std::make_unique<account_t>()} {
+phone_instance_t::phone_instance_t(std::string user_agent,
+                                   std::vector<std::string> nameserver,
+                                   std::vector<std::string> stunserver)
+: m_ep{std::make_unique<pj::Endpoint>()}, m_account{std::make_unique<account_t>()} {
+    m_call_waiting_tone_generator = std::make_unique<pj::ToneGenerator>();
+    m_dtmf_tone_generator = std::make_unique<pj::ToneGenerator>();
+
     pj::EpConfig ep_cfg{};
     ep_cfg.uaConfig.userAgent = std::move(user_agent);
     ep_cfg.uaConfig.nameserver = std::move(nameserver);
     ep_cfg.uaConfig.stunServer = std::move(stunserver);
 
+    // FIXME: hopefully pjsip fixes the assumption about beeing the owner of the *log_writer_t
+    // https://github.com/pjsip/pjproject/issues/3511
+    m_log_writer = new log_writer_t{};
+    ep_cfg.logConfig.writer = m_log_writer;
+
     ep_cfg.medConfig.ecOptions = PJMEDIA_ECHO_USE_SW_ECHO;
+
     try {
         m_ep->libCreate();
         m_ep->libInit(ep_cfg);
         m_ep->libStart();
+
+        m_call_waiting_tone_generator->createToneGenerator();
+        m_call_waiting_tone_generator->startTransmit2(m_ep->audDevManager().getPlaybackDevMedia(), {});
+
+        m_dtmf_tone_generator->createToneGenerator();
+        m_dtmf_tone_generator->startTransmit2(m_ep->audDevManager().getPlaybackDevMedia(), {});
     } catch (const pj::Error& e) {
         throw phone::exception{e.info()};
     }
 }
 
+phone_instance_t::phone_instance_t(std::string user_agent, std::vector<std::string> stunserver)
+: phone_instance_t(std::move(user_agent), system_nameserver(), std::move(stunserver)) {}
+
 phone_instance_t::~phone_instance_t() {
+    m_dtmf_tone_generator.reset();
+    m_call_waiting_tone_generator.reset();
     m_ep->libDestroy();
 }
 
@@ -57,11 +81,11 @@ void phone_instance_t::configure_opus(int channel_count, int complexity, int sam
     }
 }
 
-void phone_instance_t::create_tls_transport_with_srv_lookup() {
+void create_tls_transport_with_srv_lookup(pj::Endpoint &endpoint) {
     pj::TransportConfig t_cfg;
     t_cfg.port = 0;
     try {
-        m_ep->transportCreate(PJSIP_TRANSPORT_TLS, t_cfg);
+        endpoint.transportCreate(PJSIP_TRANSPORT_TLS, t_cfg);
     } catch (const pj::Error &e) {
         throw phone::exception{e.info()};
     }
@@ -80,7 +104,7 @@ void phone_instance_t::connect(std::string server, const std::string& user, std:
     acc_cfg.sipConfig.authCreds.push_back(cred_info);
     acc_cfg.regConfig.registrarUri = "sip:" + m_server.value() + ";transport=TLS";
 
-    create_tls_transport_with_srv_lookup();
+    create_tls_transport_with_srv_lookup(*m_ep);
 
     try {
         m_account->create(acc_cfg, true);
@@ -151,6 +175,24 @@ void phone_instance_t::hangup_call(std::string call_id) {
     }
 }
 
+void phone_instance_t::dtmf(int call_index, const std::string &digits) const {
+    try {
+        m_account->dial_dtmf(call_index, digits);
+        play_tones(*m_dtmf_tone_generator, digits);
+    } catch (const pj::Error& e) {
+        throw phone::exception{e.info()};
+    }
+}
+
+void phone_instance_t::dtmf(std::string call_id, const std::string &digits) const {
+    try {
+        m_account->dial_dtmf(std::move(call_id), digits);
+        play_tones(*m_dtmf_tone_generator, digits);
+    } catch (const pj::Error& e) {
+        throw phone::exception{e.info()};
+    }
+}
+
 void phone_instance_t::hangup_calls() noexcept {
     m_account->hangup_calls();
 }
@@ -159,7 +201,7 @@ void phone_instance_t::set_log_level(int level) {
     pj_log_set_level(level);
 }
 
-std::string phone_instance_t::get_call_id(int call_index) {
+std::string phone_instance_t::get_call_id(int call_index) const {
     try {
         return m_account->get_call_id(call_index);
     } catch (const std::invalid_argument& e) {
@@ -167,7 +209,7 @@ std::string phone_instance_t::get_call_id(int call_index) {
     }
 }
 
-int phone_instance_t::get_call_index(const std::string& call_id) {
+int phone_instance_t::get_call_index(const std::string& call_id) const {
     try {
         return m_account->get_call_index(call_id);
     } catch (const std::invalid_argument& e) {
@@ -218,7 +260,7 @@ void phone_instance_t::refresh_audio_devices() {
     pjmedia_aud_dev_refresh();
 }
 
-std::optional<std::string> phone_instance_t::call_incoming_message(int call_index) {
+std::optional<std::string> phone_instance_t::call_incoming_message(int call_index) const {
     try {
         return m_account->call_incoming_message(call_index);
     } catch (const std::invalid_argument& e) {
@@ -226,7 +268,7 @@ std::optional<std::string> phone_instance_t::call_incoming_message(int call_inde
     }
 }
 
-std::optional<std::string> phone_instance_t::call_incoming_message(const std::string& call_id) {
+std::optional<std::string> phone_instance_t::call_incoming_message(const std::string& call_id) const {
     try {
         return m_account->call_incoming_message(call_id);
     } catch (const std::invalid_argument& e) {
@@ -234,7 +276,7 @@ std::optional<std::string> phone_instance_t::call_incoming_message(const std::st
     }
 }
 
-std::optional<int> phone_instance_t::call_answer_after(int call_index) {
+std::optional<int> phone_instance_t::call_answer_after(int call_index) const {
     try {
         return m_account->call_answer_after(call_index);
     } catch (const std::invalid_argument& e) {
@@ -242,7 +284,7 @@ std::optional<int> phone_instance_t::call_answer_after(int call_index) {
     }
 }
 
-std::optional<int> phone_instance_t::call_answer_after(const std::string& call_id) {
+std::optional<int> phone_instance_t::call_answer_after(const std::string& call_id) const {
     try {
         return m_account->call_answer_after(call_id);
     } catch (const std::invalid_argument& e) {
@@ -258,6 +300,44 @@ void phone_instance_t::register_thread(const std::string &name) {
     }
 }
 
-bool phone_instance_t::is_thread_registered() {
+bool phone_instance_t::is_thread_registered() const {
     return m_ep->libIsThreadRegistered();
 }
+
+void phone_instance_t::play_call_waiting() const {
+    try {
+        m_call_waiting_tone_generator->play(call_waiting_sequence(), true);
+    } catch (const pj::Error& e) {
+        throw phone::exception{e.info()};
+    }
+}
+
+void phone_instance_t::stop_call_waiting() const {
+    try {
+        m_call_waiting_tone_generator->stop();
+    } catch (const pj::Error& e) {
+        throw phone::exception{e.info()};
+    }
+}
+
+int phone_instance_t::get_call_count() {
+    return m_account->get_call_count();
+}
+
+void phone_instance_t::set_log_function(const std::function<void(int, std::string_view message, long thread_id, std::string_view thread_name)>& log_function) {
+    m_log_writer->log_function = [log_function](int level, std::string_view message, long thread_id, std::string_view thread_name){
+        log_function(level, message, thread_id, thread_name);
+    };
+}
+
+void phone_instance_t::handle_ip_change() {
+    pjsua_ip_change_param prm;
+    pjsua_ip_change_param_default(&prm);
+    auto status = pjsua_handle_ip_change(&prm);
+    if (status != PJ_SUCCESS) {
+        char buffer[PJ_ERR_MSG_SIZE];
+        pj_strerror(status, buffer, sizeof(buffer));
+        throw phone::exception{buffer};
+    }
+}
+

@@ -16,7 +16,7 @@ class simple_task_system {
 
     phone_instance_t *    m_phone_ptr;
 
-    void run(int i) {
+    void run(unsigned i) {
         m_phone_ptr->register_thread("worker_" + std::to_string(i));
         while (true) {
             std::function<void()> f;

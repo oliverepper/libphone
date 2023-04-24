@@ -126,6 +126,11 @@ public:
         call->hangup(prm);
     }
 
+    void dial_dtmf(phone::CallID auto id, const std::string& digits) {
+        call_t *call = find_call(id);
+        call->dialDtmf(digits);
+    }
+
     std::optional<std::string> call_incoming_message(phone::CallID auto id) {
         call_t *call = find_call(id);
         return call->incoming_message;
@@ -142,6 +147,12 @@ public:
 
     int get_call_index(const std::string &call_id) {
         return static_cast<int>(*find_call(call_id));
+    }
+
+    int get_call_count() {
+        unsigned call_count = pjsua_call_get_count();
+        assert(call_count == m_calls.size());
+        return call_count;
     }
 
     void delete_call(int call_index) noexcept {

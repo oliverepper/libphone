@@ -69,6 +69,21 @@ def phone_create(user_agent, nameservers, stunservers):
     return __phone_create(c_user_agent, c_nameservers, len(nameservers), c_stunservers, len(stunservers))
 
 
+# PHONE_EXPORT phone_t phone_create_with_system_nameserver(const char *user_agent,
+#                                   const char * const stunserver[], size_t stunserver_count);
+def phone_create_with_system_nameserver(user_agent, stunservers):
+    __phone_create_with_system_nameserver = libphone.phone_create_with_system_nameserver
+    __phone_create_with_system_nameserver.restype = c_void_p
+    __phone_create_with_system_nameserver.argtypes = [c_char_p, POINTER(c_char_p), c_size_t]
+    c_user_agent = c_char_p(user_agent.encode('utf-8'))
+
+    c_stunservers = (c_char_p * len(stunservers))()
+    for i in range(len(stunservers)):
+        c_stunservers[i] = c_char_p(stunservers[i].encode('utf-8'))
+
+    return __phone_create_with_system_nameserver(c_user_agent, c_stunservers, len(stunservers))
+
+
 # PHONE_EXPORT void phone_destroy(phone_t instance);
 phone_destroy = libphone.phone_destroy
 phone_destroy.restype = None
@@ -166,6 +181,36 @@ __phone_hangup_call_index.restype = c_int
 __phone_hangup_call_index.argtypes = [c_void_p, c_int]
 
 
+# PHONE_EXPORT phone_status_t phone_hangup_call_id(phone_t instance, const char *call_id);
+def phone_hangup_call_id(phone, call_id):
+    __phone_hangup_call_id = libphone.phone_hangup_call_id
+    __phone_hangup_call_id.restype = c_int
+    __phone_hangup_call_id.argtypes = [c_void_p, c_char_p]
+    c_call_id = c_char_p(call_id.encode('utf-8'))
+    return __phone_hangup_call_id(phone, c_call_id)
+
+
+# PHONE_EXPORT phone_status_t phone_play_dtmf_call_index(phone_t instance, int call_index, const char *digits);
+def phone_play_dtmf_call_index(phone, call_index, digits):
+    __phone_play_dtmf_call_index = libphone.phone_play_dtmf_call_index
+    __phone_play_dtmf_call_index.restype = c_int
+    __phone_play_dtmf_call_index.argtypes = [c_void_p, c_int, c_char_p]
+    c_digits = c_char_p(digits.encode('utf-8'))
+    if __phone_play_dtmf_call_index(phone, call_index, c_digits) != PHONE_STATUS_SUCCESS:
+        raise Exception(phone_last_error())
+
+
+# PHONE_EXPORT phone_status_t phone_play_dtmf_call_id(phone_t instance, const char *call_id, const char *digits);
+def phone_play_dtmf_call_id(phone, call_id, digits):
+    __phone_play_dtmf_call_id = libphone.phone_play_dtmf_call_id
+    __phone_play_dtmf_call_id.restype = c_int
+    __phone_play_dtmf_call_id.argtypes = [c_void_p, c_char_p, c_char_p]
+    c_call_id = c_char_p(call_id.encode('utf-8'))
+    c_digits = c_char_p(digits.encode('utf-8'))
+    if __phone_play_dtmf_call_id(phone, c_call_id, c_digits) != PHONE_STATUS_SUCCESS:
+        raise Exception(phone_last_error())
+
+
 # PHONE_EXPORT phone_status_t phone_start_ringing_call_index(phone_t instance, int call_index);
 phone_start_ringing_call_index = libphone.phone_start_ringing_call_index
 phone_start_ringing_call_index.restype = c_int
@@ -179,15 +224,6 @@ def phone_start_ringing_call_id(phone, call_id):
     __phone_start_ringing_call_id.argtypes = [c_void_p, c_char_p]
     c_call_id = c_char_p(call_id.encode('utf-8'))
     return __phone_start_ringing_call_id(phone, c_call_id)
-
-
-# PHONE_EXPORT phone_status_t phone_hangup_call_id(phone_t instance, const char *call_id);
-def phone_hangup_call_id(phone, call_id):
-    __phone_hangup_call_id = libphone.phone_hangup_call_id
-    __phone_hangup_call_id.restype = c_int
-    __phone_hangup_call_id.argtypes = [c_void_p, c_char_p]
-    c_call_id = c_char_p(call_id.encode('utf-8'))
-    return __phone_hangup_call_id(phone, c_call_id)
 
 
 # PHONE_DEPRECATED_EXPORT phone_status_t phone_hangup_call(phone_t instance, int call_id);
@@ -267,7 +303,7 @@ def phone_get_audio_device_names(device_filter):
 
 
 # PHONE_EXPORT phone_status_t phone_get_audio_devices(audio_device_info_t *devices, size_t *devices_count, size_t max_driver_name_length, size_t max_device_name_length, device_filter_t filter);
-class phone_audio_device_info:
+class PhoneAudioDeviceInfo:
     def __init__(self, id, driver, name, input_count, output_count):
         self.id = id
         self.driver = driver
@@ -277,7 +313,7 @@ class phone_audio_device_info:
 
 
 def phone_get_audio_devices(device_filter):
-    class c_phone_audio_device_info_t(Structure):
+    class CPhoneAudioDeviceInfoT(Structure):
         _fields_ = [
             ('id', c_int),
             ('driver', c_char_p),
@@ -287,13 +323,13 @@ def phone_get_audio_devices(device_filter):
         ]
     __phone_get_audio_devices = libphone.phone_get_audio_devices
     __phone_get_audio_devices.restype = c_int
-    __phone_get_audio_devices.argtypes = [POINTER(c_phone_audio_device_info_t), POINTER(c_size_t), c_size_t, c_size_t, device_filter_t]
+    __phone_get_audio_devices.argtypes = [POINTER(CPhoneAudioDeviceInfoT), POINTER(c_size_t), c_size_t, c_size_t, device_filter_t]
     if not DEVICE_FILTER_NONE <= device_filter <= DEVICE_FILTER_OUTPUT:
         device_filter = DEVICE_FILTER_NONE
     c_count = c_size_t(phone_get_audio_devices_count())
     max_device_driver_name_length = phone_get_audio_device_driver_name_length() + 1  # +1 for zero termination
     max_device_name_length = phone_get_audio_device_info_name_length() + 1  # +1 for zero termination
-    devices = (c_phone_audio_device_info_t * c_count.value)()
+    devices = (CPhoneAudioDeviceInfoT * c_count.value)()
 
     for i in range(c_count.value):
         devices[i].driver = cast(create_string_buffer(max_device_driver_name_length), c_char_p)
@@ -303,7 +339,7 @@ def phone_get_audio_devices(device_filter):
         raise Exception(phone_last_error())
 
     def to_python(c_phone_audio_device_info):
-        return phone_audio_device_info(
+        return PhoneAudioDeviceInfo(
             c_phone_audio_device_info.id,
             c_phone_audio_device_info.driver.decode('utf-8'),
             c_phone_audio_device_info.name.decode('utf-8'),
@@ -415,6 +451,35 @@ def phone_git_description():
     __phone_git_description(buffer, len(buffer))
     return buffer.value.decode('utf-8')
 
+# PHONE_EXPORT void phone_set_log_function(phone_t instance, void (*fn)(int level, const char *message, long thread_id, const char *thread_name));
+phone_set_log_function = libphone.phone_set_log_function
+phone_set_log_function.restype = None
+phone_set_log_function.argtypes = [c_void_p, c_void_p]
+
+
+# PHONE_EXPORT phone_status_t phone_play_call_waiting(phone_t instance);
+phone_play_call_waiting = libphone.phone_play_call_waiting
+phone_play_call_waiting.restype = None
+phone_play_call_waiting.argtypes = [c_void_p]
+
+
+# PHONE_EXPORT phone_status_t phone_stop_call_waiting(phone_t instance);
+phone_stop_call_waiting = libphone.phone_stop_call_waiting
+phone_stop_call_waiting.restype = None
+phone_stop_call_waiting.argtypes = [c_void_p]
+
+
+# PHONE_EXPORT unsigned phone_get_call_count(phone_t instance);
+phone_get_call_count = libphone.phone_get_call_count
+phone_get_call_count.restype = c_int
+phone_get_call_count.argtypes = [c_void_p]
+
+
+# PHONE_EXPORT phone_status_t phone_handle_ip_change(void);
+phone_handle_ip_change = libphone.phone_handle_ip_change
+phone_handle_ip_change.restype = None
+phone_handle_ip_change.argtypes = [c_void_p]
+
 
 def die(instance):
     phone_destroy(instance)
@@ -433,5 +498,11 @@ e - kill all calls
 l - change log level
 d - list audio devices
 D - change audio devices
+p - play DTMF in call
+P - play DTMF in call
+b - play call waiting
+B - stop call waiting
+# - print call count
+i - handle ip change
 q - quit
 '''
