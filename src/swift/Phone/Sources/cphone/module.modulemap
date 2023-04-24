@@ -1,0 +1,5 @@
+module cphone [system] {
+    header "shim.h"
+    link "phone"
+    export *
+}
