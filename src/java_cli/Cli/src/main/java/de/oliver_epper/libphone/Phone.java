@@ -56,6 +56,10 @@ public class Phone {
             void onCallStateIdCallback(String callId, int state, Pointer ctx);
         }
 
+        interface LogFunction extends Callback {
+            void logFunction(int level, String message, long threadId, String threadName);
+        }
+
         // PHONE_EXPORT phone_t phone_create(const char *user_agent, const char * const nameserver[], size_t nameserver_count, const char * const stunserver[], size_t stunserver_count);
         Pointer phone_create(String userAgent, String[] nameServers, NativeLong nameServerLength, String[] stunServers, NativeLong stunServerLength);
 
@@ -105,6 +109,12 @@ public class Phone {
         int phone_hangup_call_index(Pointer instance, int call_index);
         // PHONE_EXPORT phone_status_t phone_hangup_call_id(phone_t instance, const char *call_id);
         int phone_hangup_call_id(Pointer instance, String callId);
+
+        // PHONE_EXPORT phone_status_t phone_play_dtmf_call_index(phone_t instance, int call_index, const char *digits);
+        int phone_play_dtmf_call_index(Pointer instance, int call_index, String digits);
+        // PHONE_EXPORT phone_status_t phone_play_dtmf_call_id(phone_t instance, const char *call_id, const char *digits);
+        int phone_play_dtmf_call_id(Pointer instance, String call_id, String digits);
+
         // PHONE_EXPORT void phone_hangup_calls(phone_t instance);
         void phone_hangup_calls(Pointer instance);
 
@@ -145,11 +155,26 @@ public class Phone {
         // PHONE_EXPORT void phone_set_log_level(int level);
         void phone_set_log_level(int level);
 
+        // PHONE_EXPORT void phone_set_log_function(phone_t instance, void (*fn)(int level, const char *message, long thread_id, const char *thread_name));
+        void phone_set_log_function(Pointer instance, LogFunction logFunction);
+
         // PHONE_EXPORT phone_status_t phone_register_thread(phone_t instance, const char *name);
         int phone_register_thread(Pointer instance, String name);
 
         // PHONE_EXPORT int phone_is_thread_registered(phone_t instance);
         boolean phone_is_thread_registered(Pointer instance);
+
+        // PHONE_EXPORT phone_status_t phone_play_call_waiting(phone_t instance);
+        int phone_play_call_waiting(Pointer instance);
+        // PHONE_EXPORT phone_status_t phone_stop_call_waiting(phone_t instance);
+        int phone_stop_call_waiting(Pointer instance);
+
+        // PHONE_EXPORT unsigned phone_get_call_count(phone_t instance);
+        int phone_get_call_count(Pointer instance);
+
+        // PHONE_EXPORT phone_status_t phone_handle_ip_change(void);
+        int phone_handle_ip_change();
+
 
         class AudioDeviceInfo extends Structure {
             public int id;
@@ -236,6 +261,10 @@ public class Phone {
         }
     }
 
+    void setLogFunction(PhoneLibrary.LogFunction logFunction) {
+        CPHONE.phone_set_log_function(phone, logFunction);
+    }
+
     void registerOnRegistrationStateCallback(PhoneLibrary.RegistrationStateCallback cb) {
         CPHONE.phone_register_on_registration_state_callback(phone, cb, null);
     }
@@ -264,6 +293,18 @@ public class Phone {
 
     void hangup(String callId) throws PhoneException {
         if (CPHONE.phone_hangup_call_id(phone, callId) != PHONE_STATUS_SUCCESS) {
+            throw new PhoneException(lastError());
+        }
+    }
+
+    void dtmf(int callIndex, String digits) throws PhoneException {
+        if (CPHONE.phone_play_dtmf_call_index(phone, callIndex, digits) != PHONE_STATUS_SUCCESS) {
+            throw new PhoneException(lastError());
+        }
+    }
+
+    void dtmf(String callId, String digits) throws PhoneException {
+        if (CPHONE.phone_play_dtmf_call_id(phone, callId, digits) != PHONE_STATUS_SUCCESS) {
             throw new PhoneException(lastError());
         }
     }
@@ -372,5 +413,27 @@ public class Phone {
 
     boolean isThreadRegistered() {
         return CPHONE.phone_is_thread_registered(phone);
+    }
+
+    void playCallWaiting() throws PhoneException {
+        if (CPHONE.phone_play_call_waiting(phone) != PHONE_STATUS_SUCCESS) {
+            throw new PhoneException(lastError());
+        }
+    }
+
+    void stopCallWaiting() throws PhoneException {
+        if (CPHONE.phone_stop_call_waiting(phone) != PHONE_STATUS_SUCCESS) {
+            throw new PhoneException(lastError());
+        }
+    }
+
+    int callCount() {
+        return CPHONE.phone_get_call_count(phone);
+    }
+
+    void handleIpChange() throws PhoneException {
+        if (CPHONE.phone_handle_ip_change() != PHONE_STATUS_SUCCESS) {
+            throw new PhoneException(lastError());
+        }
     }
 }

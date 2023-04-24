@@ -2,10 +2,9 @@
 // Created by Oliver Epper on 13.04.23.
 //
 
-#ifndef PHONE_NAMESERVER_H
-#define PHONE_NAMESERVER_H
+#ifndef PHONE_SYSTEM_NAMESERVER_H
+#define PHONE_SYSTEM_NAMESERVER_H
 
-#include "../phone_instance_t.h"
 #include <vector>
 #include <string>
 #include <resolv.h>
@@ -18,15 +17,33 @@ std::vector<std::string> system_nameserver() {
         throw phone::exception("could not initialize resolver state");
 
     int count = res_state.nscount;
-    struct sockaddr_storage addresses[count];
-    res_getservers(&res_state, reinterpret_cast<res_9_sockaddr_union *>(addresses), count);
 
     std::vector<std::string> server;
     server.reserve(count);
+    
+#ifdef __linux__
+    for (int i = 0; i < count; ++i) {
+        char ip_cstring[INET6_ADDRSTRLEN];
+
+        auto ipv4 = res_state.nsaddr_list[i];
+        if (ipv4.sin_family == AF_INET) {
+            inet_ntop(AF_INET, &ipv4.sin_addr, ip_cstring, sizeof(ip_cstring));
+            server.emplace_back(ip_cstring);
+        }
+
+        auto ipv6 = res_state._u._ext.nsaddrs[i];
+        if (ipv6 && ipv6->sin6_family == AF_INET6) {
+            inet_ntop(AF_INET6, &ipv6->sin6_addr, ip_cstring, sizeof(ip_cstring));
+            server.emplace_back(ip_cstring);
+        }
+    }
+#else
+    struct sockaddr_storage addresses[count];
+    res_getservers(&res_state, reinterpret_cast<res_sockaddr_union *>(addresses), count);
 
     for (int i = 0; i < count; ++i) {
         char ip_cstring[INET6_ADDRSTRLEN];
-        auto address = reinterpret_cast<struct sockaddr *>(&addresses[i]);
+        auto address = reinterpret_cast<sockaddr *>(&addresses[i]);
 
         if (address->sa_family == AF_INET) {
             auto ipv4_address = reinterpret_cast<struct sockaddr_in *>(address);
@@ -40,9 +57,10 @@ std::vector<std::string> system_nameserver() {
             continue;
         }
     }
+#endif
     res_nclose(&res_state);
 
     return server;
 }
 
-#endif //PHONE_NAMESERVER_H
+#endif //PHONE_SYSTEM_NAMESERVER_H

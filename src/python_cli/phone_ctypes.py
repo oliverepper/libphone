@@ -181,6 +181,36 @@ __phone_hangup_call_index.restype = c_int
 __phone_hangup_call_index.argtypes = [c_void_p, c_int]
 
 
+# PHONE_EXPORT phone_status_t phone_hangup_call_id(phone_t instance, const char *call_id);
+def phone_hangup_call_id(phone, call_id):
+    __phone_hangup_call_id = libphone.phone_hangup_call_id
+    __phone_hangup_call_id.restype = c_int
+    __phone_hangup_call_id.argtypes = [c_void_p, c_char_p]
+    c_call_id = c_char_p(call_id.encode('utf-8'))
+    return __phone_hangup_call_id(phone, c_call_id)
+
+
+# PHONE_EXPORT phone_status_t phone_play_dtmf_call_index(phone_t instance, int call_index, const char *digits);
+def phone_play_dtmf_call_index(phone, call_index, digits):
+    __phone_play_dtmf_call_index = libphone.phone_play_dtmf_call_index
+    __phone_play_dtmf_call_index.restype = c_int
+    __phone_play_dtmf_call_index.argtypes = [c_void_p, c_int, c_char_p]
+    c_digits = c_char_p(digits.encode('utf-8'))
+    if __phone_play_dtmf_call_index(phone, call_index, c_digits) != PHONE_STATUS_SUCCESS:
+        raise Exception(phone_last_error())
+
+
+# PHONE_EXPORT phone_status_t phone_play_dtmf_call_id(phone_t instance, const char *call_id, const char *digits);
+def phone_play_dtmf_call_id(phone, call_id, digits):
+    __phone_play_dtmf_call_id = libphone.phone_play_dtmf_call_id
+    __phone_play_dtmf_call_id.restype = c_int
+    __phone_play_dtmf_call_id.argtypes = [c_void_p, c_char_p, c_char_p]
+    c_call_id = c_char_p(call_id.encode('utf-8'))
+    c_digits = c_char_p(digits.encode('utf-8'))
+    if __phone_play_dtmf_call_id(phone, c_call_id, c_digits) != PHONE_STATUS_SUCCESS:
+        raise Exception(phone_last_error())
+
+
 # PHONE_EXPORT phone_status_t phone_start_ringing_call_index(phone_t instance, int call_index);
 phone_start_ringing_call_index = libphone.phone_start_ringing_call_index
 phone_start_ringing_call_index.restype = c_int
@@ -194,15 +224,6 @@ def phone_start_ringing_call_id(phone, call_id):
     __phone_start_ringing_call_id.argtypes = [c_void_p, c_char_p]
     c_call_id = c_char_p(call_id.encode('utf-8'))
     return __phone_start_ringing_call_id(phone, c_call_id)
-
-
-# PHONE_EXPORT phone_status_t phone_hangup_call_id(phone_t instance, const char *call_id);
-def phone_hangup_call_id(phone, call_id):
-    __phone_hangup_call_id = libphone.phone_hangup_call_id
-    __phone_hangup_call_id.restype = c_int
-    __phone_hangup_call_id.argtypes = [c_void_p, c_char_p]
-    c_call_id = c_char_p(call_id.encode('utf-8'))
-    return __phone_hangup_call_id(phone, c_call_id)
 
 
 # PHONE_DEPRECATED_EXPORT phone_status_t phone_hangup_call(phone_t instance, int call_id);
@@ -430,6 +451,35 @@ def phone_git_description():
     __phone_git_description(buffer, len(buffer))
     return buffer.value.decode('utf-8')
 
+# PHONE_EXPORT void phone_set_log_function(phone_t instance, void (*fn)(int level, const char *message, long thread_id, const char *thread_name));
+phone_set_log_function = libphone.phone_set_log_function
+phone_set_log_function.restype = None
+phone_set_log_function.argtypes = [c_void_p, c_void_p]
+
+
+# PHONE_EXPORT phone_status_t phone_play_call_waiting(phone_t instance);
+phone_play_call_waiting = libphone.phone_play_call_waiting
+phone_play_call_waiting.restype = None
+phone_play_call_waiting.argtypes = [c_void_p]
+
+
+# PHONE_EXPORT phone_status_t phone_stop_call_waiting(phone_t instance);
+phone_stop_call_waiting = libphone.phone_stop_call_waiting
+phone_stop_call_waiting.restype = None
+phone_stop_call_waiting.argtypes = [c_void_p]
+
+
+# PHONE_EXPORT unsigned phone_get_call_count(phone_t instance);
+phone_get_call_count = libphone.phone_get_call_count
+phone_get_call_count.restype = c_int
+phone_get_call_count.argtypes = [c_void_p]
+
+
+# PHONE_EXPORT phone_status_t phone_handle_ip_change(void);
+phone_handle_ip_change = libphone.phone_handle_ip_change
+phone_handle_ip_change.restype = None
+phone_handle_ip_change.argtypes = [c_void_p]
+
 
 def die(instance):
     phone_destroy(instance)
@@ -448,5 +498,11 @@ e - kill all calls
 l - change log level
 d - list audio devices
 D - change audio devices
+p - play DTMF in call
+P - play DTMF in call
+b - play call waiting
+B - stop call waiting
+# - print call count
+i - handle ip change
 q - quit
 '''

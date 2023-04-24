@@ -79,6 +79,10 @@ void on_call_state_with_id_cb(const char* call_id, int state, void *ctx) {
     printf("Call %s – state: %s\n", call_id, buffer);
 }
 
+void log_function(int level, const char *message, long thread_id, const char *thread_name) {
+    fprintf(stdout, "%s", message);
+}
+
 int main() {
     struct app_state *state = malloc(sizeof(struct app_state));
     state->last_call_index = -1;
@@ -92,6 +96,7 @@ int main() {
 
     // logging
     phone_set_log_level(0);
+    phone_set_log_function(state->phone, log_function);
 
     // callbacks
     phone_register_on_registration_state_callback(state->phone, on_registration_state, NULL);
@@ -233,6 +238,29 @@ int main() {
                     if (phone_set_audio_devices(capture_device, playback_device) != PHONE_STATUS_SUCCESS)
                         fprintf(stderr, "%s\n", phone_last_error());
                 }
+                break;
+            case 'p':
+                clear_input_buffer();
+                {
+                    char dtmf_chars[128];
+                    printf("please dtmf characters: ");
+                    if (read_string(dtmf_chars, sizeof(dtmf_chars)) != 0) break;
+                    if (phone_play_dtmf_call_id(state->phone, state->last_call_id, dtmf_chars) != PHONE_STATUS_SUCCESS)
+                        fprintf(stderr, "%s\n", phone_last_error());
+                }
+                break;
+            case 'b':
+                phone_play_call_waiting(state->phone);
+                break;
+            case 'B':
+                phone_stop_call_waiting(state->phone);
+                break;
+            case '#':
+                printf("call count: %d\n", phone_get_call_count(state->phone));
+                break;
+            case 'i':
+                printf("handle ip change\n");
+                phone_handle_ip_change();
                 break;
             default:
                 clear_input_buffer();

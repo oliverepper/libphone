@@ -149,6 +149,12 @@ public:
         return static_cast<int>(*find_call(call_id));
     }
 
+    int get_call_count() {
+        unsigned call_count = pjsua_call_get_count();
+        assert(call_count == m_calls.size());
+        return call_count;
+    }
+
     void delete_call(int call_index) noexcept {
         PJ_LOG(3, (__BASE_FILE__, "Going to delete call: %d", call_index));
         auto it = call_iterator(call_index);
