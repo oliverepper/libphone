@@ -41,6 +41,8 @@ final class Model: ObservableObject {
         } catch let Phone.Error.upstream(message) {
             self.errorMessage = message
         } catch { fatalError() }
+
+        phone?.onIncomingCallCallback = { call in print(call) }
     }
 
     func withPhone(_ block: @escaping (Phone) throws -> Void) {

@@ -19,6 +19,8 @@ public final class Phone {
     }
 
     private var phone: phone_t!
+    public typealias onIncomingCallCallbackType = (Call) -> Void
+    public var onIncomingCallCallback: onIncomingCallCallbackType?
 
     public init(userAgent: String, nameserver: [String] = [], stunserver: [String] = []) throws {
         let userAgentCString = strdup(userAgent)
@@ -32,6 +34,16 @@ public final class Phone {
 
         self.phone = phone_create(userAgentCString, nameserverCStrings, nameserver.count, stunserverCStrings, stunserver.count)
         if self.phone == nil { throw Error.initialization }
+
+        phone_set_log_level(0) // TODO: remove
+
+        phone_register_on_incoming_call_id_callback(self.phone, { call_id, ctx in
+            guard let call_id, let ctx else { return }
+            let my = Unmanaged<Phone>.fromOpaque(ctx).takeUnretainedValue()
+            if let callback = my.onIncomingCallCallback {
+                callback(Call(phone: my.phone, id: .init(cString: call_id)))
+            }
+        }, Unmanaged.passRetained(self).toOpaque())
     }
 
     deinit {
