@@ -75,3 +75,34 @@ extension Phone {
         return .init(cString: buffer)
     }
 }
+
+extension Phone {
+    public static var version: String {
+        let versionString = "libphone-" +
+        [
+            phone_version_major(),
+            phone_version_minor(),
+            phone_version_patch(),
+        ].map(String.init).joined(separator: ".")
+
+        return phone_version_tweak() == 0 ? versionString : versionString + "-\(phone_version_tweak())"
+    }
+
+    public static var gitHash: String {
+        let buffer = UnsafeMutablePointer<CChar>.allocate(capacity: 128)
+        phone_git_hash(buffer, 128)
+        defer {
+            buffer.deallocate()
+        }
+        return .init(cString: buffer)
+    }
+
+    public static var gitDescription: String {
+        let buffer = UnsafeMutablePointer<CChar>.allocate(capacity: 128)
+        phone_git_description(buffer, 128)
+        defer {
+            buffer.deallocate()
+        }
+        return .init(cString: buffer)
+    }
+}

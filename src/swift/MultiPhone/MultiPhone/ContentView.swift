@@ -14,6 +14,7 @@ struct ContentView: View {
 
     var body: some View {
         VStack {
+            Spacer()
             if let errorMessage = model.errorMessage {
                 Text(verbatim: errorMessage).foregroundColor(.red)
             }
@@ -34,6 +35,8 @@ struct ContentView: View {
 #endif
                 }.padding()
             }
+            Spacer()
+            BuildInfo(leftText: Phone.version + "\n" + Phone.gitHash + "\n" + Phone.gitDescription).padding(.horizontal)
         }
         .padding()
     }
