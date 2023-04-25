@@ -59,9 +59,7 @@ extension Call: CustomStringConvertible {
     public var description: String {
         "Call <\(self.id)> - \(self.status)"
     }
-}
 
-extension Call {
     public var status: String {
         let buffer = UnsafeMutablePointer<CChar>.allocate(capacity: 128)
         phone_call_state_name(buffer, 128, self.state)
@@ -75,3 +73,4 @@ extension Call {
         return self.state == State.disconnected.rawValue
     }
 }
+
