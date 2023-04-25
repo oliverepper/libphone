@@ -8,32 +8,19 @@
 import SwiftUI
 import Phone
 
-
 struct ContentView: View {
-    @StateObject var model = Model()
+    @StateObject var appModel = AppModel()
 
     var body: some View {
         VStack {
             Spacer()
-            if let errorMessage = model.errorMessage {
+            if let errorMessage = appModel.errorMessage {
                 Text(verbatim: errorMessage).foregroundColor(.red)
             }
-            if !model.isConnected {
-                LoginView(model: self.model)
+            if !appModel.isConnected {
+                LoginView(model: self.appModel)
             } else {
-                Group {
-                    Text(verbatim: "\(model.username) connected to \(model.server)")
-                    Button("Call Zeitansage") {
-                        model.withPhone { phone in
-                            try phone.call("+491804100100")
-                        }
-                    }
-#if os(iOS)
-                    Button(!model.isSpeakerEnabled ? "Enable Speaker" : "Disable Speaker") {
-                        model.toggleSpeaker()
-                    }
-#endif
-                }.padding()
+                MainView(appModel: self.appModel)
             }
             Spacer()
             BuildInfo(leftText: Phone.version + "\n" + Phone.gitHash + "\n" + Phone.gitDescription).padding(.horizontal)

@@ -9,8 +9,8 @@ let package = Package(
     ],
     targets: [
         .binaryTarget(name: "libphone",
-                      url: "https://github.com/oliverepper/libphone/releases/download/0.7.0/libphone-0.7.0.xcframework.zip",
-                      checksum: "a06e85587d53e728ff5692f169cd182d7c17560c22beb16d1f43fa7793c256a0"),
+                      url: "https://github.com/oliverepper/libphone/releases/download/0.7.0/libphone-0.7.0-debug.xcframework.zip",
+                      checksum: "57aa4e13da0c05156a61d0d756a28049e9e4d5e9c787267bc4bb7282e51124d9"),
         .systemLibrary(name: "cphone"),
         .target(name: "Phone",
                 dependencies: ["cphone", "libphone"]),

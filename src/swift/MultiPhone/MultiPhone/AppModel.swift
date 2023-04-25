@@ -7,18 +7,16 @@
 
 import Phone
 import SwiftUI
-import AVFoundation
 
-final class Model: ObservableObject {
+
+final class AppModel: ObservableObject {
     @AppStorage("server") var server: String = ""
     @AppStorage("user") var username: String = ""
 
     @Published var errorMessage: String? = nil
     @Published var isConnected = false
 
-#if os(iOS)
-    @Published var isSpeakerEnabled = false
-#endif
+    @Published var calls = Set<Call>()
 
     private var phone: Phone?
 
@@ -31,43 +29,44 @@ final class Model: ObservableObject {
                     self.isConnected = isRegistered
                     if !self.isConnected {
                         self.errorMessage = "Registration failed with: \(Phone.status(registrationState))"
-                    } else {
-                        self.errorMessage = nil
                     }
                 }
             })
         } catch Phone.Error.initialization {
-            self.errorMessage = "Could not initialize Phone"
+            errorMessage = "Could not initialize Phone"
         } catch let Phone.Error.upstream(message) {
-            self.errorMessage = message
+            errorMessage = message
         } catch { fatalError() }
 
-        phone?.onIncomingCallCallback = { call in print(call) }
+        phone?.onIncomingCallCallback = { call in
+            DispatchQueue.main.async {
+                self.calls.insert(call)
+            }
+        }
+
+        phone?.onCallStateCallback = { call in
+            DispatchQueue.main.async {
+                self.calls.remove(call)
+                if !call.isDisconnected {
+                    self.calls.insert(call)
+                }
+            }
+        }
     }
 
     func withPhone(_ block: @escaping (Phone) throws -> Void) {
         do {
             guard let phone else { fatalError() }
             try block(phone)
+            self.errorMessage = nil
         } catch let Phone.Error.upstream(message) {
             self.errorMessage = message
         } catch { fatalError() }
     }
 
-#if os(iOS)
-    func toggleSpeaker() {
-        let audioSession = AVAudioSession.sharedInstance()
-        do {
-            if isSpeakerEnabled {
-                try audioSession.setCategory(.playAndRecord, mode: .voiceChat, options: [])
-            } else {
-                try audioSession.setCategory(.playAndRecord, mode: .voiceChat, options: .defaultToSpeaker)
-            }
-            try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
-            isSpeakerEnabled.toggle()
-        } catch {
-            errorMessage = error.localizedDescription
+    func setError(_ message: String) {
+        DispatchQueue.main.async {
+            self.errorMessage = message
         }
     }
-#endif
 }

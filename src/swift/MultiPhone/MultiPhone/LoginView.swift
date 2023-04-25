@@ -9,7 +9,7 @@ import SwiftUI
 import Phone
 
 struct LoginView: View {
-    @State var model: Model
+    @ObservedObject var model: AppModel
     @State private var password = ""
 
     private static let passwordKeyBase = ProcessInfo.processInfo.processName
@@ -38,6 +38,6 @@ struct LoginView: View {
 
 struct LoginView_Previews: PreviewProvider {
     static var previews: some View {
-        LoginView(model: Model())
+        LoginView(model: AppModel())
     }
 }
