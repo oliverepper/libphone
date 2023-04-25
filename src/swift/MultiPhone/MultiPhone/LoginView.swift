@@ -14,20 +14,25 @@ struct LoginView: View {
 
     private static let passwordKeyBase = ProcessInfo.processInfo.processName
 
+    public static func passwordKey(server: String, username: String) -> String {
+        return [passwordKeyBase, server, username].joined(separator: "/")
+    }
+
     var body: some View {
         VStack {
+            if let errorMessage = model.errorMessage {
+                Text(verbatim: errorMessage).foregroundColor(.red)
+            }
             TextField("Server", text: $model.server)
             TextField("Username", text: $model.username)
             SecureField("Password", text: $password)
 
             Button("Login") {
-                model.connect(server: model.server, username: model.username, password: password)
+                model.withPhone { phone in
+                    try phone.connect(server: model.server, username: model.username, password: password)
+                }
             }
         }.padding()
-    }
-
-    public static func passwordKey(server: String, username: String) -> String {
-        return [passwordKeyBase, server, username].joined(separator: "/")
     }
 }
 

@@ -27,9 +27,11 @@ struct ContentView: View {
                             try phone.call("+491804100100")
                         }
                     }
-                    Button("Enable Speaker") {
-                        model.enableSpeaker()
+#if os(iOS)
+                    Button(!model.isSpeakerEnabled ? "Enable Speaker" : "Disable Speaker") {
+                        model.toggleSpeaker()
                     }
+#endif
                 }.padding()
             }
         }

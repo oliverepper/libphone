@@ -12,8 +12,13 @@ import AVFoundation
 final class Model: ObservableObject {
     @AppStorage("server") var server: String = ""
     @AppStorage("user") var username: String = ""
-    @Published var isConnected = false
+
     @Published var errorMessage: String? = nil
+    @Published var isConnected = false
+
+#if os(iOS)
+    @Published var isSpeakerEnabled = false
+#endif
 
     private var phone: Phone?
 
@@ -24,18 +29,15 @@ final class Model: ObservableObject {
             phone?.registerOnRegistrationStateCallback({ isRegistered, registrationState in
                 DispatchQueue.main.async {
                     self.isConnected = isRegistered
+                    if !self.isConnected {
+                        self.errorMessage = "Registration failed with: \(Phone.status(registrationState))"
+                    } else {
+                        self.errorMessage = nil
+                    }
                 }
             })
         } catch Phone.Error.initialization {
             self.errorMessage = "Could not initialize Phone"
-        } catch let Phone.Error.upstream(message) {
-            self.errorMessage = message
-        } catch { fatalError() }
-    }
-
-    func connect(server: String, username: String, password: String) {
-        do {
-            try phone?.connect(server: server, username: username, password: password)
         } catch let Phone.Error.upstream(message) {
             self.errorMessage = message
         } catch { fatalError() }
@@ -50,13 +52,20 @@ final class Model: ObservableObject {
         } catch { fatalError() }
     }
 
-    func enableSpeaker() {
+#if os(iOS)
+    func toggleSpeaker() {
         let audioSession = AVAudioSession.sharedInstance()
         do {
-            try audioSession.setCategory(.playAndRecord, mode: .voiceChat, options: .defaultToSpeaker)
+            if isSpeakerEnabled {
+                try audioSession.setCategory(.playAndRecord, mode: .voiceChat, options: [])
+            } else {
+                try audioSession.setCategory(.playAndRecord, mode: .voiceChat, options: .defaultToSpeaker)
+            }
             try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
+            isSpeakerEnabled.toggle()
         } catch {
             errorMessage = error.localizedDescription
         }
     }
+#endif
 }

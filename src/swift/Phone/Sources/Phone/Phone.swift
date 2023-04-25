@@ -64,3 +64,14 @@ public final class Phone {
         }
     }
 }
+
+extension Phone {
+    public static func status(_ code: Int32) -> String {
+        let buffer = UnsafeMutablePointer<CChar>.allocate(capacity: 128)
+        phone_status_name(buffer, 128, code)
+        defer {
+            buffer.deallocate()
+        }
+        return .init(cString: buffer)
+    }
+}
