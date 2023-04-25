@@ -25,7 +25,7 @@ struct MainView: View {
                 EnableSpeakerView()
 #endif
             }.padding()
-            ForEach(appModel.calls) { call in
+            ForEach(Array(appModel.calls)) { call in
                 HStack {
                     Text(verbatim: call.description)
                     Button("answer") {
