@@ -25,25 +25,22 @@ struct MainView: View {
                 EnableSpeakerView()
 #endif
             }.padding()
-            List {
-                ForEach(Array(appModel.calls)) { call in
-                    HStack {
-                        Text(verbatim: call.description)
-                        Button("answer") {
-                            do {
-                                try call.answer()
-                            } catch let Phone.Error.upstream(message) {
-                                appModel.setError(message)
-                            }
-                            catch { fatalError() }
-                        }
-                        Button("hangup") {
-                            do {
-                                try call.hangup()
-                            } catch let Phone.Error.upstream(message) {
-                                appModel.setError(message)
-                            } catch { fatalError() }
-                        }
+            ForEach(appModel.calls) { call in
+                HStack {
+                    Text(verbatim: call.description)
+                    Button("answer") {
+                        do {
+                            try call.answer()
+                        } catch let Phone.Error.upstream(message) {
+                            appModel.setError(message)
+                        } catch { fatalError() }
+                    }
+                    Button("hangup") {
+                        do {
+                            try call.hangup()
+                        } catch let Phone.Error.upstream(message) {
+                            appModel.setError(message)
+                        } catch { fatalError() }
                     }
                 }
             }
