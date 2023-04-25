@@ -9,7 +9,7 @@ import SwiftUI
 import Phone
 
 struct LoginView: View {
-    @ObservedObject var model: AppModel
+    @ObservedObject var appModel: AppModel
     @State private var password = ""
 
     private static let passwordKeyBase = ProcessInfo.processInfo.processName
@@ -20,16 +20,13 @@ struct LoginView: View {
 
     var body: some View {
         VStack {
-            if let errorMessage = model.errorMessage {
-                Text(verbatim: errorMessage).foregroundColor(.red)
-            }
-            TextField("Server", text: $model.server)
-            TextField("Username", text: $model.username)
+            TextField("Server", text: $appModel.server)
+            TextField("Username", text: $appModel.username)
             SecureField("Password", text: $password)
 
             Button("Login") {
-                model.withPhone { phone in
-                    try phone.connect(server: model.server, username: model.username, password: password)
+                appModel.withPhone { phone in
+                    try phone.connect(server: appModel.server, username: appModel.username, password: password)
                 }
             }
         }.padding()
@@ -38,6 +35,6 @@ struct LoginView: View {
 
 struct LoginView_Previews: PreviewProvider {
     static var previews: some View {
-        LoginView(model: AppModel())
+        LoginView(appModel: AppModel())
     }
 }

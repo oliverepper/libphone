@@ -7,7 +7,8 @@
 
 import cphone
 
-public struct Call: Identifiable, Hashable {
+// https://christiantietze.de/posts/2023/01/entity-vs-value-object-and-identifiable-vs-equatable/
+public struct Call: Identifiable {
 
     public enum State: Int32 {
         case null           = 0
@@ -46,13 +47,6 @@ public struct Call: Identifiable, Hashable {
         }
     }
 
-    public static func ==(lhs: Call, rhs: Call) -> Bool {
-        return lhs.id == rhs.id
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(self.id)
-    }
 }
 
 extension Call: CustomStringConvertible {

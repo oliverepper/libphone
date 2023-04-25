@@ -18,7 +18,7 @@ struct ContentView: View {
                 Text(verbatim: errorMessage).foregroundColor(.red)
             }
             if !appModel.isConnected {
-                LoginView(model: self.appModel)
+                LoginView(appModel: self.appModel)
             } else {
                 MainView(appModel: self.appModel)
             }

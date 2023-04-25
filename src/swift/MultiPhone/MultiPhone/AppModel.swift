@@ -16,8 +16,8 @@ final class AppModel: ObservableObject {
     @Published var errorMessage: String? = nil
     @Published var isConnected = false
 
-    @Published var calls = Set<Call>()
-
+    // https://christiantietze.de/posts/2023/01/entity-vs-value-object-and-identifiable-vs-equatable/
+    @Published var calls: [Call.ID: Call] = [:]
     private var phone: Phone?
 
     init() {
@@ -40,15 +40,15 @@ final class AppModel: ObservableObject {
 
         phone?.onIncomingCallCallback = { call in
             DispatchQueue.main.async {
-                self.calls.insert(call)
+                self.calls.updateValue(call, forKey: call.id)
             }
         }
 
         phone?.onCallStateCallback = { call in
             DispatchQueue.main.async {
-                self.calls.remove(call)
+                self.calls.removeValue(forKey: call.id)
                 if !call.isDisconnected {
-                    self.calls.insert(call)
+                    self.calls.updateValue(call, forKey: call.id)
                 }
             }
         }
