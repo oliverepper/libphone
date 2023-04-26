@@ -36,7 +36,6 @@ public struct Call: Identifiable {
     }
 
     public func answer() throws {
-        assert(state == .early || state == .incoming)
         if phone_answer_call_id(phone, id) != PHONE_STATUS_SUCCESS {
             throw Phone.Error.upstream(.init(cString: phone_last_error()))
         }
