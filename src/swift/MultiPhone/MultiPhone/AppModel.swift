@@ -10,6 +10,7 @@ import SwiftUI
 import CoreAudio
 import Foundation
 
+#if os(macOS)
 var deviceChangedAddress = AudioObjectPropertyAddress(
     mSelector: kAudioHardwarePropertyDevices,
     mScope: kAudioObjectPropertyScopeGlobal,
@@ -19,30 +20,28 @@ var deviceChangedAddress = AudioObjectPropertyAddress(
 func audioDeviceChanged(objectID: AudioObjectID, numberAddresses: UInt32, addresses: UnsafePointer<AudioObjectPropertyAddress>, context: UnsafeMutableRawPointer?) -> OSStatus {
     guard let context else { fatalError() }
     print("@@@@@" + #function)
-
+    
     let my = Unmanaged<AppModel>.fromOpaque(context).takeUnretainedValue()
     my.withPhone { phone in
         try phone.call("+491804100100")
         print("@@@@@ -> isThreadRegistered: \(phone.isThreadRegistered)")
     }
-
-
-
     return noErr
 }
+#endif
 
 final class AppModel: ObservableObject {
     @AppStorage("server") var server: String = ""
     @AppStorage("user") var username: String = ""
-
+    
     @Published var errorMessage: String? = nil
     @Published var isConnected = false
-
+    
     // https://christiantietze.de/posts/2023/01/entity-vs-value-object-and-identifiable-vs-equatable/
     @Published var calls: [Call.ID: Call] = [:]
     private var phone: Phone?
     private var lock = os_unfair_lock()
-
+    
     private func setup() {
         do {
             phone = try Phone(userAgent: "MultiPhone ☎️")
@@ -60,13 +59,13 @@ final class AppModel: ObservableObject {
         } catch let Phone.Error.upstream(message) {
             errorMessage = message
         } catch { fatalError() }
-
+        
         phone?.onIncomingCallCallback = { call in
             DispatchQueue.main.async {
                 self.calls.updateValue(call, forKey: call.id)
             }
         }
-
+        
         phone?.onCallStateCallback = { call in
             DispatchQueue.main.async {
                 self.calls.removeValue(forKey: call.id)
@@ -75,21 +74,24 @@ final class AppModel: ObservableObject {
                 }
             }
         }
-
+        
     }
-
+    
     init() {
         os_unfair_lock_lock(&lock)
         defer {
             os_unfair_lock_unlock(&lock)
         }
         setup()
+#if os(macOS)
         let status = AudioObjectAddPropertyListener(AudioObjectID(kAudioObjectSystemObject), &deviceChangedAddress, audioDeviceChanged, Unmanaged.passUnretained(self).toOpaque())
         guard status == noErr else {
             fatalError()
+            
         }
+#endif
     }
-
+    
     func disconnect() {
         os_unfair_lock_lock(&lock)
         defer {
@@ -98,7 +100,7 @@ final class AppModel: ObservableObject {
         self.phone = nil
         setup()
     }
-
+    
     func withPhone(_ block: (Phone) throws -> Void) {
         os_unfair_lock_lock(&lock)
         defer {
@@ -115,7 +117,7 @@ final class AppModel: ObservableObject {
             self.setError(message)
         } catch { fatalError() }
     }
-
+    
     func setError(_ message: String?) {
         DispatchQueue.main.async {
             self.errorMessage = message

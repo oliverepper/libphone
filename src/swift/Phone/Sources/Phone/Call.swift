@@ -66,5 +66,13 @@ extension Call: CustomStringConvertible {
     public var isDisconnected: Bool {
         return self.state == State.disconnected.rawValue
     }
+
+    public func getIndex(call: Self) throws -> Int32 {
+        var index: Int32 = -1
+        if phone_get_call_index(self.phone, call.id, &index) != PHONE_STATUS_SUCCESS {
+            throw Phone.Error.upstream(.init(cString: phone_last_error()))
+        }
+        return index
+    }
 }
 
