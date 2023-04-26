@@ -29,7 +29,13 @@ struct LoginView: View {
                     try phone.connect(server: appModel.server, username: appModel.username, password: password)
                 }
             }
-        }.padding()
+        }
+        .padding()
+        .onAppear {
+            appModel.withPhone { phone in
+                try phone.connect(server: appModel.server, username: appModel.username, password: password)
+            }
+        }
     }
 }
 

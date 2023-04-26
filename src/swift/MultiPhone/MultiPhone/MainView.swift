@@ -24,6 +24,9 @@ struct MainView: View {
 #if os(iOS)
                 EnableSpeakerView()
 #endif
+                Button("disconnect") {
+                    appModel.disconnect()
+                }
             }.padding()
             ForEach(Array(appModel.calls.values)) { call in
                 HStack {

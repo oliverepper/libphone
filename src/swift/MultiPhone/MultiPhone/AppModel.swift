@@ -19,8 +19,9 @@ final class AppModel: ObservableObject {
     // https://christiantietze.de/posts/2023/01/entity-vs-value-object-and-identifiable-vs-equatable/
     @Published var calls: [Call.ID: Call] = [:]
     private var phone: Phone?
+    private var lock = os_unfair_lock()
 
-    init() {
+    private func setup() {
         do {
             phone = try Phone(userAgent: "MultiPhone ☎️")
             try phone?.configureOpus()
@@ -52,9 +53,31 @@ final class AppModel: ObservableObject {
                 }
             }
         }
+
     }
 
-    func withPhone(_ block: @escaping (Phone) throws -> Void) {
+    init() {
+        os_unfair_lock_lock(&lock)
+        defer {
+            os_unfair_lock_unlock(&lock)
+        }
+        setup()
+    }
+
+    func disconnect() {
+        os_unfair_lock_lock(&lock)
+        defer {
+            os_unfair_lock_unlock(&lock)
+        }
+        self.phone = nil
+        setup()
+    }
+
+    func withPhone(_ block: (Phone) throws -> Void) {
+        os_unfair_lock_lock(&lock)
+        defer {
+            os_unfair_lock_unlock(&lock)
+        }
         do {
             guard let phone else { fatalError() }
             try block(phone)
@@ -62,6 +85,8 @@ final class AppModel: ObservableObject {
         } catch let Phone.Error.upstream(message) {
             self.errorMessage = message
         } catch { fatalError() }
+
+
     }
 
     func setError(_ message: String) {

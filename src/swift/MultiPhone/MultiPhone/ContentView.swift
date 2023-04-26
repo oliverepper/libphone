@@ -8,8 +8,10 @@
 import SwiftUI
 import Phone
 
+
 struct ContentView: View {
     @StateObject var appModel = AppModel()
+    @Environment(\.scenePhase) var scenePhase
 
     var body: some View {
         VStack {
@@ -26,6 +28,19 @@ struct ContentView: View {
             BuildInfo(leftText: Phone.version + "\n" + Phone.gitHash + "\n" + Phone.gitDescription).padding(.horizontal)
         }
         .padding()
+        .onChange(of: scenePhase) { newValue in
+            switch newValue {
+            case .active:
+                print("@@@@@ ACTIVE")
+            case .inactive:
+                print("@@@@@ INACTIVE")
+                appModel.disconnect()
+            case .background:
+                print("@@@@@ BACKGROUND")
+            @unknown default:
+                fatalError()
+            }
+        }
     }
 }
 

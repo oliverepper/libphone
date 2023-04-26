@@ -43,7 +43,7 @@ public final class Phone {
             if let callback = my.onIncomingCallCallback {
                 callback(Call(phone: my.phone, id: .init(cString: call_id)))
             }
-        }, Unmanaged.passRetained(self).toOpaque())
+        }, Unmanaged.passUnretained(self).toOpaque())
 
         phone_register_on_call_state_id_callback(self.phone, { call_id, call_state, ctx in
             guard let call_id, let ctx else { return }
@@ -51,7 +51,7 @@ public final class Phone {
             if let callback = my.onCallStateCallback {
                 callback(Call(phone: my.phone, id: .init(cString: call_id), state: call_state))
             }
-        }, Unmanaged.passRetained(self).toOpaque())
+        }, Unmanaged.passUnretained(self).toOpaque())
     }
 
     deinit {
