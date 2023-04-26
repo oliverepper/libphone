@@ -31,6 +31,7 @@ struct MainView: View {
                     Button("answer") {
                         do {
                             try call.answer()
+                            appModel.errorMessage = nil
                         } catch let Phone.Error.upstream(message) {
                             appModel.setError(message)
                         } catch { fatalError() }
@@ -38,6 +39,7 @@ struct MainView: View {
                     Button("hangup") {
                         do {
                             try call.hangup()
+                            appModel.errorMessage = nil
                         } catch let Phone.Error.upstream(message) {
                             appModel.setError(message)
                         } catch { fatalError() }
