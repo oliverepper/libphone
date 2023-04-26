@@ -83,6 +83,12 @@ public final class Phone {
             throw Error.upstream(.init(cString: phone_last_error()))
         }
     }
+
+    public func registerThread(label: String) {
+        if phone_is_thread_registered(self.phone) != 1 {
+            phone_register_thread(self.phone, label)
+        }
+    }
 }
 
 extension Phone {
