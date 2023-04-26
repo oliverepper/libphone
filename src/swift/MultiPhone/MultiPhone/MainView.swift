@@ -31,13 +31,15 @@ struct MainView: View {
             ForEach(Array(appModel.calls.values)) { call in
                 HStack {
                     Text(verbatim: call.description)
-                    Button("answer") {
-                        do {
-                            try call.answer()
-                            appModel.errorMessage = nil
-                        } catch let Phone.Error.upstream(message) {
-                            appModel.setError(message)
-                        } catch { fatalError() }
+                    if [Call.State.incoming, Call.State.early].contains(call.state) {
+                        Button("answer") {
+                            do {
+                                try call.answer()
+                                appModel.errorMessage = nil
+                            } catch let Phone.Error.upstream(message) {
+                                appModel.setError(message)
+                            } catch { fatalError() }
+                        }
                     }
                     Button("hangup") {
                         do {

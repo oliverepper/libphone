@@ -25,17 +25,18 @@ public struct Call: Identifiable {
     }
 
     public let id: String
-    private let state: Int32
+    public let state: State
 
     private let phone: phone_t
 
     init(phone: phone_t, id: String, state: Int32 = 0) {
         self.phone = phone
         self.id = id
-        self.state = state
+        self.state = State(rawValue: state)!
     }
 
     public func answer() throws {
+        assert(state == .early || state == .incoming)
         if phone_answer_call_id(phone, id) != PHONE_STATUS_SUCCESS {
             throw Phone.Error.upstream(.init(cString: phone_last_error()))
         }
@@ -56,7 +57,7 @@ extension Call: CustomStringConvertible {
 
     public var status: String {
         let buffer = UnsafeMutablePointer<CChar>.allocate(capacity: 128)
-        phone_call_state_name(buffer, 128, self.state)
+        phone_call_state_name(buffer, 128, self.state.rawValue)
         defer {
             buffer.deallocate()
         }

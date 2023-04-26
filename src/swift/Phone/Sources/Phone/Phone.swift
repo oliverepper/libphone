@@ -84,9 +84,9 @@ public final class Phone {
         }
     }
 
-    public func registerThread(label: String) {
-        if phone_is_thread_registered(self.phone) != 1 {
-            phone_register_thread(self.phone, label)
+    public func registerThread(label: String = .init()) throws {
+        if phone_register_thread(self.phone, label) != PHONE_STATUS_SUCCESS {
+            throw Error.upstream(.init(cString: phone_last_error()))
         }
     }
 }
@@ -103,6 +103,10 @@ extension Phone {
 }
 
 extension Phone {
+    public var isThreadRegistered: Bool {
+        return phone_is_thread_registered(self.phone) != 0
+    }
+
     public static var version: String {
         let versionString = "libphone-" +
         [
