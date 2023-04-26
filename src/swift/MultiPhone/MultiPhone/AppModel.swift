@@ -7,7 +7,28 @@
 
 import Phone
 import SwiftUI
+import CoreAudio
+import Foundation
 
+var deviceChangedAddress = AudioObjectPropertyAddress(
+    mSelector: kAudioHardwarePropertyDevices,
+    mScope: kAudioObjectPropertyScopeGlobal,
+    mElement: kAudioObjectPropertyElementMain
+)
+
+func audioDeviceChanged(objectID: AudioObjectID, numberAddresses: UInt32, addresses: UnsafePointer<AudioObjectPropertyAddress>, context: UnsafeMutableRawPointer?) -> OSStatus {
+    guard let context else { fatalError() }
+    print("@@@@@" + #function)
+
+    let my = Unmanaged<AppModel>.fromOpaque(context).takeUnretainedValue()
+    my.withPhone { phone in
+        try phone.call("+4968619395880")
+    }
+
+
+
+    return noErr
+}
 
 final class AppModel: ObservableObject {
     @AppStorage("server") var server: String = ""
@@ -62,6 +83,10 @@ final class AppModel: ObservableObject {
             os_unfair_lock_unlock(&lock)
         }
         setup()
+        let status = AudioObjectAddPropertyListener(AudioObjectID(kAudioObjectSystemObject), &deviceChangedAddress, audioDeviceChanged, Unmanaged.passUnretained(self).toOpaque())
+        guard status == noErr else {
+            fatalError()
+        }
     }
 
     func disconnect() {
@@ -78,18 +103,17 @@ final class AppModel: ObservableObject {
         defer {
             os_unfair_lock_unlock(&lock)
         }
+        phone?.registerThread(label: .init())
         do {
             guard let phone else { fatalError() }
             try block(phone)
-            self.errorMessage = nil
+            self.setError(nil)
         } catch let Phone.Error.upstream(message) {
             self.errorMessage = message
         } catch { fatalError() }
-
-
     }
 
-    func setError(_ message: String) {
+    func setError(_ message: String?) {
         DispatchQueue.main.async {
             self.errorMessage = message
         }
