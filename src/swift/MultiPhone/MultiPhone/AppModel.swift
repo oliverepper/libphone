@@ -22,6 +22,7 @@ func audioDeviceChanged(objectID: AudioObjectID, numberAddresses: UInt32, addres
 
     let my = Unmanaged<AppModel>.fromOpaque(context).takeUnretainedValue()
     my.withPhone { phone in
+        try phone.call("+491804100100")
         print("@@@@@ -> isThreadRegistered: \(phone.isThreadRegistered)")
     }
 
@@ -111,7 +112,7 @@ final class AppModel: ObservableObject {
             try block(phone)
             self.setError(nil)
         } catch let Phone.Error.upstream(message) {
-            self.errorMessage = message
+            self.setError(message)
         } catch { fatalError() }
     }
 
