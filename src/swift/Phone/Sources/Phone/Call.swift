@@ -19,9 +19,9 @@ public struct Call: Identifiable {
         case confirmed      = 5
         case disconnected   = 6
 
-        public static func ==(lhs: State, rhs: Int32) -> Bool {
-            return lhs.rawValue == rhs
-        }
+//        public static func ==(lhs: State, rhs: Int32) -> Bool {
+//            return lhs.rawValue == rhs
+//        }
     }
 
     public let id: String
@@ -64,7 +64,7 @@ extension Call: CustomStringConvertible {
     }
 
     public var isDisconnected: Bool {
-        return self.state == State.disconnected.rawValue
+        return self.state == .disconnected
     }
 
     public func getIndex(call: Self) throws -> Int32 {
