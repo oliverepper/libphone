@@ -320,7 +320,7 @@ void phone_instance_t::stop_call_waiting() const {
     }
 }
 
-int phone_instance_t::get_call_count() {
+unsigned int phone_instance_t::get_call_count() {
     return m_account->get_call_count();
 }
 
@@ -341,3 +341,33 @@ void phone_instance_t::handle_ip_change() {
     }
 }
 
+unsigned int phone_instance_t::get_rx_level_for_call(int call_index) const {
+    try {
+        return m_account->get_rx_level_for_call(call_index);
+    } catch (const pj::Error& e) {
+        throw phone::exception{e.info()};
+    }
+}
+
+unsigned int phone_instance_t::get_rx_level_for_call(const std::string &call_id) const {
+    try {
+        return m_account->get_rx_level_for_call(call_id);
+    } catch (const pj::Error& e) {
+        throw phone::exception{e.info()};
+    }
+}
+
+void phone_instance_t::set_rx_level_for_call(int call_index, int level) const {
+    try {
+        m_account->set_rx_level_for_call(call_index, level);
+    } catch (const pj::Error& e) {
+        throw phone::exception{e.info()};
+    }
+}
+void phone_instance_t::set_rx_level_for_call(const std::string &call_id, int level) const {
+    try {
+        m_account->set_rx_level_for_call(call_id, level);
+    } catch (const pj::Error& e) {
+        throw phone::exception{e.info()};
+    }
+}

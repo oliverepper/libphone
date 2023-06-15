@@ -157,6 +157,12 @@ PHONE_EXPORT unsigned phone_get_call_count(phone_t instance);
 
 PHONE_EXPORT phone_status_t phone_handle_ip_change(void);
 
+PHONE_EXPORT phone_status_t phone_get_rx_level_call_index(phone_t instance, int call_index, int* level);
+PHONE_EXPORT phone_status_t phone_get_rx_level_call_id(phone_t instance, const char *call_id, int* level);
+
+PHONE_EXPORT phone_status_t phone_set_rx_level_call_index(phone_t instance, int call_index, int level);
+PHONE_EXPORT phone_status_t phone_set_rx_level_call_id(phone_t instance, const char *call_id, int level);
+
 #ifdef __cplusplus
 }
 #endif

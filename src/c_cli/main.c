@@ -262,6 +262,41 @@ int main() {
                 printf("handle ip change\n");
                 phone_handle_ip_change();
                 break;
+            case 'm':
+                clear_input_buffer();
+                {
+                    int call_index, level;
+                    printf("please enter call index: ");
+                    if (read_int(&call_index) != 0) break;
+                    if (phone_get_rx_level_call_index(state->phone, call_index, &level) != PHONE_STATUS_SUCCESS)
+                        fprintf(stderr, "%s\n", phone_last_error());
+                    printf("last rx level for call: %d\n", level);
+                }
+                break;
+            case 'M':
+                clear_input_buffer();
+                {
+                    char call_id[128];
+                    int level;
+                    printf("please enter call id: ");
+                    if (read_string(call_id, sizeof(call_id)) != 0) break;
+                    if(phone_get_rx_level_call_id(state->phone, call_id, &level) != PHONE_STATUS_SUCCESS)
+                        fprintf(stderr, "%s\n", phone_last_error());
+                    printf("last rx level for call: %d\n", level);
+                }
+                break;
+            case '0':
+                clear_input_buffer();
+                {
+                    int call_index, level;
+                    printf("please enter call index: ");
+                    if (read_int(&call_index) != 0) break;
+                    printf("please enter desired level: ");
+                    if (read_int(&level) != 0) break;
+                    if (phone_set_rx_level_call_index(state->phone, call_index, level) != PHONE_STATUS_SUCCESS)
+                        fprintf(stderr, "%s\n", phone_last_error());
+                }
+                break;
             default:
                 clear_input_buffer();
                 break;
