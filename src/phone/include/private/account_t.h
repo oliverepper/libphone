@@ -187,7 +187,7 @@ public:
         }
     }
 
-    void set_rx_level_for_call(phone::CallID auto id, int level) {
+    void set_rx_level_for_call(phone::CallID auto id, float level) {
         auto call = find_call(id);
         auto media = call->getInfo().media;
         auto it = std::find_if(
@@ -199,7 +199,7 @@ public:
         if (it != std::end(media)) {
             auto index = it->index;
             if (index <= std::numeric_limits<int>::max()) {
-                call->getAudioMedia(static_cast<int>(index)).adjustRxLevel(static_cast<float>(level) / 100);
+                call->getAudioMedia(static_cast<int>(index)).adjustRxLevel(level);
             } else {
                 throw phone::exception("media index out of range");
             }

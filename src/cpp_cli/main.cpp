@@ -225,16 +225,16 @@ auto main() -> int {
                     int call_index;
                     std::cout << "please enter call index: ";
                     std::cin >> call_index;
-                    int level;
-                    std::cout << "please enter desired level 0-200: ";
+                    float level;
+                    std::cout << "please enter desired level 0-2: ";
                     std::cin >> level;
                     state.phone.set_rx_level_for_call(call_index, level);
                 } else if (command == '=') {
                     int call_id;
                     std::cout << "please enter call id: ";
                     std::cin >> call_id;
-                    int level;
-                    std::cout << "please enter desired level 0-200: ";
+                    float level;
+                    std::cout << "please enter desired level 0-2: ";
                     std::cin >> level;
                     state.phone.set_rx_level_for_call(call_id, level);
                 }

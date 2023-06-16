@@ -132,8 +132,8 @@ public:
     [[nodiscard]] PHONE_EXPORT unsigned int get_rx_level_for_call(int call_index) const;
     [[nodiscard]] PHONE_EXPORT unsigned int get_rx_level_for_call(const std::string& call_id) const;
 
-    PHONE_EXPORT void set_rx_level_for_call(int call_index, int level) const;
-    PHONE_EXPORT void set_rx_level_for_call(const std::string& call_id, int level) const;
+    PHONE_EXPORT void set_rx_level_for_call(int call_index, float level) const;
+    PHONE_EXPORT void set_rx_level_for_call(const std::string& call_id, float level) const;
 
 private:
     std::unique_ptr<pj::Endpoint> m_ep;

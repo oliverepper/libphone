@@ -357,14 +357,14 @@ unsigned int phone_instance_t::get_rx_level_for_call(const std::string &call_id)
     }
 }
 
-void phone_instance_t::set_rx_level_for_call(int call_index, int level) const {
+void phone_instance_t::set_rx_level_for_call(int call_index, float level) const {
     try {
         m_account->set_rx_level_for_call(call_index, level);
     } catch (const pj::Error& e) {
         throw phone::exception{e.info()};
     }
 }
-void phone_instance_t::set_rx_level_for_call(const std::string &call_id, int level) const {
+void phone_instance_t::set_rx_level_for_call(const std::string &call_id, float level) const {
     try {
         m_account->set_rx_level_for_call(call_id, level);
     } catch (const pj::Error& e) {
