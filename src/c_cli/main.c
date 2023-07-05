@@ -50,8 +50,11 @@ void on_incoming_call_with_id_cb(const char *call_id, __attribute__((unused)) vo
 
     printf("Incoming call id: %s, index: %d\n", call_id, s->last_call_index);
 
-    int answer_after;
-    phone_call_answer_after_id(s->phone, call_id, &answer_after);
+    int answer_after = -1;
+    if (phone_call_answer_after_id(s->phone, call_id, &answer_after) != PHONE_STATUS_SUCCESS)
+        fprintf(stderr, "%s\n", phone_last_error());
+
+    // call is user initiated if >= 0
     if (answer_after >= 0) {
         sleep(answer_after);
         phone_answer_call_id(s->phone, call_id);
