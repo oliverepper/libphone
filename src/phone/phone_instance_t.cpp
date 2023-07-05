@@ -132,6 +132,8 @@ void phone_instance_t::answer_call(int id) {
         m_account->answer_call(id);
     } catch (const pj::Error &e) {
         throw phone::exception{e.info()};
+    } catch (const std::invalid_argument& e) {
+        throw phone::exception{e.what()};
     }
 }
 
@@ -140,6 +142,8 @@ void phone_instance_t::answer_call(std::string call_id) {
         m_account->answer_call(std::move(call_id));
     } catch (const pj::Error& e) {
         throw phone::exception{e.info()};
+    } catch (const std::invalid_argument& e) {
+        throw phone::exception{e.what()};
     }
 }
 
@@ -148,6 +152,8 @@ void phone_instance_t::start_ringing_call(int id) {
         m_account->start_ringing_call(id);
     } catch (const pj::Error &e) {
         throw phone::exception{e.info()};
+    } catch (const std::invalid_argument& e) {
+        throw phone::exception{e.what()};
     }
 }
 
@@ -156,6 +162,8 @@ void phone_instance_t::start_ringing_call(std::string call_id) {
         m_account->start_ringing_call(std::move(call_id));
     } catch (const pj::Error& e) {
         throw phone::exception{e.info()};
+    } catch (const std::invalid_argument& e) {
+        throw phone::exception{e.what()};
     }
 }
 
@@ -164,6 +172,8 @@ void phone_instance_t::hangup_call(int call_id) {
         m_account->hangup_call(call_id);
     } catch (const pj::Error &e) {
         throw phone::exception{e.info()};
+    } catch (const std::invalid_argument& e) {
+        throw phone::exception{e.what()};
     }
 }
 
@@ -172,6 +182,8 @@ void phone_instance_t::hangup_call(std::string call_id) {
         m_account->hangup_call(std::move(call_id));
     } catch (const pj::Error& e) {
         throw phone::exception{e.info()};
+    } catch (const std::invalid_argument& e) {
+        throw phone::exception{e.what()};
     }
 }
 
@@ -181,6 +193,8 @@ void phone_instance_t::dtmf(int call_index, const std::string &digits) const {
         play_tones(*m_dtmf_tone_generator, digits);
     } catch (const pj::Error& e) {
         throw phone::exception{e.info()};
+    } catch (const std::invalid_argument& e) {
+        throw phone::exception{e.what()};
     }
 }
 
@@ -190,6 +204,8 @@ void phone_instance_t::dtmf(std::string call_id, const std::string &digits) cons
         play_tones(*m_dtmf_tone_generator, digits);
     } catch (const pj::Error& e) {
         throw phone::exception{e.info()};
+    } catch (const std::invalid_argument& e) {
+        throw phone::exception{e.what()};
     }
 }
 
@@ -206,12 +222,16 @@ std::string phone_instance_t::get_call_id(int call_index) const {
         return m_account->get_call_id(call_index);
     } catch (const std::invalid_argument& e) {
         throw phone::exception{e.what()};
+    } catch (const std::invalid_argument& e) {
+        throw phone::exception{e.what()};
     }
 }
 
 int phone_instance_t::get_call_index(const std::string& call_id) const {
     try {
         return m_account->get_call_index(call_id);
+    } catch (const std::invalid_argument& e) {
+        throw phone::exception{e.what()};
     } catch (const std::invalid_argument& e) {
         throw phone::exception{e.what()};
     }
@@ -265,12 +285,16 @@ std::optional<std::string> phone_instance_t::call_incoming_message(int call_inde
         return m_account->call_incoming_message(call_index);
     } catch (const std::invalid_argument& e) {
         throw phone::exception{e.what()};
+    } catch (const std::invalid_argument& e) {
+        throw phone::exception{e.what()};
     }
 }
 
 std::optional<std::string> phone_instance_t::call_incoming_message(const std::string& call_id) const {
     try {
         return m_account->call_incoming_message(call_id);
+    } catch (const std::invalid_argument& e) {
+        throw phone::exception{e.what()};
     } catch (const std::invalid_argument& e) {
         throw phone::exception{e.what()};
     }
@@ -281,12 +305,16 @@ std::optional<int> phone_instance_t::call_answer_after(int call_index) const {
         return m_account->call_answer_after(call_index);
     } catch (const std::invalid_argument& e) {
         throw phone::exception{e.what()};
+    } catch (const std::invalid_argument& e) {
+        throw phone::exception{e.what()};
     }
 }
 
 std::optional<int> phone_instance_t::call_answer_after(const std::string& call_id) const {
     try {
         return m_account->call_answer_after(call_id);
+    } catch (const std::invalid_argument& e) {
+        throw phone::exception{e.what()};
     } catch (const std::invalid_argument& e) {
         throw phone::exception{e.what()};
     }
@@ -346,6 +374,8 @@ unsigned int phone_instance_t::get_rx_level_for_call(int call_index) const {
         return m_account->get_rx_level_for_call(call_index);
     } catch (const pj::Error& e) {
         throw phone::exception{e.info()};
+    } catch (const std::invalid_argument& e) {
+        throw phone::exception{e.what()};
     }
 }
 
@@ -354,6 +384,8 @@ unsigned int phone_instance_t::get_rx_level_for_call(const std::string &call_id)
         return m_account->get_rx_level_for_call(call_id);
     } catch (const pj::Error& e) {
         throw phone::exception{e.info()};
+    } catch (const std::invalid_argument& e) {
+        throw phone::exception{e.what()};
     }
 }
 
@@ -362,6 +394,8 @@ void phone_instance_t::set_rx_level_for_call(int call_index, float level) const 
         m_account->set_rx_level_for_call(call_index, level);
     } catch (const pj::Error& e) {
         throw phone::exception{e.info()};
+    } catch (const std::invalid_argument& e) {
+        throw phone::exception{e.what()};
     }
 }
 void phone_instance_t::set_rx_level_for_call(const std::string &call_id, float level) const {
@@ -369,5 +403,7 @@ void phone_instance_t::set_rx_level_for_call(const std::string &call_id, float l
         m_account->set_rx_level_for_call(call_id, level);
     } catch (const pj::Error& e) {
         throw phone::exception{e.info()};
+    } catch (const std::invalid_argument& e) {
+        throw phone::exception{e.what()};
     }
 }
