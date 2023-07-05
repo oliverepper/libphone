@@ -32,7 +32,7 @@ public:
         for (const auto& media : info.media) {
             if (media.type == PJMEDIA_TYPE_AUDIO) {
                 auto& manager = pj::Endpoint::instance().audDevManager();
-                if (media.index <= static_cast<unsigned int>(std::numeric_limits<int>::max())) {
+                if (media.index <= std::numeric_limits<int>::max()) {
                     auto audio_media = getAudioMedia(static_cast<int>(media.index));
                     audio_media.startTransmit(manager.getPlaybackDevMedia());
                     manager.getCaptureDevMedia().startTransmit(audio_media);

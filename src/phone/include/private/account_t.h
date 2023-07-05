@@ -149,7 +149,7 @@ public:
         return static_cast<int>(*find_call(call_id));
     }
 
-    int get_call_count() {
+    unsigned int get_call_count() {
         unsigned call_count = pjsua_call_get_count();
         assert(call_count == m_calls.size());
         return call_count;
@@ -163,6 +163,47 @@ public:
 
     void hangup_calls() noexcept {
         m_calls.clear();
+    }
+
+    unsigned int get_rx_level_for_call(phone::CallID auto id) {
+        auto call = find_call(id);
+        auto media = call->getInfo().media;
+        auto it = std::find_if(
+                std::begin(media),
+                std::end(media),
+                [](const auto& info) {
+                    return info.type == PJMEDIA_TYPE_AUDIO;
+                });
+        if (it != std::end(media)) {
+            auto index = it->index;
+            if (index <= std::numeric_limits<int>::max()) {
+                return call->getAudioMedia(static_cast<int>(index)).getRxLevel();
+            }
+        }
+        if constexpr (std::is_same_v<decltype(id), int>) {
+            throw phone::exception{"no audio media for call: " + std::to_string(id)};
+        } else {
+            throw phone::exception{"no audio media for call: " + id};
+        }
+    }
+
+    void set_rx_level_for_call(phone::CallID auto id, float level) {
+        auto call = find_call(id);
+        auto media = call->getInfo().media;
+        auto it = std::find_if(
+                std::begin(media),
+                std::end(media),
+                [](const auto& info){
+                    return info.type == PJMEDIA_TYPE_AUDIO;
+                });
+        if (it != std::end(media)) {
+            auto index = it->index;
+            if (index <= std::numeric_limits<int>::max()) {
+                call->getAudioMedia(static_cast<int>(index)).adjustRxLevel(level);
+            } else {
+                throw phone::exception("media index out of range");
+            }
+        }
     }
 
 private:

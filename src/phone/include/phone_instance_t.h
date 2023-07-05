@@ -125,9 +125,15 @@ public:
     PHONE_EXPORT void play_call_waiting() const;
     PHONE_EXPORT void stop_call_waiting() const;
 
-    [[nodiscard]] PHONE_EXPORT int get_call_count();
+    [[nodiscard]] PHONE_EXPORT unsigned int get_call_count();
 
     PHONE_EXPORT static void handle_ip_change();
+
+    [[nodiscard]] PHONE_EXPORT unsigned int get_rx_level_for_call(int call_index) const;
+    [[nodiscard]] PHONE_EXPORT unsigned int get_rx_level_for_call(const std::string& call_id) const;
+
+    PHONE_EXPORT void set_rx_level_for_call(int call_index, float level) const;
+    PHONE_EXPORT void set_rx_level_for_call(const std::string& call_id, float level) const;
 
 private:
     std::unique_ptr<pj::Endpoint> m_ep;
