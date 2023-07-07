@@ -222,16 +222,12 @@ std::string phone_instance_t::get_call_id(int call_index) const {
         return m_account->get_call_id(call_index);
     } catch (const std::invalid_argument& e) {
         throw phone::exception{e.what()};
-    } catch (const std::invalid_argument& e) {
-        throw phone::exception{e.what()};
     }
 }
 
 int phone_instance_t::get_call_index(const std::string& call_id) const {
     try {
         return m_account->get_call_index(call_id);
-    } catch (const std::invalid_argument& e) {
-        throw phone::exception{e.what()};
     } catch (const std::invalid_argument& e) {
         throw phone::exception{e.what()};
     }
@@ -285,16 +281,12 @@ std::optional<std::string> phone_instance_t::call_incoming_message(int call_inde
         return m_account->call_incoming_message(call_index);
     } catch (const std::invalid_argument& e) {
         throw phone::exception{e.what()};
-    } catch (const std::invalid_argument& e) {
-        throw phone::exception{e.what()};
     }
 }
 
 std::optional<std::string> phone_instance_t::call_incoming_message(const std::string& call_id) const {
     try {
         return m_account->call_incoming_message(call_id);
-    } catch (const std::invalid_argument& e) {
-        throw phone::exception{e.what()};
     } catch (const std::invalid_argument& e) {
         throw phone::exception{e.what()};
     }
@@ -305,16 +297,12 @@ std::optional<int> phone_instance_t::call_answer_after(int call_index) const {
         return m_account->call_answer_after(call_index);
     } catch (const std::invalid_argument& e) {
         throw phone::exception{e.what()};
-    } catch (const std::invalid_argument& e) {
-        throw phone::exception{e.what()};
     }
 }
 
 std::optional<int> phone_instance_t::call_answer_after(const std::string& call_id) const {
     try {
         return m_account->call_answer_after(call_id);
-    } catch (const std::invalid_argument& e) {
-        throw phone::exception{e.what()};
     } catch (const std::invalid_argument& e) {
         throw phone::exception{e.what()};
     }

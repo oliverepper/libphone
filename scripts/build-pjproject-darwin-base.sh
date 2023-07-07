@@ -11,7 +11,7 @@ then
 fi
 
 export PREFIX="$1/pjproject"
-PJPROJECT_VERSION=2.13
+PJPROJECT_VERSION=2.13.1
 
 #IOS_ARM64_INSTALL_PREFIX="${PREFIX}/ios-arm64"
 #
