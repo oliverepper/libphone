@@ -72,10 +72,17 @@ public:
 
         m_calls.back()->on_call_state_with_index = on_call_state_with_index;
         m_calls.back()->on_call_state_with_id = on_call_state_with_id;
-        if (on_incoming_call_with_index.has_value())
-            on_incoming_call_with_index.value()(static_cast<int>(*m_calls.back()));
-        if (on_incoming_call_with_id.has_value())
-            on_incoming_call_with_id.value()(static_cast<std::string>(*m_calls.back()));
+
+        if (on_incoming_call_with_index.has_value()) {
+            auto index = static_cast<int>(*m_calls.back());
+            PJ_LOG(6, (__BASE_FILE__, "calling on_incoming_call with index: %d", index));
+            on_incoming_call_with_index.value()(index);
+        }
+        if (on_incoming_call_with_id.has_value()) {
+            auto id = static_cast<std::string>(*m_calls.back());
+            PJ_LOG(6, (__BASE_FILE__, "calling on_incoming_call with id: %s", index));
+            on_incoming_call_with_id.value()(id);
+        }
     }
 
     void make_call(const std::string &uri) {

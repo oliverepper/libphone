@@ -14,7 +14,7 @@ class simple_task_system {
     std::vector<std::thread>    m_threads;
     simple_notification_queue   m_queue;
 
-    phone_instance_t *    m_phone_ptr;
+    phone_instance_t            *m_phone_ptr;
 
     void run(unsigned i) {
         m_phone_ptr->register_thread("worker_" + std::to_string(i));

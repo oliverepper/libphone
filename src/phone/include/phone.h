@@ -57,8 +57,11 @@ PHONE_DEPRECATED_EXPORT phone_status_t phone_answer_call(phone_t instance, int c
 PHONE_EXPORT phone_status_t phone_answer_call_index(phone_t instance, int call_index);
 PHONE_EXPORT phone_status_t phone_answer_call_id(phone_t instance, const char *call_id);
 
-PHONE_EXPORT phone_status_t phone_start_ringing_call_index(phone_t instance, int call_index);
-PHONE_EXPORT phone_status_t phone_start_ringing_call_id(phone_t instance, const char *call_id);
+PHONE_DEPRECATED_EXPORT phone_status_t phone_start_ringing_call_index(phone_t instance, int call_index);
+PHONE_DEPRECATED_EXPORT phone_status_t phone_start_ringing_call_id(phone_t instance, const char *call_id);
+
+PHONE_EXPORT phone_status_t phone_answer_ringing_call_index(phone_t instance, int call_index);
+PHONE_EXPORT phone_status_t phone_answer_ringing_call_id(phone_t instance, const char *call_id);
 
 PHONE_DEPRECATED_EXPORT phone_status_t phone_hangup_call(phone_t instance, int call_id);
 PHONE_EXPORT phone_status_t phone_hangup_call_index(phone_t instance, int call_index);
@@ -102,7 +105,7 @@ PHONE_EXPORT phone_status_t phone_set_audio_devices(int capture_device, int play
  * <pre>
  *  Call-Info: \<sip:SERVER\>;answer-after=0
  * </pre>
- * If so the value will be returned via the out parameter \p answer-after.
+ * If so this value will be returned via the out parameter \p answer-after, -1 otherwise.
  *
  * @param instance      phone instance
  * @param call_index    the call index
