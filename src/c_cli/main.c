@@ -50,8 +50,11 @@ void on_incoming_call_with_id_cb(const char *call_id, __attribute__((unused)) vo
 
     printf("Incoming call id: %s, index: %d\n", call_id, s->last_call_index);
 
-    int answer_after;
-    phone_call_answer_after_id(s->phone, call_id, &answer_after);
+    int answer_after = -1;
+    if (phone_call_answer_after_id(s->phone, call_id, &answer_after) != PHONE_STATUS_SUCCESS)
+        fprintf(stderr, "%s\n", phone_last_error());
+
+    // call is user initiated if >= 0
     if (answer_after >= 0) {
         sleep(answer_after);
         phone_answer_call_id(s->phone, call_id);
@@ -204,8 +207,10 @@ int main() {
                 {
                     phone_refresh_audio_devices();
                     size_t count = phone_get_audio_devices_count();
-                    size_t max_driver_name_length = phone_get_audio_device_driver_name_length() + 1; // +1 for zero termination
-                    size_t max_device_name_length = phone_get_audio_device_info_name_length() + 1; // +1 for zero termination
+                    size_t max_driver_name_length =
+                            phone_get_audio_device_driver_name_length() + 1; // +1 for zero termination
+                    size_t max_device_name_length =
+                            phone_get_audio_device_info_name_length() + 1; // +1 for zero termination
 
                     audio_device_info_t devices[count];
                     char driver_names[count][max_driver_name_length];
@@ -222,7 +227,8 @@ int main() {
                         fprintf(stderr, "%s\n", phone_last_error());
 
                     for (i = 0; i < count; i++) {
-                        printf("%d - %s/%s (%d/%d)\n", devices[i].id, devices[i].driver, devices[i].name, devices[i].input_count, devices[i].output_count);
+                        printf("%d - %s/%s (%d/%d)\n", devices[i].id, devices[i].driver, devices[i].name,
+                               devices[i].input_count, devices[i].output_count);
                     }
                 }
                 break;
@@ -261,6 +267,56 @@ int main() {
             case 'i':
                 printf("handle ip change\n");
                 phone_handle_ip_change();
+                break;
+            case 'm':
+                clear_input_buffer();
+                {
+                    int call_index;
+                    unsigned level;
+                    printf("please enter call index: ");
+                    if (read_int(&call_index) != 0) break;
+                    if (phone_get_rx_level_call_index(state->phone, call_index, &level) != PHONE_STATUS_SUCCESS)
+                        fprintf(stderr, "%s\n", phone_last_error());
+                    printf("last rx level for call: %d\n", level);
+                }
+                break;
+            case 'M':
+                clear_input_buffer();
+                {
+                    char call_id[128];
+                    unsigned level;
+                    printf("please enter call id: ");
+                    if (read_string(call_id, sizeof(call_id)) != 0) break;
+                    if (phone_get_rx_level_call_id(state->phone, call_id, &level) != PHONE_STATUS_SUCCESS)
+                        fprintf(stderr, "%s\n", phone_last_error());
+                    printf("last rx level for call: %d\n", level);
+                }
+                break;
+            case '0':
+                clear_input_buffer();
+                {
+                    int call_index;
+                    float level;
+                    printf("please enter call index: ");
+                    if (read_int(&call_index) != 0) break;
+                    printf("please enter desired level: ");
+                    if (read_float(&level) != 0) break;
+                    if (phone_set_rx_level_call_index(state->phone, call_index, level) != PHONE_STATUS_SUCCESS)
+                        fprintf(stderr, "%s\n", phone_last_error());
+                }
+                break;
+            case '=':
+                clear_input_buffer();
+                {
+                    char call_id[128];
+                    float level;
+                    printf("please enter call id: ");
+                    if (read_string(call_id, sizeof(call_id)) != 0) break;
+                    printf("please enter desired level: ");
+                    if (read_float(&level) != 0) break;
+                    if (phone_set_rx_level_call_id(state->phone, call_id, level) != PHONE_STATUS_SUCCESS)
+                        fprintf(stderr, "%s\n", phone_last_error());
+                }
                 break;
             default:
                 clear_input_buffer();

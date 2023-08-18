@@ -19,8 +19,16 @@ public:
 
     void onCallState(pj::OnCallStateParam &prm) override {
         auto info = getInfo();
-        if (on_call_state_with_index.has_value()) on_call_state_with_index.value()(info.id, info.state);
-        if (on_call_state_with_id.has_value()) on_call_state_with_id.value()(info.callIdString, info.state);
+        if (on_call_state_with_index.has_value()) {
+            PJ_LOG(6, (__BASE_FILE__, "calling on_call_state with index: %d and state: %s(%d)",
+                    info.id, phone::call_state_name(info.state), info.state));
+            on_call_state_with_index.value()(info.id, info.state);
+        }
+        if (on_call_state_with_id.has_value()) {
+            PJ_LOG(6, (__BASE_FILE__, "calling on_call_state with id: %s and state: %s(%d)",
+                    info.callIdString.c_str(), phone::call_state_name(info.state), info.state));
+            on_call_state_with_id.value()(info.callIdString, info.state);
+        }
         if (info.state == PJSIP_INV_STATE_DISCONNECTED) {
             PJ_LOG(3, (__BASE_FILE__, "calling delete function for call: %d with id: %s", info.id, info.callIdString.c_str()));
             m_delete_call_from_account(info.id);
@@ -32,7 +40,7 @@ public:
         for (const auto& media : info.media) {
             if (media.type == PJMEDIA_TYPE_AUDIO) {
                 auto& manager = pj::Endpoint::instance().audDevManager();
-                if (media.index <= static_cast<unsigned int>(std::numeric_limits<int>::max())) {
+                if (media.index <= std::numeric_limits<int>::max()) {
                     auto audio_media = getAudioMedia(static_cast<int>(media.index));
                     audio_media.startTransmit(manager.getPlaybackDevMedia());
                     manager.getCaptureDevMedia().startTransmit(audio_media);

@@ -10,6 +10,7 @@
 #include <string.h>
 #include <limits.h>
 #include <stdlib.h>
+#include <float.h>
 
 void clear_input_buffer(void) {
     int c;
@@ -42,9 +43,33 @@ int read_int(int *in) {
     if (value <= INT_MAX && value >= INT_MIN) {
         *in = (int)value;
     } else {
-        fprintf(stderr, "invalid input.\n");
+        fprintf(stderr, "value out of range.\n");
         return  1;
     }
+    return 0;
+}
+
+int read_float(float *in) {
+    char input[11];
+    double value;
+    char *endptr;
+
+    if (read_string(input, sizeof(input)) != 0) return 1;
+
+    value = strtod(input, &endptr);
+
+    if (*input == '\0' || *endptr != '\0') {
+        fprintf(stderr, "invalid input.\n");
+        return 1;
+    }
+
+    if (value <= FLT_MAX && value >= -FLT_MAX) {
+        *in = (float)value;
+    } else {
+        fprintf(stderr, "value out of range.\n");
+        return 1;
+    }
+
     return 0;
 }
 

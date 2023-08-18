@@ -138,8 +138,15 @@ phone_status_t phone_answer_call_id(phone_t instance, const char *call_id) {
     }
     return PHONE_STATUS_SUCCESS;
 }
-
 phone_status_t phone_start_ringing_call_index(phone_t instance, int call_index) {
+    return phone_answer_ringing_call_index(instance, call_index);
+}
+
+phone_status_t phone_start_ringing_call_id(phone_t instance, const char *call_id) {
+    return phone_answer_ringing_call_id(instance, call_id);
+}
+
+phone_status_t phone_answer_ringing_call_index(phone_t instance, int call_index) {
     try {
         instance->start_ringing_call(call_index);
     } catch (const phone::exception& e) {
@@ -149,7 +156,7 @@ phone_status_t phone_start_ringing_call_index(phone_t instance, int call_index) 
     return PHONE_STATUS_SUCCESS;
 }
 
-phone_status_t phone_start_ringing_call_id(phone_t instance, const char *call_id) {
+phone_status_t phone_answer_ringing_call_id(phone_t instance, const char *call_id) {
     try {
         instance->start_ringing_call(call_id);
     } catch (const phone::exception& e) {
@@ -442,5 +449,45 @@ phone_status_t phone_handle_ip_change(void) {
         return PHONE_STATUS_FAILURE;
     }
 
+    return PHONE_STATUS_SUCCESS;
+}
+
+phone_status_t phone_get_rx_level_call_index(phone_t instance, int call_index, unsigned int *level) {
+    try {
+        *level = instance->get_rx_level_for_call(call_index);
+    } catch (const phone::exception& e) {
+        strncpy(global_last_error, e.what(), sizeof(global_last_error));
+        return PHONE_STATUS_FAILURE;
+    }
+    return PHONE_STATUS_SUCCESS;
+}
+
+phone_status_t phone_get_rx_level_call_id(phone_t instance, const char *call_id, unsigned int *level) {
+    try {
+        *level = instance->get_rx_level_for_call(call_id);
+    } catch (const phone::exception& e) {
+        strncpy(global_last_error, e.what(), sizeof(global_last_error));
+        return PHONE_STATUS_FAILURE;
+    }
+    return PHONE_STATUS_SUCCESS;
+}
+
+phone_status_t phone_set_rx_level_call_index(phone_t instance, int call_index, float level) {
+    try {
+        instance->set_rx_level_for_call(call_index, level);
+    } catch (const phone::exception& e) {
+        strncpy(global_last_error, e.what(), sizeof(global_last_error));
+        return PHONE_STATUS_FAILURE;
+    }
+    return PHONE_STATUS_SUCCESS;
+}
+
+phone_status_t phone_set_rx_level_call_id(phone_t instance, const char *call_id, float level) {
+    try {
+        instance->set_rx_level_for_call(call_id, level);
+    } catch (const phone::exception& e) {
+        strncpy(global_last_error, e.what(), sizeof(global_last_error));
+        return PHONE_STATUS_FAILURE;
+    }
     return PHONE_STATUS_SUCCESS;
 }
