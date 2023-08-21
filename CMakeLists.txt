@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.3)
 
-project(phone VERSION 0.8.0 LANGUAGES C CXX)
+project(phone VERSION 0.8.1 LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 
