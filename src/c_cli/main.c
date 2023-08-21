@@ -292,6 +292,16 @@ int main() {
                     printf("last rx level for call: %d\n", level);
                 }
                 break;
+            case 'n':
+                clear_input_buffer();
+                if (phone_set_rx_level_capture_device(state->phone, 0) != PHONE_STATUS_SUCCESS)
+                    fprintf(stderr, "%s\n", phone_last_error());
+                break;
+            case 'N':
+                clear_input_buffer();
+                if (phone_set_rx_level_capture_device(state->phone, 1) != PHONE_STATUS_SUCCESS)
+                    fprintf(stderr, "%s\n", phone_last_error());
+                break;
             case '0':
                 clear_input_buffer();
                 {
