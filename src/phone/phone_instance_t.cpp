@@ -395,3 +395,11 @@ void phone_instance_t::set_rx_level_for_call(const std::string &call_id, float l
         throw phone::exception{e.what()};
     }
 }
+
+void phone_instance_t::set_rx_level_for_capture_device(float level) const {
+    try {
+        m_ep->audDevManager().getCaptureDevMedia().adjustRxLevel(level);
+    } catch (const pj::Error& e) {
+        throw phone::exception{e.info()};
+    }
+}

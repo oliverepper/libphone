@@ -135,6 +135,8 @@ public:
     PHONE_EXPORT void set_rx_level_for_call(int call_index, float level) const;
     PHONE_EXPORT void set_rx_level_for_call(const std::string& call_id, float level) const;
 
+    PHONE_EXPORT void set_rx_level_for_capture_device(float level) const;
+
 private:
     std::unique_ptr<pj::Endpoint> m_ep;
     std::unique_ptr<account_t> m_account;

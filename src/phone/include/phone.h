@@ -166,6 +166,8 @@ PHONE_EXPORT phone_status_t phone_get_rx_level_call_id(phone_t instance, const c
 PHONE_EXPORT phone_status_t phone_set_rx_level_call_index(phone_t instance, int call_index, float level);
 PHONE_EXPORT phone_status_t phone_set_rx_level_call_id(phone_t instance, const char *call_id, float level);
 
+PHONE_EXPORT phone_status_t phone_set_rx_level_capture_device(phone_t instance, float level);
+
 #ifdef __cplusplus
 }
 #endif
