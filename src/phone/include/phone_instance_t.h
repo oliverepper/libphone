@@ -63,6 +63,11 @@ namespace phone {
         unsigned int input_count;
         unsigned int output_count;
     };
+
+    enum class tx_rx_direction {
+        Transmit,
+        Receive
+    };
 } //namespace phone
 
 class phone_instance_t {
@@ -129,13 +134,23 @@ public:
 
     PHONE_EXPORT static void handle_ip_change();
 
-    [[nodiscard]] PHONE_EXPORT unsigned int get_rx_level_for_call(int call_index) const;
-    [[nodiscard]] PHONE_EXPORT unsigned int get_rx_level_for_call(const std::string& call_id) const;
+    [[nodiscard]] PHONE_EXPORT unsigned int get_tx_level_for_capture_device() const;
+    [[nodiscard]] PHONE_EXPORT unsigned int get_rx_level_for_capture_device() const;
 
-    PHONE_EXPORT void set_rx_level_for_call(int call_index, float level) const;
-    PHONE_EXPORT void set_rx_level_for_call(const std::string& call_id, float level) const;
-
+    PHONE_EXPORT void set_tx_level_for_capture_device(float level) const;
     PHONE_EXPORT void set_rx_level_for_capture_device(float level) const;
+
+//    [[nodiscard]] PHONE_EXPORT unsigned int get_rx_level_for_call(int call_index) const;
+//    [[nodiscard]] PHONE_EXPORT unsigned int get_rx_level_for_call(const std::string& call_id) const;
+//
+//    PHONE_EXPORT void set_rx_level_for_call(int call_index, float level) const;
+//    PHONE_EXPORT void set_rx_level_for_call(const std::string& call_id, float level) const;
+//
+//    PHONE_EXPORT void set_level_for_call(int call_index, phone::tx_rx_direction direction, float level) const;
+//    PHONE_EXPORT void set_level_for_call(const std::string& call_id, phone::tx_rx_direction direction, float level) const;
+
+//    [[nodiscard]] PHONE_EXPORT unsigned int get_level_for_capture_device(phone::tx_rx_direction direction) const;
+//    PHONE_EXPORT void set_level_for_capture_device(phone::tx_rx_direction direction, float level) const;
 
 private:
     std::unique_ptr<pj::Endpoint> m_ep;
@@ -146,6 +161,9 @@ private:
     // FIXME: hopefully pjsip fixes the assumption about beeing the owner of the *log_writer_t
     // https://github.com/pjsip/pjproject/issues/3511
     log_writer_t *m_log_writer;
+
+    unsigned int get_level_for_capture_device(phone::tx_rx_direction direction) const;
+    void set_level_for_capture_device(phone::tx_rx_direction direction, float level) const;
 };
 
 #endif //PHONE_INSTANCE_T_H

@@ -268,7 +268,7 @@ void phone_instance_t::set_audio_devices(int capture_index, int playback_index) 
         pj_strerror(status, error_message, sizeof(error_message));
         throw phone::exception{error_message};
     } else {
-        PJ_LOG(3,(__BASE_FILE__, "did set capture device to: %d and playback device to: %d", capture_index, playback_index));
+        PJ_LOG(3,(__BASE_FILE__, "did set capture device to: %d and playback device to: %d", prm.capture_dev, prm.playback_dev));
     }
 }
 
@@ -357,49 +357,77 @@ void phone_instance_t::handle_ip_change() {
     }
 }
 
-unsigned int phone_instance_t::get_rx_level_for_call(int call_index) const {
+void phone_instance_t::set_tx_level_for_capture_device(float level) const {
     try {
-        return m_account->get_rx_level_for_call(call_index);
+        set_level_for_capture_device(phone::tx_rx_direction::Transmit, level);
     } catch (const pj::Error& e) {
         throw phone::exception{e.info()};
-    } catch (const std::invalid_argument& e) {
-        throw phone::exception{e.what()};
-    }
-}
-
-unsigned int phone_instance_t::get_rx_level_for_call(const std::string &call_id) const {
-    try {
-        return m_account->get_rx_level_for_call(call_id);
-    } catch (const pj::Error& e) {
-        throw phone::exception{e.info()};
-    } catch (const std::invalid_argument& e) {
-        throw phone::exception{e.what()};
-    }
-}
-
-void phone_instance_t::set_rx_level_for_call(int call_index, float level) const {
-    try {
-        m_account->set_rx_level_for_call(call_index, level);
-    } catch (const pj::Error& e) {
-        throw phone::exception{e.info()};
-    } catch (const std::invalid_argument& e) {
-        throw phone::exception{e.what()};
-    }
-}
-void phone_instance_t::set_rx_level_for_call(const std::string &call_id, float level) const {
-    try {
-        m_account->set_rx_level_for_call(call_id, level);
-    } catch (const pj::Error& e) {
-        throw phone::exception{e.info()};
-    } catch (const std::invalid_argument& e) {
-        throw phone::exception{e.what()};
     }
 }
 
 void phone_instance_t::set_rx_level_for_capture_device(float level) const {
     try {
-        m_ep->audDevManager().getCaptureDevMedia().adjustRxLevel(level);
+        set_level_for_capture_device(phone::tx_rx_direction::Receive, level);
     } catch (const pj::Error& e) {
         throw phone::exception{e.info()};
     }
 }
+
+unsigned int phone_instance_t::get_level_for_capture_device(phone::tx_rx_direction direction) const {
+    switch (direction) {
+        case phone::tx_rx_direction::Transmit:
+            return m_ep->audDevManager().getCaptureDevMedia().getTxLevel();
+        case phone::tx_rx_direction::Receive:
+            return m_ep->audDevManager().getCaptureDevMedia().getRxLevel();
+    }
+}
+
+void phone_instance_t::set_level_for_capture_device(phone::tx_rx_direction direction, float level) const {
+    switch (direction) {
+        case phone::tx_rx_direction::Transmit:
+            m_ep->audDevManager().getCaptureDevMedia().adjustTxLevel(level);
+            break;
+        case phone::tx_rx_direction::Receive:
+            m_ep->audDevManager().getCaptureDevMedia().adjustRxLevel(level);
+            break;
+    }
+}
+
+//unsigned int phone_instance_t::get_rx_level_for_call(int call_index) const {
+//    try {
+//        return m_account->get_level_for_call(call_index, phone::tx_rx_direction::Receive);
+//    } catch (const pj::Error& e) {
+//        throw phone::exception{e.info()};
+//    } catch (const std::invalid_argument& e) {
+//        throw phone::exception{e.what()};
+//    }
+//}
+//
+//unsigned int phone_instance_t::get_rx_level_for_call(const std::string &call_id) const {
+//    try {
+//        return m_account->get_level_for_call(call_id, phone::tx_rx_direction::Receive);
+//    } catch (const pj::Error& e) {
+//        throw phone::exception{e.info()};
+//    } catch (const std::invalid_argument& e) {
+//        throw phone::exception{e.what()};
+//    }
+//}
+//
+//void phone_instance_t::set_rx_level_for_call(int call_index, float level) const {
+//    try {
+//        m_account->set_level_for_call(call_index, phone::tx_rx_direction::Receive, level);
+//    } catch (const pj::Error& e) {
+//        throw phone::exception{e.info()};
+//    } catch (const std::invalid_argument& e) {
+//        throw phone::exception{e.what()};
+//    }
+//}
+//void phone_instance_t::set_rx_level_for_call(const std::string &call_id, float level) const {
+//    try {
+//        m_account->set_level_for_call(call_id, phone::tx_rx_direction::Receive, level);
+//    } catch (const pj::Error& e) {
+//        throw phone::exception{e.info()};
+//    } catch (const std::invalid_argument& e) {
+//        throw phone::exception{e.what()};
+//    }
+//}

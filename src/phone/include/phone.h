@@ -160,13 +160,14 @@ PHONE_EXPORT unsigned phone_get_call_count(phone_t instance);
 
 PHONE_EXPORT phone_status_t phone_handle_ip_change(void);
 
-PHONE_EXPORT phone_status_t phone_get_rx_level_call_index(phone_t instance, int call_index, unsigned int *level);
-PHONE_EXPORT phone_status_t phone_get_rx_level_call_id(phone_t instance, const char *call_id, unsigned int *level);
-
-PHONE_EXPORT phone_status_t phone_set_rx_level_call_index(phone_t instance, int call_index, float level);
-PHONE_EXPORT phone_status_t phone_set_rx_level_call_id(phone_t instance, const char *call_id, float level);
-
+PHONE_EXPORT phone_status_t phone_set_tx_level_capture_device(phone_t instance, float level);
 PHONE_EXPORT phone_status_t phone_set_rx_level_capture_device(phone_t instance, float level);
+
+//PHONE_EXPORT phone_status_t phone_get_rx_level_call_index(phone_t instance, int call_index, unsigned int *level);
+//PHONE_EXPORT phone_status_t phone_get_rx_level_call_id(phone_t instance, const char *call_id, unsigned int *level);
+//
+//PHONE_EXPORT phone_status_t phone_set_rx_level_call_index(phone_t instance, int call_index, float level);
+//PHONE_EXPORT phone_status_t phone_set_rx_level_call_id(phone_t instance, const char *call_id, float level);
 
 #ifdef __cplusplus
 }
