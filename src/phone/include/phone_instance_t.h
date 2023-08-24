@@ -115,6 +115,7 @@ public:
     PHONE_EXPORT static void set_log_level(int level);
     PHONE_EXPORT void set_log_function(const std::function<void(int, std::string_view message, long thread_id, std::string_view thread_name)>& log_function);
 
+    PHONE_EXPORT static void disconnect_audio_devices();
     PHONE_EXPORT static void refresh_audio_devices();
     [[nodiscard]] PHONE_EXPORT static std::vector<phone::audio_device_info_t> get_audio_devices();
     PHONE_EXPORT static void set_audio_devices(int capture_index, int playback_index);

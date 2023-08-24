@@ -245,6 +245,13 @@ int main() {
                         fprintf(stderr, "%s\n", phone_last_error());
                 }
                 break;
+            case 'S':
+                clear_input_buffer();
+                {
+                    printf("Disconnecting audio devices from bridge\n");
+                    phone_disconnect_sound_device();
+                }
+                break;
             case 'p':
                 clear_input_buffer();
                 {

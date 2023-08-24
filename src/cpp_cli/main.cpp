@@ -193,6 +193,9 @@ auto main() -> int {
                     std::cout << "please enter desired playback device: ";
                     std::cin >> playback_index;
                     phone_instance_t::set_audio_devices(capture_index, playback_index);
+                } else if (command == 'S') {
+                    std::cout << "Disconnecting audio devices from bridge" << std::endl;
+                    phone_instance_t::disconnect_audio_devices();
                 } else if (command == 'p') {
                     std::cout << "please enter dtmf characters: ";
                     std::string dtmf_digits;

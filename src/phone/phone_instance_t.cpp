@@ -272,6 +272,10 @@ void phone_instance_t::set_audio_devices(int capture_index, int playback_index) 
     }
 }
 
+void phone_instance_t::disconnect_audio_devices() {
+    pjsua_set_no_snd_dev();
+}
+
 void phone_instance_t::refresh_audio_devices() {
     pjmedia_aud_dev_refresh();
 }
