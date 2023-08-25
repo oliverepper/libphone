@@ -135,8 +135,8 @@ public:
 
     PHONE_EXPORT static void handle_ip_change();
 
-    [[nodiscard]] PHONE_EXPORT unsigned int get_last_tx_level_for_capture_device() const;
-    [[nodiscard]] PHONE_EXPORT unsigned int get_last_rx_level_for_capture_device() const;
+    [[nodiscard]] PHONE_EXPORT unsigned int get_tx_level_adjustment_for_capture_device() const;
+    [[nodiscard]] PHONE_EXPORT unsigned int get_rx_level_adjustment_for_capture_device() const;
 
     PHONE_EXPORT void adjust_tx_level_for_capture_device(float level) const;
     PHONE_EXPORT void adjust_rx_level_for_capture_device(float level) const;
@@ -150,7 +150,7 @@ public:
 //    PHONE_EXPORT void set_level_for_call(int call_index, phone::tx_rx_direction direction, float level) const;
 //    PHONE_EXPORT void set_level_for_call(const std::string& call_id, phone::tx_rx_direction direction, float level) const;
 
-//    [[nodiscard]] PHONE_EXPORT unsigned int get_level_for_capture_device(phone::tx_rx_direction direction) const;
+//    [[nodiscard]] PHONE_EXPORT unsigned int get_level_adjustment_for_capture_device(phone::tx_rx_direction direction) const;
 //    PHONE_EXPORT void adjust_level_for_capture_device(phone::tx_rx_direction direction, float level) const;
 
 private:
@@ -163,7 +163,7 @@ private:
     // https://github.com/pjsip/pjproject/issues/3511
     log_writer_t *m_log_writer;
 
-    unsigned int get_level_for_capture_device(phone::tx_rx_direction direction) const;
+    unsigned int get_level_adjustment_for_capture_device(phone::tx_rx_direction direction) const;
     void adjust_level_for_capture_device(phone::tx_rx_direction direction, float level) const;
 };
 

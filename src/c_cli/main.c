@@ -289,30 +289,30 @@ int main() {
                 clear_input_buffer();
                 {
                     unsigned int level;
-                    if (phone_get_last_tx_level_capture_device(state->phone, &level) != PHONE_STATUS_SUCCESS)
+                    if (phone_get_tx_level_adjustment_for_capture_device(state->phone, &level) != PHONE_STATUS_SUCCESS)
                         fprintf(stderr, "%s\n", phone_last_error());
-                    printf("last tx level for call: %d\n", level);
+                    printf("tx level adjustment for capture device: %d\n", level);
                 }
                 break;
             case 'r':
                 clear_input_buffer();
                 {
                     unsigned int level;
-                    if (phone_get_last_rx_level_capture_device(state->phone, &level) != PHONE_STATUS_SUCCESS)
+                    if (phone_get_rx_level_adjustment_for_capture_device(state->phone, &level) != PHONE_STATUS_SUCCESS)
                         fprintf(stderr, "%s\n", phone_last_error());
                     printf("last rx level for call: %d\n", level);
                 }
                 break;
             case 'm':
                 clear_input_buffer();
-                printf("setting tx level for capture device to 0\n");
-                if (phone_adjust_tx_level_capture_device(state->phone, 0) != PHONE_STATUS_SUCCESS)
+                printf("adjust tx level for capture device to 0\n");
+                if (phone_adjust_tx_level_for_capture_device(state->phone, 0) != PHONE_STATUS_SUCCESS)
                     fprintf(stderr, "%s\n", phone_last_error());
                 break;
             case 'M':
                 clear_input_buffer();
-                printf("setting tx level for capture device to 1\n");
-                if (phone_adjust_tx_level_capture_device(state->phone, 1) != PHONE_STATUS_SUCCESS)
+                printf("adjust tx level for capture device to 1\n");
+                if (phone_adjust_tx_level_for_capture_device(state->phone, 1) != PHONE_STATUS_SUCCESS)
                     fprintf(stderr, "%s\n", phone_last_error());
                 break;
             default:

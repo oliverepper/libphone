@@ -456,9 +456,9 @@ phone_status_t phone_handle_ip_change(void) {
     return PHONE_STATUS_SUCCESS;
 }
 
-phone_status_t phone_get_last_tx_level_capture_device(phone_t instance, unsigned int *level) {
+phone_status_t phone_get_tx_level_adjustment_for_capture_device(phone_t instance, unsigned int *level) {
     try {
-        *level = instance->get_last_tx_level_for_capture_device();
+        *level = instance->get_tx_level_adjustment_for_capture_device();
     } catch (const phone::exception& e) {
         strncpy(global_last_error, e.what(), sizeof(global_last_error));
         return PHONE_STATUS_FAILURE;
@@ -466,7 +466,7 @@ phone_status_t phone_get_last_tx_level_capture_device(phone_t instance, unsigned
     return PHONE_STATUS_SUCCESS;
 }
 
-phone_status_t phone_adjust_tx_level_capture_device(phone_t instance, float level) {
+phone_status_t phone_adjust_tx_level_for_capture_device(phone_t instance, float level) {
     try {
         instance->adjust_tx_level_for_capture_device(level);
     } catch (const phone::exception& e) {
@@ -476,9 +476,9 @@ phone_status_t phone_adjust_tx_level_capture_device(phone_t instance, float leve
     return PHONE_STATUS_SUCCESS;
 }
 
-phone_status_t phone_get_last_rx_level_capture_device(phone_t instance, unsigned int *level) {
+phone_status_t phone_get_rx_level_adjustment_for_capture_device(phone_t instance, unsigned int *level) {
     try {
-        *level = instance->get_last_rx_level_for_capture_device();
+        *level = instance->get_rx_level_adjustment_for_capture_device();
     } catch (const phone::exception& e) {
         strncpy(global_last_error, e.what(), sizeof(global_last_error));
         return PHONE_STATUS_FAILURE;
@@ -486,7 +486,7 @@ phone_status_t phone_get_last_rx_level_capture_device(phone_t instance, unsigned
     return PHONE_STATUS_SUCCESS;
 }
 
-phone_status_t phone_adjust_rx_level_capture_device(phone_t instance, float level) {
+phone_status_t phone_adjust_rx_level_for_capture_device(phone_t instance, float level) {
     try {
         instance->adjust_rx_level_for_capture_device(level);
     } catch (const phone::exception& e) {

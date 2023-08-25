@@ -215,9 +215,9 @@ auto main() -> int {
                     std::cout << "handle ip change" << std::endl;
                     phone_instance_t::handle_ip_change();
                 } else if (command == 't') {
-                    std::cout << "TX level: " << state.phone.get_last_tx_level_for_capture_device() << std::endl;
+                    std::cout << "TX level: " << state.phone.get_tx_level_adjustment_for_capture_device() << std::endl;
                 } else if (command == 'r') {
-                    std::cout << "RX level: " << state.phone.get_last_rx_level_for_capture_device() << std::endl;
+                    std::cout << "RX level: " << state.phone.get_rx_level_adjustment_for_capture_device() << std::endl;
                 } else if (command == 'm') {
                     state.phone.adjust_tx_level_for_capture_device(0);
                 } else if (command == 'M') {

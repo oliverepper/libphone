@@ -377,28 +377,29 @@ void phone_instance_t::adjust_rx_level_for_capture_device(float level) const {
     }
 }
 
-unsigned int phone_instance_t::get_last_tx_level_for_capture_device() const {
+unsigned int phone_instance_t::get_tx_level_adjustment_for_capture_device() const {
     try {
-        return get_level_for_capture_device(phone::tx_rx_direction::Transmit);
+        return get_level_adjustment_for_capture_device(phone::tx_rx_direction::Transmit);
     } catch (const pj::Error& e) {
         throw phone::exception{e.info()};
     }
 }
 
-unsigned int phone_instance_t::get_last_rx_level_for_capture_device() const {
+unsigned int phone_instance_t::get_rx_level_adjustment_for_capture_device() const {
     try {
-        return get_level_for_capture_device(phone::tx_rx_direction::Receive);
+        return get_level_adjustment_for_capture_device(phone::tx_rx_direction::Receive);
     } catch (const pj::Error& e) {
         throw phone::exception{e.info()};
     }
 }
 
-unsigned int phone_instance_t::get_level_for_capture_device(phone::tx_rx_direction direction) const {
+unsigned int phone_instance_t::get_level_adjustment_for_capture_device(phone::tx_rx_direction direction) const {
+    auto portInfo = m_ep->audDevManager().getCaptureDevMedia().getPortInfo();
     switch (direction) {
         case phone::tx_rx_direction::Transmit:
-            return m_ep->audDevManager().getCaptureDevMedia().getTxLevel();
+            return portInfo.txLevelAdj;
         case phone::tx_rx_direction::Receive:
-            return m_ep->audDevManager().getCaptureDevMedia().getRxLevel();
+            return portInfo.rxLevelAdj;
     }
 }
 

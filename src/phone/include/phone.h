@@ -161,11 +161,11 @@ PHONE_EXPORT unsigned phone_get_call_count(phone_t instance);
 
 PHONE_EXPORT phone_status_t phone_handle_ip_change(void);
 
-PHONE_EXPORT phone_status_t phone_get_last_tx_level_capture_device(phone_t instance, unsigned int *level);
-PHONE_EXPORT phone_status_t phone_adjust_tx_level_capture_device(phone_t instance, float level);
+PHONE_EXPORT phone_status_t phone_get_tx_level_adjustment_for_capture_device(phone_t instance, unsigned int *level);
+PHONE_EXPORT phone_status_t phone_adjust_tx_level_for_capture_device(phone_t instance, float level);
 
-PHONE_EXPORT phone_status_t phone_get_last_rx_level_capture_device(phone_t instance, unsigned int *level);
-PHONE_EXPORT phone_status_t phone_adjust_rx_level_capture_device(phone_t instance, float level);
+PHONE_EXPORT phone_status_t phone_get_rx_level_adjustment_for_capture_device(phone_t instance, unsigned int *level);
+PHONE_EXPORT phone_status_t phone_adjust_rx_level_for_capture_device(phone_t instance, float level);
 
 #ifdef __cplusplus
 }
