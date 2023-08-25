@@ -456,7 +456,7 @@ phone_status_t phone_handle_ip_change(void) {
     return PHONE_STATUS_SUCCESS;
 }
 
-phone_status_t phone_get_tx_level_adjustment_for_capture_device(phone_t instance, unsigned int *level) {
+phone_status_t phone_get_tx_level_adjustment_for_capture_device(phone_t instance, float *level) {
     try {
         *level = instance->get_tx_level_adjustment_for_capture_device();
     } catch (const phone::exception& e) {
@@ -476,7 +476,7 @@ phone_status_t phone_adjust_tx_level_for_capture_device(phone_t instance, float 
     return PHONE_STATUS_SUCCESS;
 }
 
-phone_status_t phone_get_rx_level_adjustment_for_capture_device(phone_t instance, unsigned int *level) {
+phone_status_t phone_get_rx_level_adjustment_for_capture_device(phone_t instance, float *level) {
     try {
         *level = instance->get_rx_level_adjustment_for_capture_device();
     } catch (const phone::exception& e) {

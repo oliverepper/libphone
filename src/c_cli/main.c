@@ -288,19 +288,19 @@ int main() {
             case 't':
                 clear_input_buffer();
                 {
-                    unsigned int level;
+                    float level;
                     if (phone_get_tx_level_adjustment_for_capture_device(state->phone, &level) != PHONE_STATUS_SUCCESS)
                         fprintf(stderr, "%s\n", phone_last_error());
-                    printf("tx level adjustment for capture device: %d\n", level);
+                    printf("tx level adjustment for capture device: %.1f\n", level);
                 }
                 break;
             case 'r':
                 clear_input_buffer();
                 {
-                    unsigned int level;
+                    float level;
                     if (phone_get_rx_level_adjustment_for_capture_device(state->phone, &level) != PHONE_STATUS_SUCCESS)
                         fprintf(stderr, "%s\n", phone_last_error());
-                    printf("last rx level for call: %d\n", level);
+                    printf("last rx level for call: %.1f\n", level);
                 }
                 break;
             case 'm':
