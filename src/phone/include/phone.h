@@ -75,6 +75,7 @@ PHONE_EXPORT void phone_hangup_calls(phone_t instance);
 PHONE_EXPORT phone_status_t phone_get_call_id(phone_t instance, int call_index, char *call_id, size_t size);
 PHONE_EXPORT phone_status_t phone_get_call_index(phone_t instance, const char *call_id, int *out);
 
+PHONE_EXPORT void phone_set_no_sound_devices(void);
 PHONE_EXPORT void phone_disconnect_sound_device(void);
 PHONE_EXPORT void phone_refresh_audio_devices(void);
 PHONE_EXPORT size_t phone_get_audio_devices_count(void);

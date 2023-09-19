@@ -251,6 +251,10 @@ void phone_call_state_name(char *out, size_t buffer_size, int state) {
     strncpy(out, phone::call_state_name(state).data(), buffer_size);
 }
 
+void phone_set_no_sound_devices(void) {
+    phone_instance_t::set_no_sound_devices();
+}
+
 void phone_disconnect_sound_device(void) {
     phone_instance_t::disconnect_audio_devices();
 }

@@ -262,6 +262,13 @@ int main() {
                     phone_disconnect_sound_device();
                 }
                 break;
+            case 'n':
+                clear_input_buffer();
+                {
+                    printf("Setting no sound devices\n");
+                    phone_set_no_sound_devices();
+                }
+                break;
             case 'p':
                 clear_input_buffer();
                 {
