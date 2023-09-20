@@ -499,3 +499,8 @@ phone_status_t phone_adjust_rx_level_for_capture_device(phone_t instance, float 
     }
     return PHONE_STATUS_SUCCESS;
 }
+
+void phone_crash(void) {
+    phone_instance_t::crash();
+}
+

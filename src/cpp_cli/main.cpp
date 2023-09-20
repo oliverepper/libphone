@@ -222,6 +222,8 @@ auto main() -> int {
                     state.phone.adjust_tx_level_for_capture_device(0);
                 } else if (command == 'M') {
                     state.phone.adjust_tx_level_for_capture_device(1);
+                } else if (command == '!') {
+                    state.phone.crash();
                 }
             } catch (const phone::exception& e) {
                 std::cerr << "Error: " << e.what() << std::endl;

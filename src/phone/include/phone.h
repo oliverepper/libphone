@@ -168,6 +168,8 @@ PHONE_EXPORT phone_status_t phone_adjust_tx_level_for_capture_device(phone_t ins
 PHONE_EXPORT phone_status_t phone_get_rx_level_adjustment_for_capture_device(phone_t instance, float *level);
 PHONE_EXPORT phone_status_t phone_adjust_rx_level_for_capture_device(phone_t instance, float level);
 
+PHONE_EXPORT void phone_crash(void);
+
 #ifdef __cplusplus
 }
 #endif

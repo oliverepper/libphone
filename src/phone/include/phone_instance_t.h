@@ -154,6 +154,8 @@ public:
 //    [[nodiscard]] PHONE_EXPORT unsigned int get_level_adjustment_for_capture_device(phone::tx_rx_direction direction) const;
 //    PHONE_EXPORT void adjust_level_for_capture_device(phone::tx_rx_direction direction, float level) const;
 
+    PHONE_EXPORT static void crash();
+
 private:
     std::unique_ptr<pj::Endpoint> m_ep;
     std::unique_ptr<account_t> m_account;

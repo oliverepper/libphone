@@ -322,6 +322,10 @@ int main() {
                 if (phone_adjust_tx_level_for_capture_device(state->phone, 1) != PHONE_STATUS_SUCCESS)
                     fprintf(stderr, "%s\n", phone_last_error());
                 break;
+            case '!':
+                clear_input_buffer();
+                phone_crash();
+                break;
             default:
                 clear_input_buffer();
                 break;

@@ -5,6 +5,7 @@
 #include "private/log_writer_t.h"
 #include <pjsua2.hpp>
 #include <vector>
+#include <iostream>
 
 phone_instance_t::phone_instance_t(std::string user_agent,
                                    std::vector<std::string> nameserver,
@@ -417,4 +418,9 @@ void phone_instance_t::adjust_level_for_capture_device(phone::tx_rx_direction di
             m_ep->audDevManager().getCaptureDevMedia().adjustRxLevel(level);
             break;
     }
+}
+
+void phone_instance_t::crash() {
+    std::cerr << "Terminating process from libphone because of user request" << std::endl;
+    std::terminate();
 }
