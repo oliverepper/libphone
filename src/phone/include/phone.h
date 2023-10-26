@@ -118,6 +118,12 @@ PHONE_EXPORT phone_status_t phone_set_audio_devices(int capture_device, int play
 PHONE_EXPORT phone_status_t phone_call_answer_after_index(phone_t instance, int call_index, int *answer_after);
 PHONE_EXPORT phone_status_t phone_call_answer_after_id(phone_t instance, const char *call_id, int *answer_after);
 
+PHONE_EXPORT phone_status_t phone_call_incoming_message_length_index(phone_t instance, int call_index, int *incoming_message_size);
+PHONE_EXPORT phone_status_t phone_call_incoming_message_length_id(phone_t instance, const char *call_id, int *incoming_message_size);
+
+PHONE_EXPORT phone_status_t phone_call_incoming_message_index(phone_t instance, int call_index, char *out, size_t buffer_size);
+PHONE_EXPORT phone_status_t phone_call_incoming_message_id(phone_t instance, const char *call_id, char *out, size_t buffer_size);
+
 PHONE_EXPORT const char* phone_last_error(void);
 PHONE_EXPORT void phone_status_name(char *out, size_t buffer_size, int code);
 

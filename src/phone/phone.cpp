@@ -402,6 +402,56 @@ phone_status_t phone_call_answer_after_id(phone_t instance, const char *call_id,
     return PHONE_STATUS_SUCCESS;
 }
 
+phone_status_t phone_call_incoming_message_length_index(phone_t instance, int call_index, int *incoming_message_size) {
+    try {
+        auto call_incoming_message = instance->call_incoming_message(call_index);
+        *incoming_message_size = -1;
+        if (call_incoming_message.has_value())
+            *incoming_message_size = call_incoming_message.value().length();
+    } catch (const phone::exception& e) {
+        strncpy(global_last_error, e.what(), sizeof(global_last_error));
+        return PHONE_STATUS_FAILURE;
+    }
+    return PHONE_STATUS_SUCCESS;
+}
+
+phone_status_t phone_call_incoming_message_length_id(phone_t instance, const char *call_id, int *incoming_message_size) {
+    try {
+        auto call_incoming_message = instance->call_incoming_message(call_id);
+        *incoming_message_size = -1;
+        if (call_incoming_message.has_value())
+            *incoming_message_size = call_incoming_message.value().length();
+    } catch (const phone::exception& e) {
+        strncpy(global_last_error, e.what(), sizeof(global_last_error));
+        return PHONE_STATUS_FAILURE;
+    }
+    return PHONE_STATUS_SUCCESS;
+}
+
+phone_status_t phone_call_incoming_message_index(phone_t instance, int call_index, char *out, size_t buffer_size) {
+    try {
+        auto call_incoming_message = instance->call_incoming_message(call_index);
+        if (call_incoming_message.has_value())
+            strncpy(out, call_incoming_message.value().c_str(), buffer_size);
+    } catch (const phone::exception& e) {
+        strncpy(global_last_error, e.what(), sizeof(global_last_error));
+        return PHONE_STATUS_FAILURE;
+    }
+    return PHONE_STATUS_SUCCESS;
+}
+
+phone_status_t phone_call_incoming_message_id(phone_t instance, const char *call_id, char *out, size_t buffer_size) {
+    try {
+        auto call_incoming_message = instance->call_incoming_message(call_id);
+        if (call_incoming_message.has_value())
+            strncpy(out, call_incoming_message.value().c_str(), buffer_size);
+    } catch (const phone::exception& e) {
+        strncpy(global_last_error, e.what(), sizeof(global_last_error));
+        return PHONE_STATUS_FAILURE;
+    }
+    return PHONE_STATUS_SUCCESS;
+}
+
 phone_status_t phone_register_thread(phone_t instance, const char *name) {
     try {
         instance->register_thread(name);
@@ -503,4 +553,3 @@ phone_status_t phone_adjust_rx_level_for_capture_device(phone_t instance, float 
 void phone_crash(void) {
     phone_instance_t::crash();
 }
-
