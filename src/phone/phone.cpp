@@ -402,7 +402,7 @@ phone_status_t phone_call_answer_after_id(phone_t instance, const char *call_id,
     return PHONE_STATUS_SUCCESS;
 }
 
-phone_status_t phone_call_incoming_message_length_index(phone_t instance, int call_index, int *incoming_message_size) {
+phone_status_t phone_call_incoming_message_length_index(phone_t instance, int call_index, size_t *incoming_message_size) {
     try {
         auto call_incoming_message = instance->call_incoming_message(call_index);
         *incoming_message_size = -1;
@@ -415,7 +415,7 @@ phone_status_t phone_call_incoming_message_length_index(phone_t instance, int ca
     return PHONE_STATUS_SUCCESS;
 }
 
-phone_status_t phone_call_incoming_message_length_id(phone_t instance, const char *call_id, int *incoming_message_size) {
+phone_status_t phone_call_incoming_message_length_id(phone_t instance, const char *call_id, size_t *incoming_message_size) {
     try {
         auto call_incoming_message = instance->call_incoming_message(call_id);
         *incoming_message_size = -1;
