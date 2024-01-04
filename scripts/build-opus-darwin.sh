@@ -12,7 +12,7 @@ fi
 
 PREFIX=$1
 BUILD_BASE_DIR=build-opus
-OPUS_COMMIT=8cf872a186b96085b1bb3a547afd598354ebeb87
+OPUS_COMMIT=101a71e03bbf860aaafb7090a0e440675cb27660
 
 if [ -d opus ]
 then

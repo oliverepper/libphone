@@ -224,6 +224,10 @@ auto main() -> int {
                     state.phone.adjust_tx_level_for_capture_device(1);
                 } else if (command == '!') {
                     state.phone.crash();
+                } else if (command == '0') {
+                    state.phone.disconnect();
+                } else if (command == '9') {
+                    state.phone.connect(SERVER, USER, PASSWORD_FUNCTION);
                 }
             } catch (const phone::exception& e) {
                 std::cerr << "Error: " << e.what() << std::endl;

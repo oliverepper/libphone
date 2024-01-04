@@ -97,6 +97,7 @@ public:
 
     PHONE_EXPORT void configure_opus(int channel_count = 1, int complexity = 8 , int sample_rate = 16000);
     PHONE_EXPORT void connect(std::string server, const std::string& user, std::optional<std::function<std::string()>> password = std::nullopt);
+    PHONE_EXPORT void disconnect();
 
     PHONE_EXPORT void make_call(const std::string& uri);
     PHONE_EXPORT void answer_call(int call_index);
@@ -119,7 +120,7 @@ public:
     PHONE_EXPORT static void disconnect_audio_devices();
     PHONE_EXPORT static void refresh_audio_devices();
     [[nodiscard]] PHONE_EXPORT static std::vector<phone::audio_device_info_t> get_audio_devices();
-    PHONE_EXPORT static void set_audio_devices(int capture_index, int playback_index);
+    PHONE_EXPORT static void set_audio_devices(int capture_index, int playback_index, bool use_global_sound_device_setting = false);
 
     [[nodiscard]] PHONE_EXPORT std::optional<std::string> call_incoming_message(int call_index) const;
     [[nodiscard]] PHONE_EXPORT std::optional<std::string> call_incoming_message(const std::string& call_id) const;

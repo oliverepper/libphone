@@ -4,7 +4,6 @@ mkdir -p build
 pushd build || exit 1
 sh ../scripts/get-ios-toolchain.sh
 sh ../scripts/build-opus-darwin.sh "$(pwd)/../installed/opus"
-sh ../scripts/build-sdl-darwin.sh "$(pwd)/../installed/sdl"
 
 sh ../scripts/build-pjproject-ios-arm64.sh "$(pwd)/../installed"
 

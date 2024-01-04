@@ -105,10 +105,25 @@ void phone_instance_t::connect(std::string server, const std::string& user, std:
     acc_cfg.sipConfig.authCreds.push_back(cred_info);
     acc_cfg.regConfig.registrarUri = "sip:" + m_server.value() + ";transport=TLS";
 
-    create_tls_transport_with_srv_lookup(*m_ep);
-
     try {
-        m_account->create(acc_cfg, true);
+        create_tls_transport_with_srv_lookup(*m_ep);
+        if (m_account->isValid()) {
+            m_account->modify(acc_cfg);
+            m_account->setRegistration(true);
+        }
+        else
+            m_account->create(acc_cfg, true);
+    } catch (const pj::Error &e) {
+        throw phone::exception{e.info()};
+    }
+}
+
+void phone_instance_t::disconnect() {
+    try {
+        for (const auto &id: m_ep->transportEnum())
+            m_ep->transportClose(id);
+        if (m_account->isValid())
+            m_account->setRegistration(false);
     } catch (const pj::Error &e) {
         throw phone::exception{e.info()};
     }
@@ -258,11 +273,12 @@ std::vector<phone::audio_device_info_t> phone_instance_t::get_audio_devices() {
     return result;
 }
 
-void phone_instance_t::set_audio_devices(int capture_index, int playback_index) {
+void phone_instance_t::set_audio_devices(int capture_index, int playback_index, bool use_global_sound_device_setting) {
     pjsua_snd_dev_param prm;
     pjsua_snd_dev_param_default(&prm);
     prm.capture_dev = capture_index;
     prm.playback_dev = playback_index;
+    prm.use_default_settings = use_global_sound_device_setting;
     auto status = pjsua_set_snd_dev2(&prm);
     if (status != PJ_SUCCESS) {
         char error_message[PJ_ERR_MSG_SIZE] = {0};
@@ -283,7 +299,12 @@ void phone_instance_t::disconnect_audio_devices() {
 }
 
 void phone_instance_t::refresh_audio_devices() {
-    pjmedia_aud_dev_refresh();
+    auto status = pjmedia_aud_dev_refresh();
+    if (status != PJ_SUCCESS) {
+        char error_message[PJ_ERR_MSG_SIZE] = {0};
+        pj_strerror(status, error_message, sizeof(error_message));
+        throw phone::exception{error_message};
+    }
 }
 
 std::optional<std::string> phone_instance_t::call_incoming_message(int call_index) const {

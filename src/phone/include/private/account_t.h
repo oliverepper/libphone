@@ -171,63 +171,7 @@ public:
     void hangup_calls() noexcept {
         m_calls.clear();
     }
-
-//    unsigned int get_level_for_call(phone::CallID auto id, phone::tx_rx_direction direction) {
-//        auto call = find_call(id);
-//        auto media = call->getInfo().media;
-//        auto it = std::find_if(
-//                std::begin(media),
-//                std::end(media),
-//                [](const auto& info) {
-//                    return info.type == PJMEDIA_TYPE_AUDIO;
-//                });
-//        if (it != std::end(media)) {
-//            auto index = it->index;
-//            if (index <= std::numeric_limits<int>::max()) {
-//                switch (direction) {
-//                    case phone::tx_rx_direction::Transmit:
-//                        return call->getAudioMedia(static_cast<int>(index)).getRxLevel();
-//                        break;
-//                    case phone::tx_rx_direction::Receive:
-//                        return call->getAudioMedia(static_cast<int>(index)).getRxLevel();
-//                        break;
-//                }
-//                return call->getAudioMedia(static_cast<int>(index)).getRxLevel();
-//            }
-//        }
-//        if constexpr (std::is_same_v<decltype(id), int>) {
-//            throw phone::exception{"no audio media for call: " + std::to_string(id)};
-//        } else {
-//            throw phone::exception{"no audio media for call: " + id};
-//        }
-//    }
-//
-//    void set_level_for_call(phone::CallID auto id, phone::tx_rx_direction direction, float level) {
-//        auto call = find_call(id);
-//        auto media = call->getInfo().media;
-//        auto it = std::find_if(
-//                std::begin(media),
-//                std::end(media),
-//                [](const auto& info){
-//                    return info.type == PJMEDIA_TYPE_AUDIO;
-//                });
-//        if (it != std::end(media)) {
-//            auto index = it->index;
-//            if (index <= std::numeric_limits<int>::max()) {
-//                switch (direction) {
-//                    case phone::tx_rx_direction::Transmit:
-//                        call->getAudioMedia(static_cast<int>(index)).adjustTxLevel(level);
-//                        break;
-//                    case phone::tx_rx_direction::Receive:
-//                        call->getAudioMedia(static_cast<int>(index)).adjustRxLevel(level);
-//                        break;
-//                }
-//            } else {
-//                throw phone::exception("media index out of range");
-//            }
-//        }
-//    }
-
+    
 private:
     std::vector<std::unique_ptr<call_t>> m_calls{};
 };
