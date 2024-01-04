@@ -193,6 +193,9 @@ auto main() -> int {
                     std::cout << "please enter desired playback device: ";
                     std::cin >> playback_index;
                     phone_instance_t::set_audio_devices(capture_index, playback_index);
+                } else if (command == 'S') {
+                    std::cout << "Disconnecting audio devices from bridge" << std::endl;
+                    phone_instance_t::disconnect_audio_devices();
                 } else if (command == 'p') {
                     std::cout << "please enter dtmf characters: ";
                     std::string dtmf_digits;
@@ -211,32 +214,20 @@ auto main() -> int {
                 } else if (command == 'i') {
                     std::cout << "handle ip change" << std::endl;
                     phone_instance_t::handle_ip_change();
+                } else if (command == 't') {
+                    std::cout << "TX level: " << state.phone.get_tx_level_adjustment_for_capture_device() << std::endl;
+                } else if (command == 'r') {
+                    std::cout << "RX level: " << state.phone.get_rx_level_adjustment_for_capture_device() << std::endl;
                 } else if (command == 'm') {
-                    int call_index;
-                    std::cout << "please enter call index: ";
-                    std::cin >> call_index;
-                    std::cout << "tx level for call: " << state.phone.get_rx_level_for_call(call_index) << std::endl;
+                    state.phone.adjust_tx_level_for_capture_device(0);
                 } else if (command == 'M') {
-                    std::string call_id;
-                    std::cout << "please enter call id: ";
-                    std::cin >> call_id;
-                    std::cout << "tx level for call: " << state.phone.get_rx_level_for_call(call_id) << std::endl;
+                    state.phone.adjust_tx_level_for_capture_device(1);
+                } else if (command == '!') {
+                    state.phone.crash();
                 } else if (command == '0') {
-                    int call_index;
-                    std::cout << "please enter call index: ";
-                    std::cin >> call_index;
-                    float level;
-                    std::cout << "please enter desired level 0-2: ";
-                    std::cin >> level;
-                    state.phone.set_rx_level_for_call(call_index, level);
-                } else if (command == '=') {
-                    int call_id;
-                    std::cout << "please enter call id: ";
-                    std::cin >> call_id;
-                    float level;
-                    std::cout << "please enter desired level 0-2: ";
-                    std::cin >> level;
-                    state.phone.set_rx_level_for_call(call_id, level);
+                    state.phone.disconnect();
+                } else if (command == '9') {
+                    state.phone.connect(SERVER, USER, PASSWORD_FUNCTION);
                 }
             } catch (const phone::exception& e) {
                 std::cerr << "Error: " << e.what() << std::endl;

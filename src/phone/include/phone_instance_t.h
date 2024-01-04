@@ -63,6 +63,11 @@ namespace phone {
         unsigned int input_count;
         unsigned int output_count;
     };
+
+    enum class tx_rx_direction {
+        Transmit,
+        Receive
+    };
 } //namespace phone
 
 class phone_instance_t {
@@ -92,6 +97,7 @@ public:
 
     PHONE_EXPORT void configure_opus(int channel_count = 1, int complexity = 8 , int sample_rate = 16000);
     PHONE_EXPORT void connect(std::string server, const std::string& user, std::optional<std::function<std::string()>> password = std::nullopt);
+    PHONE_EXPORT void disconnect();
 
     PHONE_EXPORT void make_call(const std::string& uri);
     PHONE_EXPORT void answer_call(int call_index);
@@ -110,9 +116,11 @@ public:
     PHONE_EXPORT static void set_log_level(int level);
     PHONE_EXPORT void set_log_function(const std::function<void(int, std::string_view message, long thread_id, std::string_view thread_name)>& log_function);
 
+    PHONE_EXPORT static void set_no_sound_devices();
+    PHONE_EXPORT static void disconnect_audio_devices();
     PHONE_EXPORT static void refresh_audio_devices();
     [[nodiscard]] PHONE_EXPORT static std::vector<phone::audio_device_info_t> get_audio_devices();
-    PHONE_EXPORT static void set_audio_devices(int capture_index, int playback_index);
+    PHONE_EXPORT static void set_audio_devices(int capture_index, int playback_index, bool use_global_sound_device_setting = false);
 
     [[nodiscard]] PHONE_EXPORT std::optional<std::string> call_incoming_message(int call_index) const;
     [[nodiscard]] PHONE_EXPORT std::optional<std::string> call_incoming_message(const std::string& call_id) const;
@@ -129,13 +137,25 @@ public:
 
     PHONE_EXPORT static void handle_ip_change();
 
-    [[nodiscard]] PHONE_EXPORT unsigned int get_rx_level_for_call(int call_index) const;
-    [[nodiscard]] PHONE_EXPORT unsigned int get_rx_level_for_call(const std::string& call_id) const;
+    [[nodiscard]] PHONE_EXPORT float get_tx_level_adjustment_for_capture_device() const;
+    [[nodiscard]] PHONE_EXPORT float get_rx_level_adjustment_for_capture_device() const;
 
-    PHONE_EXPORT void set_rx_level_for_call(int call_index, float level) const;
-    PHONE_EXPORT void set_rx_level_for_call(const std::string& call_id, float level) const;
+    PHONE_EXPORT void adjust_tx_level_for_capture_device(float level) const;
+    PHONE_EXPORT void adjust_rx_level_for_capture_device(float level) const;
 
-    PHONE_EXPORT void set_rx_level_for_capture_device(float level) const;
+//    [[nodiscard]] PHONE_EXPORT unsigned int get_rx_level_for_call(int call_index) const;
+//    [[nodiscard]] PHONE_EXPORT unsigned int get_rx_level_for_call(const std::string& call_id) const;
+//
+//    PHONE_EXPORT void set_rx_level_for_call(int call_index, float level) const;
+//    PHONE_EXPORT void set_rx_level_for_call(const std::string& call_id, float level) const;
+//
+//    PHONE_EXPORT void set_level_for_call(int call_index, phone::tx_rx_direction direction, float level) const;
+//    PHONE_EXPORT void set_level_for_call(const std::string& call_id, phone::tx_rx_direction direction, float level) const;
+
+//    [[nodiscard]] PHONE_EXPORT unsigned int get_level_adjustment_for_capture_device(phone::tx_rx_direction direction) const;
+//    PHONE_EXPORT void adjust_level_for_capture_device(phone::tx_rx_direction direction, float level) const;
+
+    PHONE_EXPORT static void crash();
 
 private:
     std::unique_ptr<pj::Endpoint> m_ep;
@@ -146,6 +166,9 @@ private:
     // FIXME: hopefully pjsip fixes the assumption about beeing the owner of the *log_writer_t
     // https://github.com/pjsip/pjproject/issues/3511
     log_writer_t *m_log_writer;
+
+    float get_level_adjustment_for_capture_device(phone::tx_rx_direction direction) const;
+    void adjust_level_for_capture_device(phone::tx_rx_direction direction, float level) const;
 };
 
 #endif //PHONE_INSTANCE_T_H

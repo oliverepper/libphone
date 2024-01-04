@@ -50,6 +50,7 @@ PHONE_EXPORT void phone_register_on_call_state_id_callback(phone_t instance, voi
 
 PHONE_EXPORT phone_status_t phone_configure_opus(phone_t instance, int channel_count, int complexity, int sample_rate);
 PHONE_EXPORT phone_status_t phone_connect(phone_t instance, const char *server, const char *user, const char *password);
+PHONE_EXPORT phone_status_t phone_disconnect(phone_t instance);
 
 PHONE_EXPORT phone_status_t phone_make_call(phone_t instance, const char *uri);
 
@@ -75,9 +76,11 @@ PHONE_EXPORT void phone_hangup_calls(phone_t instance);
 PHONE_EXPORT phone_status_t phone_get_call_id(phone_t instance, int call_index, char *call_id, size_t size);
 PHONE_EXPORT phone_status_t phone_get_call_index(phone_t instance, const char *call_id, int *out);
 
-PHONE_EXPORT void phone_refresh_audio_devices(void);
+PHONE_EXPORT void phone_set_no_sound_devices(void);
+PHONE_EXPORT void phone_disconnect_sound_device(void);
+PHONE_EXPORT phone_status_t phone_refresh_audio_devices(void);
 PHONE_EXPORT size_t phone_get_audio_devices_count(void);
-PHONE_EXPORT size_t phone_get_audio_device_driver_name_length(void);
+PHONE_EXPORT phone_status_t phone_get_audio_device_driver_name_length(size_t *max_driver_name_length);
 PHONE_EXPORT size_t phone_get_audio_device_info_name_length(void);
 PHONE_DEPRECATED_EXPORT phone_status_t phone_get_audio_device_names(char **device_names, size_t *devices_count, size_t max_device_name_length, device_filter_t filter);
 
@@ -99,6 +102,7 @@ PHONE_EXPORT phone_status_t
 phone_get_audio_devices(audio_device_info_t *devices, size_t *devices_count, size_t max_driver_name_length,
                         size_t max_device_name_length, device_filter_t filter);
 PHONE_EXPORT phone_status_t phone_set_audio_devices(int capture_device, int playback_device);
+PHONE_EXPORT phone_status_t phone_set_audio_devices_use_global_sound_device_settings(int capture_device, int playback_device);
 
 /**
  * Check if the SIP INVITE had a \p Call-Info header that included a value like this:
@@ -115,6 +119,12 @@ PHONE_EXPORT phone_status_t phone_set_audio_devices(int capture_device, int play
  */
 PHONE_EXPORT phone_status_t phone_call_answer_after_index(phone_t instance, int call_index, int *answer_after);
 PHONE_EXPORT phone_status_t phone_call_answer_after_id(phone_t instance, const char *call_id, int *answer_after);
+
+PHONE_EXPORT phone_status_t phone_call_incoming_message_length_index(phone_t instance, int call_index, size_t *incoming_message_size);
+PHONE_EXPORT phone_status_t phone_call_incoming_message_length_id(phone_t instance, const char *call_id, size_t *incoming_message_size);
+
+PHONE_EXPORT phone_status_t phone_call_incoming_message_index(phone_t instance, int call_index, char *out, size_t buffer_size);
+PHONE_EXPORT phone_status_t phone_call_incoming_message_id(phone_t instance, const char *call_id, char *out, size_t buffer_size);
 
 PHONE_EXPORT const char* phone_last_error(void);
 PHONE_EXPORT void phone_status_name(char *out, size_t buffer_size, int code);
@@ -160,13 +170,13 @@ PHONE_EXPORT unsigned phone_get_call_count(phone_t instance);
 
 PHONE_EXPORT phone_status_t phone_handle_ip_change(void);
 
-PHONE_EXPORT phone_status_t phone_get_rx_level_call_index(phone_t instance, int call_index, unsigned int *level);
-PHONE_EXPORT phone_status_t phone_get_rx_level_call_id(phone_t instance, const char *call_id, unsigned int *level);
+PHONE_EXPORT phone_status_t phone_get_tx_level_adjustment_for_capture_device(phone_t instance, float *level);
+PHONE_EXPORT phone_status_t phone_adjust_tx_level_for_capture_device(phone_t instance, float level);
 
-PHONE_EXPORT phone_status_t phone_set_rx_level_call_index(phone_t instance, int call_index, float level);
-PHONE_EXPORT phone_status_t phone_set_rx_level_call_id(phone_t instance, const char *call_id, float level);
+PHONE_EXPORT phone_status_t phone_get_rx_level_adjustment_for_capture_device(phone_t instance, float *level);
+PHONE_EXPORT phone_status_t phone_adjust_rx_level_for_capture_device(phone_t instance, float level);
 
-PHONE_EXPORT phone_status_t phone_set_rx_level_capture_device(phone_t instance, float level);
+PHONE_EXPORT void phone_crash(void);
 
 #ifdef __cplusplus
 }

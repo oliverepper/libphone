@@ -11,33 +11,21 @@ then
 fi
 
 export PREFIX="$1/pjproject"
-PJPROJECT_VERSION=2.13.1
-
-#IOS_ARM64_INSTALL_PREFIX="${PREFIX}/ios-arm64"
-#
-#SIMULATOR_ARM64_INSTALL_PREFIX="${PREFIX}"/simulator-arm64
-#
-##IOS_ARM64_SIMULATOR_INSTALL_PREFIX="${PREFIX}/ios-arm64-simulator"
-##IOS_X86_64_SIMULATOR_INSTALL_PREFIX="${PREFIX}/ios-x86_64-simulator"
-##IOS_ARM64_X86_64_SIMULATOR_INSTALL_PREFIX="${PREFIX}/ios-arm64_x86_64-simulator"
-#
-#
-#IOS_ARM64_MACCATALYST_INSTALL_PREFIX="${PREFIX}/ios-arm64-maccatalyst"
-#IOS_X86_64_MACCATALYST_INSTALL_PREFIX="${PREFIX}/ios-x86_64-maccatalyst"
-#IOS_ARM64_X86_64_MACCATALYST_INSTALL_PREFIX="${PREFIX}/ios-arm64_x86_64-maccatalyst"
-#
-#MACOS_ARM64_INSTALL_PREFIX="${PREFIX}/macos-arm64"
-#MACOS_X86_64_INSTALL_PREFIX="${PREFIX}/macos-x86_64"
-#MACOS_ARM64_X86_64_INSTALL_PREFIX="${PREFIX}/macos-arm64_x86_64"
-#MACOS_ARM64_DEBUG_INSTALL_PREFIX="${PREFIX}/macos-arm64-debug"
+PJPROJECT_URL=https://github.com/pjsip/pjproject
+PJPROJECT_VERSION=2.14
+# PJPROJECT_COMMIT=master
 
 if [ -d pjproject ]
 then
     pushd pjproject
     git reset --hard "${PJPROJECT_VERSION}"
+    # git pull https://github.com/pjsip/pjproject.git
+    # git reset --hard "${PJPROJECT_COMMIT}"
     popd
 else
-    git -c advice.detachedHead=false clone --depth 1 --branch "${PJPROJECT_VERSION}" https://github.com/pjsip/pjproject # > /dev/null 2>&1
+    git -c advice.detachedHead=false clone --depth 1 --branch "${PJPROJECT_VERSION}" "${PJPROJECT_URL}"
+    # git clone https://github.com/pjsip/pjproject.git
+    # git -c advice.detachedHead=false -C pjproject checkout ${PJPROJECT_COMMIT}    
 fi
 
 # create base configuration for pjproject build
@@ -88,11 +76,11 @@ function create_lib {
         unset OPUS
         unset OPUS_LATEST
     fi
-    if [[ -d "${SDL_LATEST}" ]]; then
-        EXTRA_LIBS+=("${SDL_LATEST}/lib/libSDL2.a")
-        unset SDL
-        unset SDL_LATEST
-    fi
+    # if [[ -d "${SDL_LATEST}" ]]; then
+    #     EXTRA_LIBS+=("${SDL_LATEST}/lib/libSDL2.a")
+    #     unset SDL
+    #     unset SDL_LATEST
+    # fi
 
     LLVM=(/opt/homebrew/Cellar/llvm/*)
     LLVM_LATEST=${LLVM[${#LLVM[@]} - 1]}

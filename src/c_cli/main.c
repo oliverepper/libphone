@@ -31,13 +31,25 @@ void on_incoming_call_with_index_cb(int call_index, __attribute__((unused)) void
 
     printf("Incoming call index: %d, id: %s\n", call_index, call_id_buffer);
 
+    size_t incoming_message_length = -1;
+    if (phone_call_incoming_message_length_index(s->phone, call_index, &incoming_message_length) != PHONE_STATUS_SUCCESS)
+        fprintf(stderr, "%s\n", phone_last_error());
+    if (incoming_message_length != -1) {
+        printf("SIP Invite Message length: %zu\n", incoming_message_length);
+        char buffer[incoming_message_length + 1];
+        if (phone_call_incoming_message_index(s->phone, call_index, buffer, sizeof(buffer)) != PHONE_STATUS_SUCCESS)
+            fprintf(stderr, "%s\n", phone_last_error());
+        else
+            printf("%s\n\n", buffer);
+    }
+
     int answer_after;
     phone_call_answer_after_index(s->phone, call_index, &answer_after);
     if (answer_after >= 0) {
         sleep(answer_after);
         phone_answer_call_index(s->phone, call_index);
     } else {
-        phone_start_ringing_call_index(s->phone, call_index);
+        phone_answer_ringing_call_index(s->phone, call_index);
     }
 }
 
@@ -50,6 +62,18 @@ void on_incoming_call_with_id_cb(const char *call_id, __attribute__((unused)) vo
 
     printf("Incoming call id: %s, index: %d\n", call_id, s->last_call_index);
 
+    size_t incoming_message_length = -1;
+    if (phone_call_incoming_message_length_id(s->phone, call_id, &incoming_message_length) != PHONE_STATUS_SUCCESS)
+        fprintf(stderr, "%s\n", phone_last_error());
+    if (incoming_message_length != -1) {
+        printf("SIP Invite Message length: %zu\n", incoming_message_length);
+        char buffer[incoming_message_length + 1];
+        if (phone_call_incoming_message_id(s->phone, call_id, buffer, sizeof(buffer)) != PHONE_STATUS_SUCCESS)
+            fprintf(stderr, "%s\n", phone_last_error());
+        else
+            printf("%s\n", buffer);
+    }
+
     int answer_after = -1;
     if (phone_call_answer_after_id(s->phone, call_id, &answer_after) != PHONE_STATUS_SUCCESS)
         fprintf(stderr, "%s\n", phone_last_error());
@@ -59,7 +83,7 @@ void on_incoming_call_with_id_cb(const char *call_id, __attribute__((unused)) vo
         sleep(answer_after);
         phone_answer_call_id(s->phone, call_id);
     } else {
-        phone_start_ringing_call_id(s->phone, call_id);
+        phone_answer_ringing_call_id(s->phone, call_id);
     }
 }
 
@@ -83,7 +107,17 @@ void on_call_state_with_id_cb(const char* call_id, int state, void *ctx) {
 }
 
 void log_function(int level, const char *message, long thread_id, const char *thread_name) {
-    fprintf(stdout, "%s", message);
+    static FILE *out = {0};
+    if (out == 0) {
+        char filename[32];
+        char fullpath[PATH_MAX];
+        strncpy(filename, "last_log.txt", sizeof(filename));
+        if ((out = fopen(filename, "w")) == NULL) {
+            fprintf(stderr, "could not open file: %s\n", filename);
+        }
+        realpath(filename, fullpath);
+    }
+    fprintf(out, "%s(%lu), %d – %s", thread_name, thread_id, level, message);
 }
 
 int main() {
@@ -115,8 +149,8 @@ int main() {
         die(state->phone);
 
     // connect
-    if (phone_connect(state->phone, SERVER, USER, PASSWORD) != PHONE_STATUS_SUCCESS)
-        die(state->phone);
+//    if (phone_connect(state->phone, SERVER, USER, PASSWORD) != PHONE_STATUS_SUCCESS)
+//        die(state->phone);
 
     // repl
     int command;
@@ -207,8 +241,12 @@ int main() {
                 {
                     phone_refresh_audio_devices();
                     size_t count = phone_get_audio_devices_count();
-                    size_t max_driver_name_length =
-                            phone_get_audio_device_driver_name_length() + 1; // +1 for zero termination
+                    size_t max_driver_name_length;
+                    if (phone_get_audio_device_driver_name_length(&max_driver_name_length) != PHONE_STATUS_SUCCESS)
+                        fprintf(stderr, "%s\n", phone_last_error());
+                    // +1 for zero termination!
+                    ++max_driver_name_length;
+
                     size_t max_device_name_length =
                             phone_get_audio_device_info_name_length() + 1; // +1 for zero termination
 
@@ -245,6 +283,20 @@ int main() {
                         fprintf(stderr, "%s\n", phone_last_error());
                 }
                 break;
+            case 'S':
+                clear_input_buffer();
+                {
+                    printf("Disconnecting audio devices from bridge\n");
+                    phone_disconnect_sound_device();
+                }
+                break;
+            case 'n':
+                clear_input_buffer();
+                {
+                    printf("Setting no sound devices\n");
+                    phone_set_no_sound_devices();
+                }
+                break;
             case 'p':
                 clear_input_buffer();
                 {
@@ -268,65 +320,51 @@ int main() {
                 printf("handle ip change\n");
                 phone_handle_ip_change();
                 break;
-            case 'm':
+            case 't':
                 clear_input_buffer();
                 {
-                    int call_index;
-                    unsigned level;
-                    printf("please enter call index: ");
-                    if (read_int(&call_index) != 0) break;
-                    if (phone_get_rx_level_call_index(state->phone, call_index, &level) != PHONE_STATUS_SUCCESS)
+                    float level;
+                    if (phone_get_tx_level_adjustment_for_capture_device(state->phone, &level) != PHONE_STATUS_SUCCESS)
                         fprintf(stderr, "%s\n", phone_last_error());
-                    printf("last rx level for call: %d\n", level);
+                    printf("tx level adjustment for capture device: %.1f\n", level);
                 }
+                break;
+            case 'r':
+                clear_input_buffer();
+                {
+                    float level;
+                    if (phone_get_rx_level_adjustment_for_capture_device(state->phone, &level) != PHONE_STATUS_SUCCESS)
+                        fprintf(stderr, "%s\n", phone_last_error());
+                    printf("last rx level for call: %.1f\n", level);
+                }
+                break;
+            case 'm':
+                clear_input_buffer();
+                printf("adjust tx level for capture device to 0\n");
+                if (phone_adjust_tx_level_for_capture_device(state->phone, 0) != PHONE_STATUS_SUCCESS)
+                    fprintf(stderr, "%s\n", phone_last_error());
                 break;
             case 'M':
                 clear_input_buffer();
-                {
-                    char call_id[128];
-                    unsigned level;
-                    printf("please enter call id: ");
-                    if (read_string(call_id, sizeof(call_id)) != 0) break;
-                    if (phone_get_rx_level_call_id(state->phone, call_id, &level) != PHONE_STATUS_SUCCESS)
-                        fprintf(stderr, "%s\n", phone_last_error());
-                    printf("last rx level for call: %d\n", level);
-                }
-                break;
-            case 'n':
-                clear_input_buffer();
-                if (phone_set_rx_level_capture_device(state->phone, 0) != PHONE_STATUS_SUCCESS)
-                    fprintf(stderr, "%s\n", phone_last_error());
-                break;
-            case 'N':
-                clear_input_buffer();
-                if (phone_set_rx_level_capture_device(state->phone, 1) != PHONE_STATUS_SUCCESS)
+                printf("adjust tx level for capture device to 1\n");
+                if (phone_adjust_tx_level_for_capture_device(state->phone, 1) != PHONE_STATUS_SUCCESS)
                     fprintf(stderr, "%s\n", phone_last_error());
                 break;
             case '0':
                 clear_input_buffer();
-                {
-                    int call_index;
-                    float level;
-                    printf("please enter call index: ");
-                    if (read_int(&call_index) != 0) break;
-                    printf("please enter desired level: ");
-                    if (read_float(&level) != 0) break;
-                    if (phone_set_rx_level_call_index(state->phone, call_index, level) != PHONE_STATUS_SUCCESS)
-                        fprintf(stderr, "%s\n", phone_last_error());
-                }
+                printf("disconnecting\n");
+                if (phone_disconnect(state->phone) != PHONE_STATUS_SUCCESS)
+                    fprintf(stderr, "%s\n", phone_last_error());
                 break;
-            case '=':
+            case '9':
                 clear_input_buffer();
-                {
-                    char call_id[128];
-                    float level;
-                    printf("please enter call id: ");
-                    if (read_string(call_id, sizeof(call_id)) != 0) break;
-                    printf("please enter desired level: ");
-                    if (read_float(&level) != 0) break;
-                    if (phone_set_rx_level_call_id(state->phone, call_id, level) != PHONE_STATUS_SUCCESS)
-                        fprintf(stderr, "%s\n", phone_last_error());
-                }
+                printf("connecting\n");
+                if (phone_connect(state->phone, SERVER, USER, PASSWORD) != PHONE_STATUS_SUCCESS)
+                    fprintf(stderr, "%s\n", phone_last_error());
+                break;
+            case '!':
+                clear_input_buffer();
+                phone_crash();
                 break;
             default:
                 clear_input_buffer();
