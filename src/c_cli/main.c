@@ -242,8 +242,10 @@ int main() {
                     phone_refresh_audio_devices();
                     size_t count = phone_get_audio_devices_count();
                     size_t max_driver_name_length;
-                    if (phone_get_audio_device_driver_name_length(&max_driver_name_length) != PHONE_STATUS_SUCCESS)
+                    if (phone_get_audio_device_driver_name_length(&max_driver_name_length) != PHONE_STATUS_SUCCESS) {
                         fprintf(stderr, "%s\n", phone_last_error());
+                        break;
+                    }
                     // +1 for zero termination!
                     ++max_driver_name_length;
 
