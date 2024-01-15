@@ -143,18 +143,6 @@ public:
     PHONE_EXPORT void adjust_tx_level_for_capture_device(float level) const;
     PHONE_EXPORT void adjust_rx_level_for_capture_device(float level) const;
 
-//    [[nodiscard]] PHONE_EXPORT unsigned int get_rx_level_for_call(int call_index) const;
-//    [[nodiscard]] PHONE_EXPORT unsigned int get_rx_level_for_call(const std::string& call_id) const;
-//
-//    PHONE_EXPORT void set_rx_level_for_call(int call_index, float level) const;
-//    PHONE_EXPORT void set_rx_level_for_call(const std::string& call_id, float level) const;
-//
-//    PHONE_EXPORT void set_level_for_call(int call_index, phone::tx_rx_direction direction, float level) const;
-//    PHONE_EXPORT void set_level_for_call(const std::string& call_id, phone::tx_rx_direction direction, float level) const;
-
-//    [[nodiscard]] PHONE_EXPORT unsigned int get_level_adjustment_for_capture_device(phone::tx_rx_direction direction) const;
-//    PHONE_EXPORT void adjust_level_for_capture_device(phone::tx_rx_direction direction, float level) const;
-
     PHONE_EXPORT static void crash();
 
 private:

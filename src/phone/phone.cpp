@@ -4,10 +4,7 @@
 #include <vector>
 #include <cstring>
 #include <ranges>
-#include <algorithm>
-#ifdef __linux__
 #include <numeric>
-#endif
 
 char global_last_error[1024] = "no error";
 
@@ -288,8 +285,15 @@ size_t phone_get_audio_device_info_name_length(void) {
     return PJMEDIA_AUD_DEV_INFO_NAME_LEN;
 }
 
+size_t phone_get_audio_device_info_driver_length(void) {
+    return 32;
+}
+
 phone_status_t phone_get_audio_device_driver_name_length(size_t *max_driver_name_length) {
-#ifdef __linux__
+    return phone_calculate_audio_device_driver_name_length(max_driver_name_length);
+}
+
+phone_status_t phone_calculate_audio_device_driver_name_length(size_t *max_driver_name_length) {
     try {
         auto audio_devices = phone_instance_t::get_audio_devices();
         auto max_length = std::transform_reduce(
@@ -305,19 +309,6 @@ phone_status_t phone_get_audio_device_driver_name_length(size_t *max_driver_name
         return PHONE_STATUS_FAILURE;
     }
     return PHONE_STATUS_SUCCESS;
-#else
-    try {
-        auto lens = std::views::transform(phone_instance_t::get_audio_devices(),
-                                          [](const phone::audio_device_info_t &info) {
-                                              return info.driver.length();
-                                          });
-        *max_driver_name_length = std::ranges::max(lens);
-    } catch (const phone::exception& e) {
-        strncpy(global_last_error, e.what(), sizeof(global_last_error));
-        return PHONE_STATUS_FAILURE;
-    }
-    return PHONE_STATUS_SUCCESS;
-#endif
 }
 
 phone_status_t phone_get_audio_device_names(char **device_names, size_t *devices_count, size_t max_device_name_length, device_filter_t filter) {

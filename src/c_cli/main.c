@@ -22,7 +22,7 @@ void on_registration_state(int is_registered, int registration_state, __attribut
 }
 
 void on_incoming_call_with_index_cb(int call_index, __attribute__((unused)) void *ctx) {
-    struct app_state *s = (struct app_state*)ctx;
+    struct app_state *s = (struct app_state *) ctx;
     s->last_call_index = call_index;
 
     char call_id_buffer[128] = {0};
@@ -32,7 +32,8 @@ void on_incoming_call_with_index_cb(int call_index, __attribute__((unused)) void
     printf("Incoming call index: %d, id: %s\n", call_index, call_id_buffer);
 
     size_t incoming_message_length = -1;
-    if (phone_call_incoming_message_length_index(s->phone, call_index, &incoming_message_length) != PHONE_STATUS_SUCCESS)
+    if (phone_call_incoming_message_length_index(s->phone, call_index, &incoming_message_length) !=
+        PHONE_STATUS_SUCCESS)
         fprintf(stderr, "%s\n", phone_last_error());
     if (incoming_message_length != -1) {
         printf("SIP Invite Message length: %zu\n", incoming_message_length);
@@ -54,7 +55,7 @@ void on_incoming_call_with_index_cb(int call_index, __attribute__((unused)) void
 }
 
 void on_incoming_call_with_id_cb(const char *call_id, __attribute__((unused)) void *ctx) {
-    struct app_state *s = (struct app_state*)ctx;
+    struct app_state *s = (struct app_state *) ctx;
     strncpy(s->last_call_id, call_id, sizeof(s->last_call_id));
 
     if (phone_get_call_index(s->phone, call_id, &s->last_call_index) != PHONE_STATUS_SUCCESS)
@@ -88,7 +89,7 @@ void on_incoming_call_with_id_cb(const char *call_id, __attribute__((unused)) vo
 }
 
 void on_call_state_with_index_cb(int call_index, int state, void *ctx) {
-    struct app_state *s = (struct app_state*)ctx;
+    struct app_state *s = (struct app_state *) ctx;
     s->last_call_index = call_index;
 
     char call_state_buffer[64] = {0};
@@ -97,8 +98,8 @@ void on_call_state_with_index_cb(int call_index, int state, void *ctx) {
     printf("Call %d – state: %s\n", call_index, call_state_buffer);
 }
 
-void on_call_state_with_id_cb(const char* call_id, int state, void *ctx) {
-    struct app_state *s = (struct app_state*)ctx;
+void on_call_state_with_id_cb(const char *call_id, int state, void *ctx) {
+    struct app_state *s = (struct app_state *) ctx;
     strncpy(s->last_call_id, call_id, sizeof(s->last_call_id));
 
     char buffer[64];
@@ -161,8 +162,8 @@ int main() {
     do {
         printf("last call index: %d\n", state->last_call_index);
         printf("last call id: %s\n", state->last_call_id);
-        printf("libphone version %d.%d.%d (%s)\n",
-               phone_version_major(), phone_version_minor(), phone_version_patch(), git_hash);
+        printf("libphone version %d.%d.%d (%s)\n", phone_version_major(), phone_version_minor(), phone_version_patch(),
+               git_hash);
         printf("%s\n\n", git_description);
 
         command = getchar();
@@ -241,16 +242,12 @@ int main() {
                 {
                     phone_refresh_audio_devices();
                     size_t count = phone_get_audio_devices_count();
-                    size_t max_driver_name_length;
-                    if (phone_get_audio_device_driver_name_length(&max_driver_name_length) != PHONE_STATUS_SUCCESS) {
-                        fprintf(stderr, "%s\n", phone_last_error());
-                        break;
-                    }
-                    // +1 for zero termination!
-                    ++max_driver_name_length;
 
                     size_t max_device_name_length =
                             phone_get_audio_device_info_name_length() + 1; // +1 for zero termination
+
+                    size_t max_driver_name_length =
+                            phone_get_audio_device_info_driver_length() + 1; // +1 for zero termination
 
                     audio_device_info_t devices[count];
                     char driver_names[count][max_driver_name_length];

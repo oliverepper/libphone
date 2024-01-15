@@ -80,8 +80,10 @@ PHONE_EXPORT void phone_set_no_sound_devices(void);
 PHONE_EXPORT void phone_disconnect_sound_device(void);
 PHONE_EXPORT phone_status_t phone_refresh_audio_devices(void);
 PHONE_EXPORT size_t phone_get_audio_devices_count(void);
-PHONE_EXPORT phone_status_t phone_get_audio_device_driver_name_length(size_t *max_driver_name_length);
 PHONE_EXPORT size_t phone_get_audio_device_info_name_length(void);
+PHONE_EXPORT size_t phone_get_audio_device_info_driver_length(void);
+PHONE_DEPRECATED_EXPORT phone_status_t phone_get_audio_device_driver_name_length(size_t *max_driver_name_length);
+PHONE_EXPORT phone_status_t phone_calculate_audio_device_driver_name_length(size_t *max_driver_name_length);
 PHONE_DEPRECATED_EXPORT phone_status_t phone_get_audio_device_names(char **device_names, size_t *devices_count, size_t max_device_name_length, device_filter_t filter);
 
 /**

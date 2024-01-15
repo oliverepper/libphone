@@ -29,6 +29,7 @@ phone_instance_t::phone_instance_t(std::string user_agent,
     try {
         m_ep->libCreate();
         m_ep->libInit(ep_cfg);
+        m_ep->audDevManager().setNullDev();
         m_ep->libStart();
 
         m_call_waiting_tone_generator->createToneGenerator();
