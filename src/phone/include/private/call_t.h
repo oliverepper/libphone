@@ -20,17 +20,17 @@ public:
     void onCallState(pj::OnCallStateParam &prm) override {
         auto info = getInfo();
         if (on_call_state_with_index.has_value()) {
-            PJ_LOG(6, (__BASE_FILE__, "calling on_call_state with index: %d and state: %s(%d)",
+            PJ_LOG(6, (__FILE_NAME__, "calling on_call_state with index: %d and state: %s(%d)",
                     info.id, phone::call_state_name(info.state), info.state));
             on_call_state_with_index.value()(info.id, info.state);
         }
         if (on_call_state_with_id.has_value()) {
-            PJ_LOG(6, (__BASE_FILE__, "calling on_call_state with id: %s and state: %s(%d)",
+            PJ_LOG(6, (__FILE_NAME__, "calling on_call_state with id: %s and state: %s(%d)",
                     info.callIdString.c_str(), phone::call_state_name(info.state), info.state));
             on_call_state_with_id.value()(info.callIdString, info.state);
         }
         if (info.state == PJSIP_INV_STATE_DISCONNECTED) {
-            PJ_LOG(3, (__BASE_FILE__, "calling delete function for call: %d with id: %s", info.id, info.callIdString.c_str()));
+            PJ_LOG(3, (__FILE_NAME__, "calling delete function for call: %d with id: %s", info.id, info.callIdString.c_str()));
             m_delete_call_from_account(info.id);
         }
     }

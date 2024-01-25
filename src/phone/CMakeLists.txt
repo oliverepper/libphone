@@ -1,6 +1,8 @@
 find_package(PkgConfig REQUIRED)
+
 pkg_check_modules(PJPROJECT REQUIRED libpjproject)
 
+# configure git variables in version templates
 find_package(Git REQUIRED)
 execute_process(
         COMMAND ${GIT_EXECUTABLE} -C ${CMAKE_SOURCE_DIR} rev-parse HEAD
@@ -39,13 +41,21 @@ target_compile_options(phone PUBLIC ${PJPROJECT_CFLAGS})
 
 find_library(RESOLV_LIBRARY resolv)
 
+include(FetchContent)
+
+FetchContent_Declare(stunning
+    GIT_REPOSITORY https://github.com/oliverepper/stunning.git
+    GIT_TAG        main)
+
+FetchContent_MakeAvailable(stunning)
+
 target_include_directories(phone
         PUBLIC
         include
         ${CMAKE_CURRENT_BINARY_DIR}
         PRIVATE
         include/phone)
-target_link_libraries(phone PRIVATE ${PJPROJECT_LINK_LIBRARIES} ${RESOLV_LIBRARY})
+target_link_libraries(phone PRIVATE ${PJPROJECT_LINK_LIBRARIES} ${RESOLV_LIBRARY} stunning::stunning)
 
 set(phone_PUBLIC_HEADERS
         ${CMAKE_CURRENT_SOURCE_DIR}/include/phone.h

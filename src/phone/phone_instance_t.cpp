@@ -286,7 +286,7 @@ void phone_instance_t::set_audio_devices(int capture_index, int playback_index, 
         pj_strerror(status, error_message, sizeof(error_message));
         throw phone::exception{error_message};
     } else {
-        PJ_LOG(3,(__BASE_FILE__, "did set capture device to: %d and playback device to: %d", prm.capture_dev, prm.playback_dev));
+        PJ_LOG(3,(__FILE_NAME__, "did set capture device to: %d and playback device to: %d", prm.capture_dev, prm.playback_dev));
     }
 }
 

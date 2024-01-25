@@ -20,15 +20,15 @@ public:
     void onRegState(pj::OnRegStateParam &prm) override {
         auto info = getInfo();
         if (info.regIsActive) {
-            PJ_LOG(3, (__BASE_FILE__, "register code: %d", prm.code));
+            PJ_LOG(3, (__FILE_NAME__, "register code: %d", prm.code));
         } else {
-            PJ_LOG(3, (__BASE_FILE__, "unregister code: %d", prm.code));
+            PJ_LOG(3, (__FILE_NAME__, "unregister code: %d", prm.code));
         }
         if (on_registration_state.has_value()) on_registration_state.value()(info.regIsActive, prm.code);
     }
 
     void onIncomingCall(pj::OnIncomingCallParam &prm) override {
-        PJ_LOG(3, (__BASE_FILE__, "Incoming call: %d", prm.callId));
+        PJ_LOG(3, (__FILE_NAME__, "Incoming call: %d", prm.callId));
         m_calls.emplace_back(std::make_unique<call_t>(*this,
                                                       [this](int id) { delete_call(id); },
                                                       prm.callId));
@@ -58,9 +58,9 @@ public:
                     try {
                         m_calls.back()->answer_after.emplace(std::stoi(++pos));
                     } catch (const std::invalid_argument &e) {
-                        PJ_LOG(1, (__BASE_FILE__, "%s", e.what()));
+                        PJ_LOG(1, (__FILE_NAME__, "%s", e.what()));
                     } catch (const std::out_of_range &e) {
-                        PJ_LOG(1, (__BASE_FILE__, "%s", e.what()));
+                        PJ_LOG(1, (__FILE_NAME__, "%s", e.what()));
                     }
                 } while (false);
                 if (m_calls.back()->answer_after.has_value())
@@ -75,12 +75,12 @@ public:
 
         if (on_incoming_call_with_index.has_value()) {
             auto index = static_cast<int>(*m_calls.back());
-            PJ_LOG(6, (__BASE_FILE__, "calling on_incoming_call with index: %d", index));
+            PJ_LOG(6, (__FILE_NAME__, "calling on_incoming_call with index: %d", index));
             on_incoming_call_with_index.value()(index);
         }
         if (on_incoming_call_with_id.has_value()) {
             auto id = static_cast<std::string>(*m_calls.back());
-            PJ_LOG(6, (__BASE_FILE__, "calling on_incoming_call with id: %s", index));
+            PJ_LOG(6, (__FILE_NAME__, "calling on_incoming_call with id: %s", index));
             on_incoming_call_with_id.value()(id);
         }
     }
@@ -163,7 +163,7 @@ public:
     }
 
     void delete_call(int call_index) noexcept {
-        PJ_LOG(3, (__BASE_FILE__, "Going to delete call: %d", call_index));
+        PJ_LOG(3, (__FILE_NAME__, "Going to delete call: %d", call_index));
         auto it = call_iterator(call_index);
         if (it != std::end(m_calls)) { m_calls.erase(it); }
     }
