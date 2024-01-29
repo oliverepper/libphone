@@ -3,6 +3,9 @@
 #include "private/system_nameserver.h"
 #include "private/tone_generator_helper.h"
 #include "private/log_writer_t.h"
+
+#include <stunning.h>
+
 #include <pjsua2.hpp>
 #include <vector>
 #include <iostream>
@@ -10,25 +13,25 @@
 phone_instance_t::phone_instance_t(std::string user_agent,
                                    std::vector<std::string> nameserver,
                                    std::vector<std::string> stunserver)
-: m_ep{std::make_unique<pj::Endpoint>()}, m_account{std::make_unique<account_t>()} {
+: m_ep{std::make_unique<pj::Endpoint>()}, m_account{std::make_unique<account_t>()}, m_ep_cfg{std::make_unique<pj::EpConfig>()} {
     m_call_waiting_tone_generator = std::make_unique<pj::ToneGenerator>();
     m_dtmf_tone_generator = std::make_unique<pj::ToneGenerator>();
 
-    pj::EpConfig ep_cfg{};
-    ep_cfg.uaConfig.userAgent = std::move(user_agent);
-    ep_cfg.uaConfig.nameserver = std::move(nameserver);
-    ep_cfg.uaConfig.stunServer = std::move(stunserver);
+
+    m_ep_cfg->uaConfig.userAgent = std::move(user_agent);
+    m_ep_cfg->uaConfig.nameserver = std::move(nameserver);
+    m_ep_cfg->uaConfig.stunServer = std::move(stunserver);
 
     // FIXME: hopefully pjsip fixes the assumption about beeing the owner of the *log_writer_t
     // https://github.com/pjsip/pjproject/issues/3511
     m_log_writer = new log_writer_t{};
-    ep_cfg.logConfig.writer = m_log_writer;
+    m_ep_cfg->logConfig.writer = m_log_writer;
 
-    ep_cfg.medConfig.ecOptions = PJMEDIA_ECHO_USE_SW_ECHO;
+    m_ep_cfg->medConfig.ecOptions = PJMEDIA_ECHO_USE_SW_ECHO;
 
     try {
         m_ep->libCreate();
-        m_ep->libInit(ep_cfg);
+        m_ep->libInit(*m_ep_cfg);
         m_ep->audDevManager().setNullDev();
         m_ep->libStart();
 
@@ -445,4 +448,16 @@ void phone_instance_t::adjust_level_for_capture_device(phone::tx_rx_direction di
 void phone_instance_t::crash() {
     std::cerr << "Terminating process from libphone because of user request" << std::endl;
     std::terminate();
+}
+
+std::string phone_instance_t::get_public_address() const {
+    try {
+        auto result = perform_binding_request(m_ep_cfg.get()->uaConfig.stunServer.front());
+        if (result.has_value())
+            return result->value;
+        else
+            throw phone::exception{"could not resolv public address"};
+    } catch (const stunning::exception& e) {
+        throw phone::exception{e.what()};
+    }
 }

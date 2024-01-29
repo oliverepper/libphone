@@ -582,6 +582,16 @@ phone_status_t phone_adjust_rx_level_for_capture_device(phone_t instance, float 
     return PHONE_STATUS_SUCCESS;
 }
 
+phone_status_t phone_get_public_address(phone_t instance, char *out, size_t buffer_size) {
+    try {
+        strncpy(out, instance->get_public_address().c_str(), buffer_size);
+    } catch (const phone::exception& e) {
+        strncpy(global_last_error, e.what(), sizeof(global_last_error));
+        return PHONE_STATUS_FAILURE;
+    }
+    return PHONE_STATUS_SUCCESS;
+}
+
 void phone_crash(void) {
     phone_instance_t::crash();
 }

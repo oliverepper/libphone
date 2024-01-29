@@ -361,6 +361,14 @@ int main() {
                 if (phone_connect(state->phone, SERVER, USER, PASSWORD) != PHONE_STATUS_SUCCESS)
                     fprintf(stderr, "%s\n", phone_last_error());
                 break;
+            case '7':
+                clear_input_buffer();
+                char buffer[128];
+                if (phone_get_public_address(state->phone, buffer, sizeof(buffer)) != PHONE_STATUS_SUCCESS)
+                    fprintf(stderr, "%s\n", phone_last_error());
+                else
+                    printf("%s\n", buffer);
+                break;
             case '!':
                 clear_input_buffer();
                 phone_crash();

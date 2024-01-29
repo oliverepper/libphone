@@ -11,6 +11,7 @@
 namespace pj {
 class Endpoint;
 class ToneGenerator;
+class EpConfig;
 } //namespace pj
 
 class account_t;
@@ -143,9 +144,12 @@ public:
     PHONE_EXPORT void adjust_tx_level_for_capture_device(float level) const;
     PHONE_EXPORT void adjust_rx_level_for_capture_device(float level) const;
 
+    [[nodiscard]] PHONE_EXPORT std::string get_public_address() const;
+
     PHONE_EXPORT static void crash();
 
 private:
+    std::unique_ptr<pj::EpConfig> m_ep_cfg;
     std::unique_ptr<pj::Endpoint> m_ep;
     std::unique_ptr<account_t> m_account;
     std::optional<std::string> m_server;
