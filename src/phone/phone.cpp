@@ -594,7 +594,11 @@ phone_status_t phone_get_local_addresses_count(size_t *count) {
 
 phone_status_t phone_get_local_addresses_max_length(size_t *max_length) {
     try {
-        *max_length = std::ranges::max(phone_instance_t::get_local_addresses(), std::less{}, &std::string::size).size();
+        auto addresses = phone_instance_t::get_local_addresses();
+        if (addresses.size() == 0)
+            *max_length = 0;
+        else
+            *max_length = std::ranges::max(phone_instance_t::get_local_addresses(), std::less{}, &std::string::size).size();
     } catch (const phone::exception& e) {
         strncpy(global_last_error, e.what(), sizeof(global_last_error));
         return PHONE_STATUS_FAILURE;
@@ -631,7 +635,11 @@ phone_status_t phone_get_local_addresses_from_transports_count(phone_t instance,
 
 phone_status_t phone_get_local_addresses_from_transports_max_length(phone_t instance, size_t *max_length) {
     try {
-        *max_length = std::ranges::max(instance->get_local_addresses_from_transports(), std::less{}, &std::string::size).size();
+        auto addresses = instance->get_local_addresses_from_transports();
+        if (addresses.size() == 0)
+            *max_length = 0;
+        else
+            *max_length = std::ranges::max(instance->get_local_addresses_from_transports(), std::less{}, &std::string::size).size();
     } catch (const phone::exception& e) {
         strncpy(global_last_error, e.what(), sizeof(global_last_error));
         return PHONE_STATUS_FAILURE;

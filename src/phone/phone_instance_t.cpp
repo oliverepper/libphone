@@ -465,7 +465,7 @@ std::string phone_instance_t::get_public_address() const {
 }
 
 std::vector<std::string> phone_instance_t::get_local_addresses() {
-    std::vector<std::string> addresses{1};
+    std::vector<std::string> addresses;
 
     for (const auto &e: IfAddrs{}) {
         switch (e.ifa_addr->sa_family) {
@@ -478,7 +478,7 @@ std::vector<std::string> phone_instance_t::get_local_addresses() {
 }
 
 std::vector<std::string> phone_instance_t::get_local_addresses_from_transports() {
-    std::vector<std::string> addresses{1};
+    std::vector<std::string> addresses;
 
     try {
         for (const auto& transport: m_ep->transportEnum()) {
