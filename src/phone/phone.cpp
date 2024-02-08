@@ -582,9 +582,9 @@ phone_status_t phone_adjust_rx_level_for_capture_device(phone_t instance, float 
     return PHONE_STATUS_SUCCESS;
 }
 
-phone_status_t phone_get_local_addresses_count(phone_t instance, size_t *count) {
+phone_status_t phone_get_local_addresses_count(size_t *count) {
     try {
-        *count = instance->get_local_addresses().size();
+        *count = phone_instance_t::get_local_addresses().size();
     } catch (const phone::exception& e) {
         strncpy(global_last_error, e.what(), sizeof(global_last_error));
         return PHONE_STATUS_FAILURE;
@@ -592,9 +592,9 @@ phone_status_t phone_get_local_addresses_count(phone_t instance, size_t *count) 
     return PHONE_STATUS_SUCCESS;
 }
 
-phone_status_t phone_get_local_addresses_max_length(phone_t instance, size_t *max_length) {
+phone_status_t phone_get_local_addresses_max_length(size_t *max_length) {
     try {
-        *max_length = std::ranges::max(instance->get_local_addresses(), std::less{}, &std::string::size).size();
+        *max_length = std::ranges::max(phone_instance_t::get_local_addresses(), std::less{}, &std::string::size).size();
     } catch (const phone::exception& e) {
         strncpy(global_last_error, e.what(), sizeof(global_last_error));
         return PHONE_STATUS_FAILURE;
@@ -602,10 +602,10 @@ phone_status_t phone_get_local_addresses_max_length(phone_t instance, size_t *ma
     return PHONE_STATUS_SUCCESS;
 }
 
-phone_status_t phone_get_local_addresses(phone_t instance, char **addresses, size_t *addresses_count, size_t max_address_length) {
+phone_status_t phone_get_local_addresses(char **addresses, size_t *addresses_count, size_t max_address_length) {
     try {
         int i = 0;
-        for (const auto& address: instance->get_local_addresses()) {
+        for (const auto& address: phone_instance_t::get_local_addresses()) {
             if (i < *addresses_count) {
                 strncpy(addresses[i], address.c_str(), max_address_length);
                 ++i;

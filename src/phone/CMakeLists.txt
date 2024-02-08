@@ -32,7 +32,9 @@ target_include_directories(phone_version
         ${CMAKE_CURRENT_SOURCE_DIR}/include
         ${CMAKE_CURRENT_BINARY_DIR})
 
-add_library(phone OBJECT phone.cpp phone_instance_t.cpp include/private/account_t.h include/private/call_t.h)
+add_library(phone OBJECT phone.cpp phone_instance_t.cpp include/private/account_t.h include/private/call_t.h
+        include/private/linked_list_iterator.h
+        include/private/IfAddrs.h)
 
 include(GenerateExportHeader)
 generate_export_header(phone BASE_NAME "phone")

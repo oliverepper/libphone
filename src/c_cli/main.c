@@ -376,13 +376,13 @@ int main() {
                 clear_input_buffer();
                 {
                     size_t count = 0;
-                    if (phone_get_local_addresses_count(state->phone, &count) != PHONE_STATUS_SUCCESS) {
+                    if (phone_get_local_addresses_count(&count) != PHONE_STATUS_SUCCESS) {
                         fprintf(stderr, "%s\n", phone_last_error());
                         break;
                     }
 
                     size_t max_length = 0;
-                    if (phone_get_local_addresses_max_length(state->phone, &max_length) != PHONE_STATUS_SUCCESS) {
+                    if (phone_get_local_addresses_max_length(&max_length) != PHONE_STATUS_SUCCESS) {
                         fprintf(stderr, "%s\n", phone_last_error());
                         break;
                     }
@@ -396,7 +396,7 @@ int main() {
                     for (int i = 0; i < count; ++i)
                         addresses[i] = buffer[i];
 
-                    if (phone_get_local_addresses(state->phone, addresses, &count, sizeof(buffer[0])) != PHONE_STATUS_SUCCESS) {
+                    if (phone_get_local_addresses(addresses, &count, sizeof(buffer[0])) != PHONE_STATUS_SUCCESS) {
                         fprintf(stderr, "%s\n", phone_last_error());
                         break;
                     }

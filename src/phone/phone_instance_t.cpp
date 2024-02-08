@@ -3,12 +3,14 @@
 #include "private/system_nameserver.h"
 #include "private/tone_generator_helper.h"
 #include "private/log_writer_t.h"
+#include "private/IfAddrs.h"
 
 #include <stunning.h>
 
 #include <pjsua2.hpp>
 #include <vector>
 #include <iostream>
+#include <ranges>
 
 phone_instance_t::phone_instance_t(std::string user_agent,
                                    std::vector<std::string> nameserver,
@@ -462,15 +464,15 @@ std::string phone_instance_t::get_public_address() const {
     }
 }
 
-std::vector<std::string> phone_instance_t::get_local_addresses() const {
+std::vector<std::string> phone_instance_t::get_local_addresses() {
     std::vector<std::string> addresses;
-    try {
-        for (const auto &transport: m_ep->transportEnum()) {
-            auto info = m_ep->transportGetInfo(transport);
-            addresses.push_back(info.localAddress);
+
+    for (const auto &e: IfAddrs{}) {
+        switch (e.ifa_addr->sa_family) {
+            case AF_INET: {
+                addresses.push_back(inet_ntoa(((struct sockaddr_in *) e.ifa_addr)->sin_addr));
+            }
         }
-        return addresses;
-    } catch (const pj::Error& e) {
-        throw phone::exception{e.info()};
     }
+    return addresses;
 }
