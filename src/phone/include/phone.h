@@ -181,6 +181,11 @@ PHONE_EXPORT phone_status_t phone_adjust_rx_level_for_capture_device(phone_t ins
 PHONE_EXPORT phone_status_t phone_get_local_addresses_count(size_t *count);
 PHONE_EXPORT phone_status_t phone_get_local_addresses_max_length(size_t *max_length);
 PHONE_EXPORT phone_status_t phone_get_local_addresses(char **addresses, size_t *addresses_count, size_t max_address_length);
+
+PHONE_EXPORT phone_status_t phone_get_local_addresses_from_transports_count(phone_t instance, size_t *count);
+PHONE_EXPORT phone_status_t phone_get_local_addresses_from_transports_max_length(phone_t instance, size_t *max_length);
+PHONE_EXPORT phone_status_t phone_get_local_addresses_from_transports(phone_t instance, char **addresses, size_t *addresses_count, size_t max_address_length);
+
 PHONE_EXPORT phone_status_t phone_get_public_address(phone_t instance, char *address, size_t buffer_size);
 
 PHONE_EXPORT void phone_crash(void);

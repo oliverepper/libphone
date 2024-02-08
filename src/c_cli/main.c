@@ -405,6 +405,39 @@ int main() {
                         printf("%s\n", addresses[i]);
                 }
                 break;
+            case '5':
+                clear_input_buffer();
+                {
+                    size_t count = 0;
+                    if (phone_get_local_addresses_from_transports_count(state->phone, &count) != PHONE_STATUS_SUCCESS) {
+                        fprintf(stderr, "%s\n", phone_last_error());
+                        break;
+                    }
+
+                    size_t max_lenght = 0;
+                    if (phone_get_local_addresses_from_transports_max_length(state->phone, &max_lenght) != PHONE_STATUS_SUCCESS) {
+                        fprintf(stderr, "%s\n", phone_last_error());
+                        break;
+                    }
+
+                    if (count == 0)
+                        break;
+
+                    char buffer[count][max_lenght + 1];
+                    char *addresses[count];
+
+                    for (int i = 0; i < count; ++i)
+                        addresses[i] = buffer[i];
+
+                    if (phone_get_local_addresses_from_transports(state->phone, addresses, &count, sizeof(buffer[0])) != PHONE_STATUS_SUCCESS) {
+                        fprintf(stderr, "%s\n", phone_last_error());
+                        break;
+                    }
+
+                    for (int i = 0; i < count; ++i)
+                        printf("%s\n", addresses[i]);
+                }
+                break;
             case '!':
                 clear_input_buffer();
                 phone_crash();

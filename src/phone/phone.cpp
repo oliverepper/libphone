@@ -618,6 +618,43 @@ phone_status_t phone_get_local_addresses(char **addresses, size_t *addresses_cou
     return PHONE_STATUS_SUCCESS;
 }
 
+phone_status_t phone_get_local_addresses_from_transports_count(phone_t instance, size_t *count) {
+    try {
+        *count = instance->get_local_addresses_from_transports().size();
+    } catch (const phone::exception& e) {
+        strncpy(global_last_error, e.what(), sizeof(global_last_error));
+        return PHONE_STATUS_FAILURE;
+    }
+    return PHONE_STATUS_SUCCESS;
+}
+
+
+phone_status_t phone_get_local_addresses_from_transports_max_length(phone_t instance, size_t *max_length) {
+    try {
+        *max_length = std::ranges::max(instance->get_local_addresses_from_transports(), std::less{}, &std::string::size).size();
+    } catch (const phone::exception& e) {
+        strncpy(global_last_error, e.what(), sizeof(global_last_error));
+        return PHONE_STATUS_FAILURE;
+    }
+    return PHONE_STATUS_SUCCESS;
+}
+
+phone_status_t phone_get_local_addresses_from_transports(phone_t instance, char **addresses, size_t *addresses_count, size_t max_address_length) {
+    try {
+        int i = 0;
+        for (const auto& address: instance->get_local_addresses_from_transports()) {
+            if (i < *addresses_count) {
+                strncpy(addresses[i], address.c_str(), max_address_length);
+                ++i;
+            }
+        }
+    } catch (const phone::exception& e) {
+        strncpy(global_last_error, e.what(), sizeof(global_last_error));
+        return PHONE_STATUS_FAILURE;
+    }
+    return PHONE_STATUS_SUCCESS;
+}
+
 phone_status_t phone_get_public_address(phone_t instance, char *address, size_t buffer_size) {
     try {
         strncpy(address, instance->get_public_address().c_str(), buffer_size);
