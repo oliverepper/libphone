@@ -228,6 +228,9 @@ auto main() -> int {
                     state.phone.disconnect();
                 } else if (command == '9') {
                     state.phone.connect(SERVER, USER, PASSWORD_FUNCTION);
+                } else if (command == '6') {
+                    for (const auto& address : state.phone.get_local_addresses())
+                        std::cout << address << std::endl;
                 }
             } catch (const phone::exception& e) {
                 std::cerr << "Error: " << e.what() << std::endl;

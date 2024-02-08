@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <arpa/inet.h>
 
 struct app_state {
     phone_t phone;
@@ -363,11 +364,46 @@ int main() {
                 break;
             case '7':
                 clear_input_buffer();
-                char buffer[128];
-                if (phone_get_public_address(state->phone, buffer, sizeof(buffer)) != PHONE_STATUS_SUCCESS)
-                    fprintf(stderr, "%s\n", phone_last_error());
-                else
-                    printf("%s\n", buffer);
+                {
+                    char buffer[128];
+                    if (phone_get_public_address(state->phone, buffer, sizeof(buffer)) != PHONE_STATUS_SUCCESS)
+                        fprintf(stderr, "%s\n", phone_last_error());
+                    else
+                        printf("%s\n", buffer);
+                }
+                break;
+            case '6':
+                clear_input_buffer();
+                {
+                    size_t count = 0;
+                    if (phone_get_local_addresses_count(state->phone, &count) != PHONE_STATUS_SUCCESS) {
+                        fprintf(stderr, "%s\n", phone_last_error());
+                        break;
+                    }
+
+                    size_t max_length = 0;
+                    if (phone_get_local_addresses_max_length(state->phone, &max_length) != PHONE_STATUS_SUCCESS) {
+                        fprintf(stderr, "%s\n", phone_last_error());
+                        break;
+                    }
+
+                    if (count == 0)
+                        break;
+
+                    char buffer[count][max_length + 1];
+                    char *addresses[count];
+
+                    for (int i = 0; i < count; ++i)
+                        addresses[i] = buffer[i];
+
+                    if (phone_get_local_addresses(state->phone, addresses, &count, sizeof(buffer[0])) != PHONE_STATUS_SUCCESS) {
+                        fprintf(stderr, "%s\n", phone_last_error());
+                        break;
+                    }
+
+                    for (int i = 0; i < count; ++i)
+                        printf("%s\n", addresses[i]);
+                }
                 break;
             case '!':
                 clear_input_buffer();

@@ -144,6 +144,7 @@ public:
     PHONE_EXPORT void adjust_tx_level_for_capture_device(float level) const;
     PHONE_EXPORT void adjust_rx_level_for_capture_device(float level) const;
 
+    [[nodiscard]] PHONE_EXPORT std::vector<std::string> get_local_addresses() const;
     [[nodiscard]] PHONE_EXPORT std::string get_public_address() const;
 
     PHONE_EXPORT static void crash();

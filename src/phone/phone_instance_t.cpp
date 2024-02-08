@@ -461,3 +461,16 @@ std::string phone_instance_t::get_public_address() const {
         throw phone::exception{e.what()};
     }
 }
+
+std::vector<std::string> phone_instance_t::get_local_addresses() const {
+    std::vector<std::string> addresses;
+    try {
+        for (const auto &transport: m_ep->transportEnum()) {
+            auto info = m_ep->transportGetInfo(transport);
+            addresses.push_back(info.localAddress);
+        }
+        return addresses;
+    } catch (const pj::Error& e) {
+        throw phone::exception{e.info()};
+    }
+}
