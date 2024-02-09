@@ -615,6 +615,7 @@ phone_status_t phone_get_local_addresses(char **addresses, size_t *addresses_cou
                 ++i;
             }
         }
+        *addresses_count = i;
     } catch (const phone::exception& e) {
         strncpy(global_last_error, e.what(), sizeof(global_last_error));
         return PHONE_STATUS_FAILURE;
@@ -656,6 +657,7 @@ phone_status_t phone_get_local_addresses_from_transports(phone_t instance, char 
                 ++i;
             }
         }
+        *addresses_count = i;
     } catch (const phone::exception& e) {
         strncpy(global_last_error, e.what(), sizeof(global_last_error));
         return PHONE_STATUS_FAILURE;
