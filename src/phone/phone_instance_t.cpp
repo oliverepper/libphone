@@ -477,7 +477,7 @@ std::vector<std::string> phone_instance_t::get_local_addresses() {
     return addresses;
 }
 
-std::vector<std::string> phone_instance_t::get_local_addresses_from_transports() {
+std::vector<std::string> phone_instance_t::get_local_addresses_from_transports() const {
     std::vector<std::string> addresses;
 
     try {

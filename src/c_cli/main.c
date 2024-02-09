@@ -365,7 +365,7 @@ int main() {
             case '7':
                 clear_input_buffer();
                 {
-                    char buffer[128];
+                    char buffer[INET6_ADDRSTRLEN];
                     if (phone_get_public_address(state->phone, buffer, sizeof(buffer)) != PHONE_STATUS_SUCCESS)
                         fprintf(stderr, "%s\n", phone_last_error());
                     else
