@@ -677,3 +677,13 @@ void phone_crash(void) {
     phone_instance_t::crash();
 }
 
+phone_status_t phone_get_public_address_from_stun_server(char *stun_server, char *address, size_t buffer_size) {
+    try {
+        strncpy(address, phone_instance_t::get_public_address(stun_server).c_str(), buffer_size);
+    } catch (const phone::exception& e) {
+        strncpy(global_last_error, e.what(), sizeof(global_last_error));
+        return PHONE_STATUS_FAILURE;
+    }
+    return PHONE_STATUS_SUCCESS;
+}
+

@@ -148,6 +148,7 @@ public:
     [[nodiscard]] PHONE_EXPORT std::vector<std::string> get_local_addresses_from_transports() const;
 
     [[nodiscard]] PHONE_EXPORT std::string get_public_address() const;
+    [[nodiscard]] PHONE_EXPORT static std::string get_public_address(std::string stun_server);
 
     PHONE_EXPORT static void crash();
 

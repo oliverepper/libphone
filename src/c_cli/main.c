@@ -370,6 +370,11 @@ int main() {
                         fprintf(stderr, "%s\n", phone_last_error());
                     else
                         printf("%s\n", buffer);
+
+                    if (phone_get_public_address_from_stun_server("stun.t-online.de", buffer, sizeof(buffer)) != PHONE_STATUS_SUCCESS)
+                        fprintf(stderr, "%s\n", phone_last_error());
+                    else
+                        printf("%s\n", buffer);
                 }
                 break;
             case '6':

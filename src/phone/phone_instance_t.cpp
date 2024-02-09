@@ -458,7 +458,19 @@ std::string phone_instance_t::get_public_address() const {
         if (result.has_value())
             return result->value;
         else
-            throw phone::exception{"could not resolv public address"};
+            throw phone::exception{"could not resolve public address"};
+    } catch (const stunning::exception& e) {
+        throw phone::exception{e.what()};
+    }
+}
+
+std::string phone_instance_t::get_public_address(std::string stun_server) {
+    try {
+        auto result = perform_binding_request(stun_server);
+        if (result.has_value())
+            return result->value;
+        else
+            throw phone::exception{"could not resolve public address"};
     } catch (const stunning::exception& e) {
         throw phone::exception{e.what()};
     }
