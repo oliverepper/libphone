@@ -112,6 +112,8 @@ void phone_instance_t::connect(std::string server, const std::string& user, std:
     acc_cfg.regConfig.registrarUri = "sip:" + m_server.value() + ";transport=TLS";
 
     try {
+        for (const auto& id : m_ep->transportEnum())
+            m_ep->transportClose(id);
         create_tls_transport_with_srv_lookup(*m_ep);
         if (m_account->isValid()) {
             m_account->modify(acc_cfg);
