@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.3)
+cmake_minimum_required(VERSION 3.5)
 
 project(phone VERSION 0.9.3 LANGUAGES C CXX)
 
