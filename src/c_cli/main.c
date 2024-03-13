@@ -109,6 +109,7 @@ void on_call_state_with_id_cb(const char *call_id, int state, void *ctx) {
 }
 
 void log_function(int level, const char *message, long thread_id, const char *thread_name) {
+    fprintf(stdout, "%s(%lu), %d – %s", thread_name, thread_id, level, message);
     static FILE *out = {0};
     if (out == 0) {
         char filename[32];

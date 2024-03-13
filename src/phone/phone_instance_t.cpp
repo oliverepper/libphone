@@ -107,6 +107,11 @@ void phone_instance_t::connect(std::string server, const std::string& user, std:
 
     pj::AccountConfig acc_cfg{};
     acc_cfg.mediaConfig.srtpUse = PJMEDIA_SRTP_OPTIONAL;
+    // INFO: next line necessary for calling via Telekom
+    // acc_cfg.mediaConfig.srtpUse = PJMEDIA_SRTP_MANDATORY;
+    // TODO: Check if the following is necessary, or beneficial
+    // acc_cfg.natConfig.contactRewriteMethod = PJSUA_CONTACT_REWRITE_NO_UNREG;
+    // acc_cfg.sipConfig.ipv6Use = PJSUA_IPV6_DISABLED;
     acc_cfg.idUri = user + "<sip:" + user + "@" + m_server.value() + ">";
     acc_cfg.sipConfig.authCreds.push_back(cred_info);
     acc_cfg.regConfig.registrarUri = "sip:" + m_server.value() + ";transport=TLS";

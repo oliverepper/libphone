@@ -24,7 +24,7 @@ fi
 
 SDKPATH=$(xcrun -sdk macosx --show-sdk-path)
 ARCH="x86_64"
-CFLAGS="-g -O0 -isysroot $SDKPATH -mmacosx-version-min=11 -DPJ_SDK_NAME=\"\\\"$(basename "$SDKPATH")\\\"\" -arch ${ARCH}" \
+CFLAGS="-g -O2 -DNDEBUG=1 -isysroot $SDKPATH -mmacosx-version-min=11 -DPJ_SDK_NAME=\"\\\"$(basename "$SDKPATH")\\\"\" -arch ${ARCH}" \
 LDFLAGS="-isysroot $SDKPATH -framework AudioToolbox -framework Foundation -framework Network -framework Security -arch ${ARCH}" \
 ./aconfigure --prefix="${PREFIX}" --host="${ARCH}"-apple-darwin "${CONFIGURE_EXTRA_PARAMS[@]}"
 
