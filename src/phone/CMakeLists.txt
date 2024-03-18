@@ -39,7 +39,7 @@ add_library(phone OBJECT phone.cpp phone_instance_t.cpp include/private/account_
 include(GenerateExportHeader)
 generate_export_header(phone BASE_NAME "phone")
 
-target_compile_options(phone PUBLIC ${PJPROJECT_CFLAGS})
+target_compile_options(phone PUBLIC ${PJPROJECT_CFLAGS} "-ffile-prefix-map=${CMAKE_SOURCE_DIR}=.")
 
 if (APPLE)
         find_library(RESOLV_LIBRARY resolv)
