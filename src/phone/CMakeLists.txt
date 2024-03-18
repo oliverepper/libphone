@@ -41,7 +41,9 @@ generate_export_header(phone BASE_NAME "phone")
 
 target_compile_options(phone PUBLIC ${PJPROJECT_CFLAGS})
 
-find_library(RESOLV_LIBRARY resolv)
+if (APPLE)
+        find_library(RESOLV_LIBRARY resolv)
+endif()
 
 include(FetchContent)
 
