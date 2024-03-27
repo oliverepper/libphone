@@ -128,7 +128,12 @@ auto main() -> int {
         });
 
         // opus
-        state.phone.configure_opus();
+        try {
+            state.phone.configure_opus(1, 3, 8000);
+        } catch (const phone::exception& e) {
+            std::cerr << "Error: " << e.what() << std::endl;
+            return 1;
+        }
 
         // connect
         state.phone.connect(SERVER, USER, PASSWORD_FUNCTION);
