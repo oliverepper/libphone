@@ -9,7 +9,7 @@ if [ -d ios-cmake ]
 then
     pushd ios-cmake
     git clean -fxd
-    git reset --hard "${IOS_TOOLCHAIN_IOS_TOOLCHAIN_COMMIT}"
+    git reset --hard "${IOS_TOOLCHAIN_COMMIT}"
     popd
 else
     git clone https://github.com/leetal/ios-cmake.git

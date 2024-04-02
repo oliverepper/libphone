@@ -11,21 +11,18 @@ then
 fi
 
 export PREFIX="$1/pjproject"
-PJPROJECT_URL=https://github.com/pjsip/pjproject
-PJPROJECT_VERSION=2.14
-# PJPROJECT_COMMIT=master
+PJPROJECT_URL=https://github.com/pjsip/pjproject.git
+PJPROJECT_COMMIT=2f4bc29b2fa65cc29e50ba03f0b8b6de820eaf6b
 
 if [ -d pjproject ]
 then
     pushd pjproject
-    git reset --hard "${PJPROJECT_VERSION}"
-    # git pull https://github.com/pjsip/pjproject.git
-    # git reset --hard "${PJPROJECT_COMMIT}"
+    git clean -fxd
+    git reset --hard "${PJPROJECT_COMMIT}"
     popd
 else
-    git -c advice.detachedHead=false clone --depth 1 --branch "${PJPROJECT_VERSION}" "${PJPROJECT_URL}"
-    # git clone https://github.com/pjsip/pjproject.git
-    # git -c advice.detachedHead=false -C pjproject checkout ${PJPROJECT_COMMIT}    
+    git clone https://github.com/pjsip/pjproject.git
+    git -c advice.detachedHead=false -C pjproject checkout ${PJPROJECT_COMMIT}    
 fi
 
 # create base configuration for pjproject build
