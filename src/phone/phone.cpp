@@ -689,3 +689,13 @@ phone_status_t phone_get_public_address_from_stun_server(char *stun_server, char
     return PHONE_STATUS_SUCCESS;
 }
 
+phone_status_t phone_update_nameserver(phone_t instance) {
+    try {
+        instance->update_nameserver();
+    } catch (const phone::exception& e) {
+        strncpy(global_last_error, e.what(), sizeof(global_last_error));
+        return PHONE_STATUS_FAILURE;
+    }
+    return PHONE_STATUS_SUCCESS;
+}
+

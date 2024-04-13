@@ -189,6 +189,8 @@ PHONE_EXPORT phone_status_t phone_get_local_addresses_from_transports(phone_t in
 PHONE_EXPORT phone_status_t phone_get_public_address(phone_t instance, char *address, size_t buffer_size);
 PHONE_EXPORT phone_status_t phone_get_public_address_from_stun_server(char *stun_server, char *address, size_t buffer_size);
 
+PHONE_EXPORT phone_status_t phone_update_nameserver(phone_t instance);
+
 PHONE_EXPORT void phone_crash(void);
 
 #ifdef __cplusplus

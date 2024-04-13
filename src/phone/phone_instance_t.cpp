@@ -508,3 +508,26 @@ std::vector<std::string> phone_instance_t::get_local_addresses_from_transports()
         throw phone::exception{e.info()};
     }
 }
+
+void phone_instance_t::update_nameserver() {
+    auto server = system_nameserver();
+    pj_str_t nameserver[server.size()];
+
+    int count = 0;
+    for (const auto& ns : server) {
+        std::cout << ns << std::endl;
+        pj_str_t str;
+        str.ptr = const_cast<char *>(ns.c_str());
+        str.slen = ns.size();
+        nameserver[count++] = str;
+    }
+
+    auto ep = pjsua_get_pjsip_endpt();
+    auto resolver = pjsip_endpt_get_resolver(ep);
+
+    if (pj_status_t status = pj_dns_resolver_set_ns(resolver, count, nameserver, NULL); status != PJ_SUCCESS) {
+        char error_message[PJ_ERR_MSG_SIZE] = {0};
+        pj_strerror(status, error_message, sizeof(error_message));
+        throw phone::exception{error_message};
+    }
+}

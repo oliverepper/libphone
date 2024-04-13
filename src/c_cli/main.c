@@ -444,6 +444,13 @@ int main() {
                         printf("%s\n", addresses[i]);
                 }
                 break;
+            case '4':
+                clear_input_buffer();
+                if (phone_update_nameserver(state->phone) != PHONE_STATUS_SUCCESS) {
+                    fprintf(stderr, "%s\n", phone_last_error());
+                    break;
+                }
+                break;
             case '!':
                 clear_input_buffer();
                 phone_crash();

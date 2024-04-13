@@ -152,6 +152,8 @@ public:
 
     PHONE_EXPORT static void crash();
 
+    PHONE_EXPORT void update_nameserver();
+
 private:
     std::unique_ptr<pj::EpConfig> m_ep_cfg;
     std::unique_ptr<pj::Endpoint> m_ep;
