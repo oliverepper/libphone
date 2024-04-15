@@ -514,7 +514,7 @@ void phone_instance_t::update_nameserver() {
 
     int count = 0;
     for (const auto& ns : server) {
-        std::cout << ns << std::endl;
+        PJ_LOG(3, (__FILE__, "nameserver: %s", ns.c_str()));
         pj_str_t str;
         str.ptr = const_cast<char *>(ns.c_str());
         str.slen = ns.size();
