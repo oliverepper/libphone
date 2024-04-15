@@ -12,17 +12,16 @@ fi
 
 export PREFIX="$1/pjproject"
 PJPROJECT_URL=https://github.com/pjsip/pjproject.git
-PJPROJECT_COMMIT=2f4bc29b2fa65cc29e50ba03f0b8b6de820eaf6b
+PJPROJECT_TAG=2.14.1
 
 if [ -d pjproject ]
 then
     pushd pjproject
     git clean -fxd
-    git reset --hard "${PJPROJECT_COMMIT}"
+    git reset --hard
     popd
 else
-    git clone https://github.com/pjsip/pjproject.git
-    git -c advice.detachedHead=false -C pjproject checkout ${PJPROJECT_COMMIT}    
+    git -c advice.detachedHead=false clone --depth=1 -b ${PJPROJECT_TAG} ${PJPROJECT_URL}
 fi
 
 # create base configuration for pjproject build
@@ -31,7 +30,6 @@ cat << EOF > pjlib/include/pj/config_site.h
 #define PJ_HAS_SSL_SOCK 1
 #undef PJ_SSL_SOCK_IMP
 #define PJ_SSL_SOCK_IMP PJ_SSL_SOCK_IMP_APPLE
-#include <pj/config_site_sample.h>
 EOF
 popd
 
@@ -46,7 +44,6 @@ function prepare {
 #define PJ_HAS_SSL_SOCK 1
 #undef PJ_SSL_SOCK_IMP
 #define PJ_SSL_SOCK_IMP PJ_SSL_SOCK_IMP_APPLE
-#include <pj/config_site_sample.h>
 EOF
 
     if [[ "${WANTS_IPHONE}" = "YES" ]]; then

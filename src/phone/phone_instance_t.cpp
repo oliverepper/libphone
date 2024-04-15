@@ -18,7 +18,6 @@ phone_instance_t::phone_instance_t(std::string user_agent,
     m_call_waiting_tone_generator = std::make_unique<pj::ToneGenerator>();
     m_dtmf_tone_generator = std::make_unique<pj::ToneGenerator>();
 
-
     m_ep_cfg->uaConfig.userAgent = std::move(user_agent);
     m_ep_cfg->uaConfig.nameserver = std::move(nameserver);
     m_ep_cfg->uaConfig.stunServer = std::move(stunserver);
@@ -105,9 +104,9 @@ void phone_instance_t::connect(std::string server, const std::string& user, std:
     if (password.has_value()) cred_info.data = password.value()();
 
     pj::AccountConfig acc_cfg{};
-    acc_cfg.mediaConfig.srtpUse = PJMEDIA_SRTP_OPTIONAL;
+//    acc_cfg.mediaConfig.srtpUse = PJMEDIA_SRTP_OPTIONAL;
     // INFO: next line necessary for calling via Telekom
-    // acc_cfg.mediaConfig.srtpUse = PJMEDIA_SRTP_MANDATORY;
+     acc_cfg.mediaConfig.srtpUse = PJMEDIA_SRTP_MANDATORY;
     // TODO: Check if the following is necessary, or beneficial
     // acc_cfg.natConfig.contactRewriteMethod = PJSUA_CONTACT_REWRITE_NO_UNREG;
     // acc_cfg.sipConfig.ipv6Use = PJSUA_IPV6_DISABLED;
