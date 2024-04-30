@@ -116,36 +116,68 @@ public:
         call_t *call = find_call(id);
         pj::CallOpParam prm;
         prm.statusCode = PJSIP_SC_OK;
-        call->answer(prm);
+        if (call)
+            call->answer(prm);
+        else {
+            if constexpr (std::is_same_v<decltype(id), int>) {
+                throw phone::exception("Cannot answer call with id: <" + std::to_string(id) + ">. Call is already gone.");
+            } else {
+                throw phone::exception("Cannot answer call with id: <" + id + ">. Call is already gone.");
+            }
+        }
     }
 
     void start_ringing_call(phone::CallID auto id) {
         call_t *call = find_call(id);
         pj::CallOpParam prm;
         prm.statusCode = PJSIP_SC_RINGING;
-        call->answer(prm);
+        if (call)
+            call->answer(prm);
+        else {
+            if constexpr (std::is_same_v<decltype(id), int>) {
+                throw phone::exception("Cannot start ringing for call with id: <" + std::to_string(id) + ">. Call is already gone.");
+            } else {
+                throw phone::exception("Cannot start ringing for call with id: <" + id + ">. Call is already gone.");
+            }
+        }
     }
 
     void hangup_call(phone::CallID auto id) {
         call_t *call = find_call(id);
         pj::CallOpParam prm;
         prm.statusCode = PJSIP_SC_DECLINE;
-        call->hangup(prm);
+        if (call)
+            call->hangup(prm);
+        else {
+            if constexpr (std::is_same_v<decltype(id), int>) {
+                throw phone::exception("Cannot hangup call with id: <" + std::to_string(id) + ">. Call is already gone.");
+            } else {
+                throw phone::exception("Cannot hangup call with id: <" + id + ">. Call is already gone.");
+            }
+        }
     }
 
     void dial_dtmf(phone::CallID auto id, const std::string& digits) {
         call_t *call = find_call(id);
-        call->dialDtmf(digits);
+        if (call)
+            call->dialDtmf(digits);
+        else {
+            if constexpr (std::is_same_v<decltype(id), int>) {
+                throw phone::exception("Cannot dial DTMF tones in call with id: <" + std::to_string(id) + ">. Call is already gone.");
+            } else {
+                throw phone::exception("Cannot dial DTMF tones in call with id: <" + id + ">. Call is already gone.");
+            }
+        }
     }
 
     std::optional<std::string> call_incoming_message(phone::CallID auto id) {
         call_t *call = find_call(id);
-        return call->incoming_message;
+        return call ? call->incoming_message : std::nullopt;
     }
 
     std::optional<int> call_answer_after(phone::CallID auto id) {
         call_t *call = find_call(id);
-        return call->answer_after;
+        return call ? call->answer_after : std::nullopt;
     }
 
     std::string get_call_id(int call_index) {
