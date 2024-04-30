@@ -94,17 +94,16 @@ public:
         m_calls.back()->makeCall(uri, prm);
     }
 
-    std::vector<std::unique_ptr<call_t>>::iterator call_iterator(phone::CallID auto id) {
+    std::vector<std::shared_ptr<call_t>>::iterator call_iterator(phone::CallID auto id) {
         return std::find_if(std::begin(m_calls), std::end(m_calls), [&id](const auto &element) {
             return static_cast<decltype(id)>(*element) == id;
         });
     }
-
-    call_t *find_call(phone::CallID auto id) {
+    
+    std::shared_ptr<call_t> find_call2(phone::CallID auto id) {
         auto it = call_iterator(id);
-        if (it != std::end(m_calls)) {
-            return it->get();
-        }
+        if (it != std::end(m_calls))
+            return *it;
         if constexpr (std::is_same_v<decltype(id), int>) {
             throw std::invalid_argument{"no call for index: <" + std::to_string(id) + ">"};
         } else {
@@ -113,79 +112,48 @@ public:
     }
 
     void answer_call(phone::CallID auto id) {
-        call_t *call = find_call(id);
+        auto call = find_call2(id);
         pj::CallOpParam prm;
         prm.statusCode = PJSIP_SC_OK;
-        if (call)
-            call->answer(prm);
-        else {
-            if constexpr (std::is_same_v<decltype(id), int>) {
-                throw phone::exception("Cannot answer call with id: <" + std::to_string(id) + ">. Call is already gone.");
-            } else {
-                throw phone::exception("Cannot answer call with id: <" + id + ">. Call is already gone.");
-            }
-        }
+        call->answer(prm);
     }
 
     void start_ringing_call(phone::CallID auto id) {
-        call_t *call = find_call(id);
+        auto call = find_call2(id);
         pj::CallOpParam prm;
         prm.statusCode = PJSIP_SC_RINGING;
-        if (call)
-            call->answer(prm);
-        else {
-            if constexpr (std::is_same_v<decltype(id), int>) {
-                throw phone::exception("Cannot start ringing for call with id: <" + std::to_string(id) + ">. Call is already gone.");
-            } else {
-                throw phone::exception("Cannot start ringing for call with id: <" + id + ">. Call is already gone.");
-            }
-        }
+        call->answer(prm);
     }
 
     void hangup_call(phone::CallID auto id) {
-        call_t *call = find_call(id);
+        auto call = find_call2(id);
         pj::CallOpParam prm;
         prm.statusCode = PJSIP_SC_DECLINE;
-        if (call)
-            call->hangup(prm);
-        else {
-            if constexpr (std::is_same_v<decltype(id), int>) {
-                throw phone::exception("Cannot hangup call with id: <" + std::to_string(id) + ">. Call is already gone.");
-            } else {
-                throw phone::exception("Cannot hangup call with id: <" + id + ">. Call is already gone.");
-            }
-        }
+        call->hangup(prm);
     }
 
     void dial_dtmf(phone::CallID auto id, const std::string& digits) {
-        call_t *call = find_call(id);
-        if (call)
-            call->dialDtmf(digits);
-        else {
-            if constexpr (std::is_same_v<decltype(id), int>) {
-                throw phone::exception("Cannot dial DTMF tones in call with id: <" + std::to_string(id) + ">. Call is already gone.");
-            } else {
-                throw phone::exception("Cannot dial DTMF tones in call with id: <" + id + ">. Call is already gone.");
-            }
-        }
+        auto call = find_call2(id);
+        call->dialDtmf(digits);
     }
 
     std::optional<std::string> call_incoming_message(phone::CallID auto id) {
-        call_t *call = find_call(id);
+        auto call = find_call2(id);
         return call ? call->incoming_message : std::nullopt;
     }
 
     std::optional<int> call_answer_after(phone::CallID auto id) {
-        call_t *call = find_call(id);
+        auto call = find_call2(id);
         return call ? call->answer_after : std::nullopt;
     }
 
     std::string get_call_id(int call_index) {
-        return static_cast<std::string>(*find_call(call_index));
+        auto call = find_call2(call_index);
+        return static_cast<std::string>(*find_call2(call_index).get());
     }
 
     int get_call_index(const std::string &call_id) {
-        return static_cast<int>(*find_call(call_id));
+        return static_cast<int>(*find_call2(call_id).get());
     }
 
     unsigned int get_call_count() {
@@ -205,7 +173,7 @@ public:
     }
     
 private:
-    std::vector<std::unique_ptr<call_t>> m_calls{};
+    std::vector<std::shared_ptr<call_t>> m_calls{};
 };
 
 #endif //ACCOUNT_T_H
