@@ -100,7 +100,7 @@ public:
         });
     }
     
-    std::shared_ptr<call_t> find_call2(phone::CallID auto id) {
+    std::shared_ptr<call_t> find_call(phone::CallID auto id) {
         auto it = call_iterator(id);
         if (it != std::end(m_calls))
             return *it;
@@ -112,48 +112,48 @@ public:
     }
 
     void answer_call(phone::CallID auto id) {
-        auto call = find_call2(id);
+        auto call = find_call(id);
         pj::CallOpParam prm;
         prm.statusCode = PJSIP_SC_OK;
         call->answer(prm);
     }
 
     void start_ringing_call(phone::CallID auto id) {
-        auto call = find_call2(id);
+        auto call = find_call(id);
         pj::CallOpParam prm;
         prm.statusCode = PJSIP_SC_RINGING;
         call->answer(prm);
     }
 
     void hangup_call(phone::CallID auto id) {
-        auto call = find_call2(id);
+        auto call = find_call(id);
         pj::CallOpParam prm;
         prm.statusCode = PJSIP_SC_DECLINE;
         call->hangup(prm);
     }
 
     void dial_dtmf(phone::CallID auto id, const std::string& digits) {
-        auto call = find_call2(id);
+        auto call = find_call(id);
         call->dialDtmf(digits);
     }
 
     std::optional<std::string> call_incoming_message(phone::CallID auto id) {
-        auto call = find_call2(id);
+        auto call = find_call(id);
         return call ? call->incoming_message : std::nullopt;
     }
 
     std::optional<int> call_answer_after(phone::CallID auto id) {
-        auto call = find_call2(id);
+        auto call = find_call(id);
         return call ? call->answer_after : std::nullopt;
     }
 
     std::string get_call_id(int call_index) {
-        auto call = find_call2(call_index);
-        return static_cast<std::string>(*find_call2(call_index).get());
+        auto call = find_call(call_index);
+        return static_cast<std::string>(*find_call(call_index).get());
     }
 
     int get_call_index(const std::string &call_id) {
-        return static_cast<int>(*find_call2(call_id).get());
+        return static_cast<int>(*find_call(call_id).get());
     }
 
     unsigned int get_call_count() {
