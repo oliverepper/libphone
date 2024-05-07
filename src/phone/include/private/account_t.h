@@ -139,12 +139,12 @@ public:
 
     std::optional<std::string> call_incoming_message(phone::CallID auto id) {
         auto call = find_call(id);
-        return call ? call->incoming_message : std::nullopt;
+        return call->incoming_message;
     }
 
     std::optional<int> call_answer_after(phone::CallID auto id) {
         auto call = find_call(id);
-        return call ? call->answer_after : std::nullopt;
+        return call->answer_after;
     }
 
     std::string get_call_id(int call_index) {
