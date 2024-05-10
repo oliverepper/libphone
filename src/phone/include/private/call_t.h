@@ -3,6 +3,11 @@
 
 #include <pjsua2.hpp>
 
+namespace phone {
+    template<typename T>
+    concept CallID = std::is_same_v<T, int> || std::is_same_v<T, std::string>;
+}
+
 class call_t : public pj::Call {
 public:
     std::optional<std::function<void(int, int)>> on_call_state_with_index;
