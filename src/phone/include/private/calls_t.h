@@ -5,6 +5,7 @@
 #include <vector>
 #include <memory>
 #include <mutex>
+
 class calls_t {
     std::mutex m_mutex;
     std::vector<std::shared_ptr<call_t>> m_calls;
