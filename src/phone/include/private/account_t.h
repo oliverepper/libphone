@@ -50,7 +50,9 @@ public:
                     if (pos == nullptr)
                         break;
                     try {
-                        current_call->answer_after.emplace(std::stoi(++pos));
+                        // REVISIT (oepper) : 1 is not necessarily right, the number may have more digits
+                        std::string number(++pos, 1);
+                        current_call->answer_after.emplace(std::stoi(number));
                     } catch (const std::invalid_argument &e) {
                         PJ_LOG(1, (__FILE__, "%s", e.what()));
                     } catch (const std::out_of_range &e) {
