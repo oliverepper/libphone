@@ -136,10 +136,8 @@ public:
         return static_cast<int>(*call);
     }
 
-    unsigned int get_call_count() {
-        unsigned call_count = pjsua_call_get_count();
-        assert(call_count == m_calls.size());
-        return call_count;
+    size_t get_call_count() {
+        return m_calls.size();
     }
 
     void delete_call(int call_index) {
