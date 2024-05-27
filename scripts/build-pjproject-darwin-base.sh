@@ -70,11 +70,6 @@ function create_lib {
         unset OPUS
         unset OPUS_LATEST
     fi
-    # if [[ -d "${SDL_LATEST}" ]]; then
-    #     EXTRA_LIBS+=("${SDL_LATEST}/lib/libSDL2.a")
-    #     unset SDL
-    #     unset SDL_LATEST
-    # fi
 
     LLVM=(/opt/homebrew/Cellar/llvm/*)
     LLVM_LATEST=${LLVM[${#LLVM[@]} - 1]}

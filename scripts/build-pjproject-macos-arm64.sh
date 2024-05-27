@@ -16,12 +16,6 @@ then
     CONFIGURE_EXTRA_PARAMS+=("--with-opus=${OPUS_LATEST}")
 fi
 
-# SDL=("$(pwd)"/../../installed/sdl/macos-arm64)
-# SDL_LATEST=${SDL[${#SDL[@]} - 1]}
-# if [[ -d "${SDL_LATEST}" ]]; then
-#     CONFIGURE_EXTRA_PARAMS+=("--with-sdl=${SDL_LATEST}")
-# fi
-
 SDKPATH=$(xcrun -sdk macosx --show-sdk-path)
 ARCH="arm"
 CFLAGS="-g -O2 -DNDEBUG=1 -isysroot $SDKPATH -mmacosx-version-min=11 -DPJ_SDK_NAME=\"\\\"$(basename "$SDKPATH")\\\"\"" \
