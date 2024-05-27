@@ -13,7 +13,7 @@ fi
 PREFIX=$1
 BUILD_BASE_DIR=build-opus
 OPUS_URL=https://gitlab.xiph.org/xiph/opus.git
-OPUS_TAG=v1.5.1
+OPUS_TAG=v1.5.2
 
 if [ -d opus ]
 then
