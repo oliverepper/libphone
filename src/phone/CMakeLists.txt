@@ -1,6 +1,8 @@
 find_package(PkgConfig REQUIRED)
+list(APPEND PKG_CONFIG_EXECUTABLE "--static")
 
-pkg_check_modules(PJPROJECT REQUIRED libpjproject)
+pkg_check_modules(PJPROJECT REQUIRED IMPORTED_TARGET libpjproject)
+pkg_check_modules(OPUS REQUIRED IMPORTED_TARGET opus)
 
 # configure git variables in version templates
 find_package(Git REQUIRED)
@@ -64,7 +66,12 @@ target_include_directories(phone
         ${CMAKE_CURRENT_BINARY_DIR}
         PRIVATE
         include/phone)
-target_link_libraries(phone PRIVATE ${PJPROJECT_LINK_LIBRARIES} ${RESOLV_LIBRARY} stunning::stunning)
+
+target_link_libraries(phone PRIVATE ${RESOLV_LIBRARY} stunning::stunning PkgConfig::PJPROJECT PkgConfig::OPUS)
+
+if(ADD_FRAMEWORKS)
+    target_link_libraries(phone PRIVATE ${ADD_FRAMEWORKS})
+endif()
 
 set(phone_PUBLIC_HEADERS
         ${CMAKE_CURRENT_SOURCE_DIR}/include/phone.h
