@@ -28,7 +28,7 @@ class simple_task_system {
 public:
     explicit simple_task_system(phone_instance_t *phone) : m_phone_ptr(phone) {
         for (unsigned n = 0; n != m_count; ++n)
-            m_threads.emplace_back([&]{ run(n); });
+            m_threads.emplace_back([&, n]{ run(n); });
     }
 
     ~simple_task_system() {
