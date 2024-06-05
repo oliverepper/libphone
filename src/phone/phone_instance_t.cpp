@@ -75,11 +75,11 @@ void phone_instance_t::register_on_incoming_call_callback(const std::function<vo
 }
 
 void phone_instance_t::configure_opus(int channel_count, int complexity, int sample_rate) {
-    auto opus_cfg = m_ep->getCodecOpusConfig();
-    opus_cfg.channel_cnt = channel_count;
-    opus_cfg.complexity = complexity;
-    opus_cfg.sample_rate = sample_rate;
     try {
+        auto opus_cfg = m_ep->getCodecOpusConfig();
+        opus_cfg.channel_cnt = channel_count;
+        opus_cfg.complexity = complexity;
+        opus_cfg.sample_rate = sample_rate;
         m_ep->setCodecOpusConfig(opus_cfg);
     } catch (const pj::Error &e) {
         throw phone::exception{e.info()};
@@ -104,12 +104,9 @@ void phone_instance_t::connect(std::string server, const std::string& user, std:
     if (password.has_value()) cred_info.data = password.value()();
 
     pj::AccountConfig acc_cfg{};
-//    acc_cfg.mediaConfig.srtpUse = PJMEDIA_SRTP_OPTIONAL;
     // INFO: next line necessary for calling via Telekom
-     acc_cfg.mediaConfig.srtpUse = PJMEDIA_SRTP_MANDATORY;
-    // TODO: Check if the following is necessary, or beneficial
-    // acc_cfg.natConfig.contactRewriteMethod = PJSUA_CONTACT_REWRITE_NO_UNREG;
-    // acc_cfg.sipConfig.ipv6Use = PJSUA_IPV6_DISABLED;
+    acc_cfg.mediaConfig.srtpUse = PJMEDIA_SRTP_MANDATORY;
+
     acc_cfg.idUri = user + "<sip:" + user + "@" + m_server.value() + ">";
     acc_cfg.sipConfig.authCreds.push_back(cred_info);
     acc_cfg.regConfig.registrarUri = "sip:" + m_server.value() + ";transport=TLS";
@@ -391,6 +388,7 @@ void phone_instance_t::set_log_function(const std::function<void(int, std::strin
 void phone_instance_t::handle_ip_change() {
     pjsua_ip_change_param prm;
     pjsua_ip_change_param_default(&prm);
+    prm.restart_listener = PJ_FALSE;
     auto status = pjsua_handle_ip_change(&prm);
     if (status != PJ_SUCCESS) {
         char buffer[PJ_ERR_MSG_SIZE];
