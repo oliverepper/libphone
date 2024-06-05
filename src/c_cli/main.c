@@ -315,7 +315,7 @@ int main() {
                 phone_stop_call_waiting(state->phone);
                 break;
             case '#':
-                printf("call count: %d\n", phone_get_call_count(state->phone));
+                printf("call count: %zu\n", phone_get_call_count(state->phone));
                 break;
             case 'i':
                 printf("handle ip change\n");

@@ -378,7 +378,7 @@ void phone_instance_t::stop_call_waiting() const {
     }
 }
 
-unsigned int phone_instance_t::get_call_count() {
+size_t phone_instance_t::get_call_count() {
     return m_account->get_call_count();
 }
 

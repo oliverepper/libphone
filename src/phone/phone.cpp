@@ -521,7 +521,7 @@ phone_status_t phone_stop_call_waiting(phone_t instance) {
     return PHONE_STATUS_SUCCESS;
 }
 
-unsigned phone_get_call_count(phone_t instance) {
+size_t phone_get_call_count(phone_t instance) {
     return instance->get_call_count();
 }
 

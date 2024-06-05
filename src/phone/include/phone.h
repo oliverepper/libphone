@@ -168,7 +168,7 @@ PHONE_EXPORT int phone_is_thread_registered(phone_t instance);
 PHONE_EXPORT phone_status_t phone_play_call_waiting(phone_t instance);
 PHONE_EXPORT phone_status_t phone_stop_call_waiting(phone_t instance);
 
-PHONE_EXPORT unsigned phone_get_call_count(phone_t instance);
+PHONE_EXPORT size_t phone_get_call_count(phone_t instance);
 
 PHONE_EXPORT phone_status_t phone_handle_ip_change(void);
 

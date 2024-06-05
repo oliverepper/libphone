@@ -134,7 +134,7 @@ public:
     PHONE_EXPORT void play_call_waiting() const;
     PHONE_EXPORT void stop_call_waiting() const;
 
-    [[nodiscard]] PHONE_EXPORT unsigned int get_call_count();
+    [[nodiscard]] PHONE_EXPORT size_t get_call_count();
 
     PHONE_EXPORT static void handle_ip_change();
 
