@@ -20,7 +20,7 @@ SDKPATH=$(xcrun -sdk macosx --show-sdk-path)
 ARCH="x86_64"
 CFLAGS="-isysroot $SDKPATH -isystem ${SDKPATH}/System/iOSSupport/usr/include -iframework ${SDKPATH}/System/iOSSupport/System/Library/Frameworks -miphoneos-version-min=13.1 -DPJ_SDK_NAME=\"\\\"$(basename "$SDKPATH")\\\"\" -arch $ARCH -target ${ARCH}-apple-ios-macabi" \
 LDFLAGS="-isysroot $SDKPATH -isystem ${SDKPATH}/System/iOSSupport/usr/include -iframework ${SDKPATH}/System/iOSSupport/System/Library/Frameworks -framework Network -framework Security -framework Foundation -arch $ARCH -target ${ARCH}-apple-ios-macabi" \
-./aconfigure --prefix="${PREFIX}" --host="${ARCH}"-apple-darwin_ios "${CONFIGURE_EXTRA_PARAMS[@]}" --disable-sdl
+./aconfigure --prefix="${PREFIX}" --host="${ARCH}"-apple-darwin_ios $(IFS=' '; echo "${CONFIGURE_EXTRA_PARAMS[*]}") --disable-sdl
 
 make dep && make clean
 make VERBOSE=1

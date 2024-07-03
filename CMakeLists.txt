@@ -1,17 +1,12 @@
-cmake_minimum_required(VERSION 3.3)
+cmake_minimum_required(VERSION 3.5)
 
-project(phone VERSION 0.9.2 LANGUAGES C CXX)
+project(phone VERSION 0.9.4 LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 
 set(CMAKE_C_VISIBILITY_PRESET hidden)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN true)
-
-if(NOT CMAKE_PREFIX_PATH)
-    set(CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/installed/pjproject/macos-arm64"
-            CACHE STRING "Path to pjproject dependency")
-endif()
 
 include(GNUInstallDirs)
 
@@ -37,5 +32,3 @@ else()
 endif()
 
 add_subdirectory(src bin)
-
-install(TARGETS phone_sharedlib cpp_cli)

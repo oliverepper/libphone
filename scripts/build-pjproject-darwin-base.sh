@@ -11,21 +11,17 @@ then
 fi
 
 export PREFIX="$1/pjproject"
-PJPROJECT_URL=https://github.com/pjsip/pjproject
-PJPROJECT_VERSION=2.14
-# PJPROJECT_COMMIT=master
+PJPROJECT_URL=https://github.com/pjsip/pjproject.git
+PJPROJECT_TAG=2.14.1
 
 if [ -d pjproject ]
 then
     pushd pjproject
-    git reset --hard "${PJPROJECT_VERSION}"
-    # git pull https://github.com/pjsip/pjproject.git
-    # git reset --hard "${PJPROJECT_COMMIT}"
+    git clean -fxd
+    git reset --hard
     popd
 else
-    git -c advice.detachedHead=false clone --depth 1 --branch "${PJPROJECT_VERSION}" "${PJPROJECT_URL}"
-    # git clone https://github.com/pjsip/pjproject.git
-    # git -c advice.detachedHead=false -C pjproject checkout ${PJPROJECT_COMMIT}    
+    git -c advice.detachedHead=false clone --depth=1 -b ${PJPROJECT_TAG} ${PJPROJECT_URL}
 fi
 
 # create base configuration for pjproject build
@@ -34,7 +30,6 @@ cat << EOF > pjlib/include/pj/config_site.h
 #define PJ_HAS_SSL_SOCK 1
 #undef PJ_SSL_SOCK_IMP
 #define PJ_SSL_SOCK_IMP PJ_SSL_SOCK_IMP_APPLE
-#include <pj/config_site_sample.h>
 EOF
 popd
 
@@ -49,7 +44,6 @@ function prepare {
 #define PJ_HAS_SSL_SOCK 1
 #undef PJ_SSL_SOCK_IMP
 #define PJ_SSL_SOCK_IMP PJ_SSL_SOCK_IMP_APPLE
-#include <pj/config_site_sample.h>
 EOF
 
     if [[ "${WANTS_IPHONE}" = "YES" ]]; then
@@ -76,11 +70,6 @@ function create_lib {
         unset OPUS
         unset OPUS_LATEST
     fi
-    # if [[ -d "${SDL_LATEST}" ]]; then
-    #     EXTRA_LIBS+=("${SDL_LATEST}/lib/libSDL2.a")
-    #     unset SDL
-    #     unset SDL_LATEST
-    # fi
 
     LLVM=(/opt/homebrew/Cellar/llvm/*)
     LLVM_LATEST=${LLVM[${#LLVM[@]} - 1]}

@@ -20,7 +20,7 @@ SDKPATH=$(xcrun -sdk iphonesimulator --show-sdk-path)
 ARCH="arm64"
 CFLAGS="-isysroot $SDKPATH -miphonesimulator-version-min=13 -DPJ_SDK_NAME=\"\\\"$(basename "$SDKPATH")\\\"\" -arch $ARCH" \
 LDFLAGS="-isysroot $SDKPATH -framework AudioToolbox -framework Foundation -framework Network -framework Security -arch $ARCH" \
-./aconfigure --prefix="${PREFIX}" --host="${ARCH}"-apple-darwin_ios "${CONFIGURE_EXTRA_PARAMS[@]}" --disable-sdl
+./aconfigure --prefix="${PREFIX}" --host="${ARCH}"-apple-darwin_ios $(IFS=' '; echo "${CONFIGURE_EXTRA_PARAMS[*]}") --disable-sdl
 
 make dep && make clean
 make

@@ -3,6 +3,10 @@
 #include "private/system_nameserver.h"
 #include "private/tone_generator_helper.h"
 #include "private/log_writer_t.h"
+#include "private/IfAddrs.h"
+
+#include <stunning.h>
+
 #include <pjsua2.hpp>
 #include <vector>
 #include <iostream>
@@ -10,25 +14,27 @@
 phone_instance_t::phone_instance_t(std::string user_agent,
                                    std::vector<std::string> nameserver,
                                    std::vector<std::string> stunserver)
-: m_ep{std::make_unique<pj::Endpoint>()}, m_account{std::make_unique<account_t>()} {
-    m_call_waiting_tone_generator = std::make_unique<pj::ToneGenerator>();
-    m_dtmf_tone_generator = std::make_unique<pj::ToneGenerator>();
+: m_ep{std::make_unique<pj::Endpoint>()},
+  m_account{std::make_unique<account_t>()},
+  m_ep_cfg{std::make_unique<pj::EpConfig>()},
+  m_call_waiting_tone_generator{std::make_unique<pj::ToneGenerator>()},
+  m_dtmf_tone_generator{std::make_unique<pj::ToneGenerator>()} {
 
-    pj::EpConfig ep_cfg{};
-    ep_cfg.uaConfig.userAgent = std::move(user_agent);
-    ep_cfg.uaConfig.nameserver = std::move(nameserver);
-    ep_cfg.uaConfig.stunServer = std::move(stunserver);
+    m_ep_cfg->uaConfig.userAgent = std::move(user_agent);
+    m_ep_cfg->uaConfig.nameserver = std::move(nameserver);
+    m_ep_cfg->uaConfig.stunServer = std::move(stunserver);
 
     // FIXME: hopefully pjsip fixes the assumption about beeing the owner of the *log_writer_t
     // https://github.com/pjsip/pjproject/issues/3511
     m_log_writer = new log_writer_t{};
-    ep_cfg.logConfig.writer = m_log_writer;
+    m_ep_cfg->logConfig.writer = m_log_writer;
 
-    ep_cfg.medConfig.ecOptions = PJMEDIA_ECHO_USE_SW_ECHO;
+    m_ep_cfg->medConfig.ecOptions = PJMEDIA_ECHO_WEBRTC | PJMEDIA_ECHO_USE_SW_ECHO;
 
     try {
         m_ep->libCreate();
-        m_ep->libInit(ep_cfg);
+        m_ep->libInit(*m_ep_cfg);
+        m_ep->audDevManager().setNullDev();
         m_ep->libStart();
 
         m_call_waiting_tone_generator->createToneGenerator();
@@ -71,11 +77,11 @@ void phone_instance_t::register_on_incoming_call_callback(const std::function<vo
 }
 
 void phone_instance_t::configure_opus(int channel_count, int complexity, int sample_rate) {
-    auto opus_cfg = m_ep->getCodecOpusConfig();
-    opus_cfg.channel_cnt = channel_count;
-    opus_cfg.complexity = complexity;
-    opus_cfg.sample_rate = sample_rate;
     try {
+        auto opus_cfg = m_ep->getCodecOpusConfig();
+        opus_cfg.channel_cnt = channel_count;
+        opus_cfg.complexity = complexity;
+        opus_cfg.sample_rate = sample_rate;
         m_ep->setCodecOpusConfig(opus_cfg);
     } catch (const pj::Error &e) {
         throw phone::exception{e.info()};
@@ -100,12 +106,16 @@ void phone_instance_t::connect(std::string server, const std::string& user, std:
     if (password.has_value()) cred_info.data = password.value()();
 
     pj::AccountConfig acc_cfg{};
-    acc_cfg.mediaConfig.srtpUse = PJMEDIA_SRTP_OPTIONAL;
+    // INFO: next line necessary for calling via Telekom
+    acc_cfg.mediaConfig.srtpUse = PJMEDIA_SRTP_MANDATORY;
+
     acc_cfg.idUri = user + "<sip:" + user + "@" + m_server.value() + ">";
     acc_cfg.sipConfig.authCreds.push_back(cred_info);
     acc_cfg.regConfig.registrarUri = "sip:" + m_server.value() + ";transport=TLS";
 
     try {
+        for (const auto& id : m_ep->transportEnum())
+            m_ep->transportClose(id);
         create_tls_transport_with_srv_lookup(*m_ep);
         if (m_account->isValid()) {
             m_account->modify(acc_cfg);
@@ -285,7 +295,7 @@ void phone_instance_t::set_audio_devices(int capture_index, int playback_index, 
         pj_strerror(status, error_message, sizeof(error_message));
         throw phone::exception{error_message};
     } else {
-        PJ_LOG(3,(__BASE_FILE__, "did set capture device to: %d and playback device to: %d", prm.capture_dev, prm.playback_dev));
+        PJ_LOG(3,(__FILE__, "did set capture device to: %d and playback device to: %d", prm.capture_dev, prm.playback_dev));
     }
 }
 
@@ -367,7 +377,7 @@ void phone_instance_t::stop_call_waiting() const {
     }
 }
 
-unsigned int phone_instance_t::get_call_count() {
+size_t phone_instance_t::get_call_count() {
     return m_account->get_call_count();
 }
 
@@ -380,6 +390,7 @@ void phone_instance_t::set_log_function(const std::function<void(int, std::strin
 void phone_instance_t::handle_ip_change() {
     pjsua_ip_change_param prm;
     pjsua_ip_change_param_default(&prm);
+    prm.restart_listener = PJ_FALSE;
     auto status = pjsua_handle_ip_change(&prm);
     if (status != PJ_SUCCESS) {
         char buffer[PJ_ERR_MSG_SIZE];
@@ -444,4 +455,78 @@ void phone_instance_t::adjust_level_for_capture_device(phone::tx_rx_direction di
 void phone_instance_t::crash() {
     std::cerr << "Terminating process from libphone because of user request" << std::endl;
     std::terminate();
+}
+
+std::string phone_instance_t::get_public_address() const {
+    try {
+        auto result = perform_binding_request(m_ep_cfg.get()->uaConfig.stunServer.front());
+        if (result.has_value())
+            return result->value;
+        else
+            throw phone::exception{"could not resolve public address"};
+    } catch (const stunning::exception& e) {
+        throw phone::exception{e.what()};
+    }
+}
+
+std::string phone_instance_t::get_public_address(std::string stun_server) {
+    try {
+        auto result = perform_binding_request(stun_server);
+        if (result.has_value())
+            return result->value;
+        else
+            throw phone::exception{"could not resolve public address"};
+    } catch (const stunning::exception& e) {
+        throw phone::exception{e.what()};
+    }
+}
+
+std::vector<std::string> phone_instance_t::get_local_addresses() {
+    std::vector<std::string> addresses;
+
+    for (const auto &e: IfAddrs{}) {
+        switch (e.ifa_addr->sa_family) {
+            case AF_INET: {
+                addresses.push_back(inet_ntoa(((struct sockaddr_in *) e.ifa_addr)->sin_addr));
+            }
+        }
+    }
+    return addresses;
+}
+
+std::vector<std::string> phone_instance_t::get_local_addresses_from_transports() const {
+    std::vector<std::string> addresses;
+
+    try {
+        for (const auto& transport: m_ep->transportEnum()) {
+            auto info = m_ep->transportGetInfo(transport);
+            addresses.push_back(info.localAddress);
+        }
+        return addresses;
+    } catch (const pj::Error& e) {
+        throw phone::exception{e.info()};
+    }
+}
+
+void phone_instance_t::update_nameserver() {
+    auto server = system_nameserver();
+    pj_str_t nameserver[server.size()];
+
+    int count = 0;
+    for (const auto& ns : server) {
+        PJ_LOG(3, (__FILE__, "nameserver: %s", ns.c_str()));
+        pj_str_t str;
+        str.ptr = const_cast<char *>(ns.c_str());
+        str.slen = ns.size();
+        nameserver[count++] = str;
+    }
+
+    auto ep = pjsua_get_pjsip_endpt();
+    auto resolver = pjsip_endpt_get_resolver(ep);
+
+    if (pj_status_t status = pj_dns_resolver_set_ns(resolver, count, nameserver, NULL); status != PJ_SUCCESS) {
+        char error_message[PJ_ERR_MSG_SIZE] = {0};
+        pj_strerror(status, error_message, sizeof(error_message));
+        throw phone::exception{error_message};
+    }
 }

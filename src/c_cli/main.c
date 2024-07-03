@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <arpa/inet.h>
 
 struct app_state {
     phone_t phone;
@@ -22,7 +23,7 @@ void on_registration_state(int is_registered, int registration_state, __attribut
 }
 
 void on_incoming_call_with_index_cb(int call_index, __attribute__((unused)) void *ctx) {
-    struct app_state *s = (struct app_state*)ctx;
+    struct app_state *s = (struct app_state *) ctx;
     s->last_call_index = call_index;
 
     char call_id_buffer[128] = {0};
@@ -32,7 +33,8 @@ void on_incoming_call_with_index_cb(int call_index, __attribute__((unused)) void
     printf("Incoming call index: %d, id: %s\n", call_index, call_id_buffer);
 
     size_t incoming_message_length = -1;
-    if (phone_call_incoming_message_length_index(s->phone, call_index, &incoming_message_length) != PHONE_STATUS_SUCCESS)
+    if (phone_call_incoming_message_length_index(s->phone, call_index, &incoming_message_length) !=
+        PHONE_STATUS_SUCCESS)
         fprintf(stderr, "%s\n", phone_last_error());
     if (incoming_message_length != -1) {
         printf("SIP Invite Message length: %zu\n", incoming_message_length);
@@ -54,7 +56,7 @@ void on_incoming_call_with_index_cb(int call_index, __attribute__((unused)) void
 }
 
 void on_incoming_call_with_id_cb(const char *call_id, __attribute__((unused)) void *ctx) {
-    struct app_state *s = (struct app_state*)ctx;
+    struct app_state *s = (struct app_state *) ctx;
     strncpy(s->last_call_id, call_id, sizeof(s->last_call_id));
 
     if (phone_get_call_index(s->phone, call_id, &s->last_call_index) != PHONE_STATUS_SUCCESS)
@@ -88,7 +90,7 @@ void on_incoming_call_with_id_cb(const char *call_id, __attribute__((unused)) vo
 }
 
 void on_call_state_with_index_cb(int call_index, int state, void *ctx) {
-    struct app_state *s = (struct app_state*)ctx;
+    struct app_state *s = (struct app_state *) ctx;
     s->last_call_index = call_index;
 
     char call_state_buffer[64] = {0};
@@ -97,8 +99,8 @@ void on_call_state_with_index_cb(int call_index, int state, void *ctx) {
     printf("Call %d – state: %s\n", call_index, call_state_buffer);
 }
 
-void on_call_state_with_id_cb(const char* call_id, int state, void *ctx) {
-    struct app_state *s = (struct app_state*)ctx;
+void on_call_state_with_id_cb(const char *call_id, int state, void *ctx) {
+    struct app_state *s = (struct app_state *) ctx;
     strncpy(s->last_call_id, call_id, sizeof(s->last_call_id));
 
     char buffer[64];
@@ -107,6 +109,7 @@ void on_call_state_with_id_cb(const char* call_id, int state, void *ctx) {
 }
 
 void log_function(int level, const char *message, long thread_id, const char *thread_name) {
+    fprintf(stdout, "%s(%lu), %d – %s", thread_name, thread_id, level, message);
     static FILE *out = {0};
     if (out == 0) {
         char filename[32];
@@ -161,8 +164,8 @@ int main() {
     do {
         printf("last call index: %d\n", state->last_call_index);
         printf("last call id: %s\n", state->last_call_id);
-        printf("libphone version %d.%d.%d (%s)\n",
-               phone_version_major(), phone_version_minor(), phone_version_patch(), git_hash);
+        printf("libphone version %d.%d.%d (%s)\n", phone_version_major(), phone_version_minor(), phone_version_patch(),
+               git_hash);
         printf("%s\n\n", git_description);
 
         command = getchar();
@@ -241,16 +244,12 @@ int main() {
                 {
                     phone_refresh_audio_devices();
                     size_t count = phone_get_audio_devices_count();
-                    size_t max_driver_name_length;
-                    if (phone_get_audio_device_driver_name_length(&max_driver_name_length) != PHONE_STATUS_SUCCESS) {
-                        fprintf(stderr, "%s\n", phone_last_error());
-                        break;
-                    }
-                    // +1 for zero termination!
-                    ++max_driver_name_length;
 
                     size_t max_device_name_length =
                             phone_get_audio_device_info_name_length() + 1; // +1 for zero termination
+
+                    size_t max_driver_name_length =
+                            phone_get_audio_device_info_driver_length() + 1; // +1 for zero termination
 
                     audio_device_info_t devices[count];
                     char driver_names[count][max_driver_name_length];
@@ -316,7 +315,7 @@ int main() {
                 phone_stop_call_waiting(state->phone);
                 break;
             case '#':
-                printf("call count: %d\n", phone_get_call_count(state->phone));
+                printf("call count: %zu\n", phone_get_call_count(state->phone));
                 break;
             case 'i':
                 printf("handle ip change\n");
@@ -363,6 +362,94 @@ int main() {
                 printf("connecting\n");
                 if (phone_connect(state->phone, SERVER, USER, PASSWORD) != PHONE_STATUS_SUCCESS)
                     fprintf(stderr, "%s\n", phone_last_error());
+                break;
+            case '7':
+                clear_input_buffer();
+                {
+                    char buffer[INET6_ADDRSTRLEN];
+                    if (phone_get_public_address(state->phone, buffer, sizeof(buffer)) != PHONE_STATUS_SUCCESS)
+                        fprintf(stderr, "%s\n", phone_last_error());
+                    else
+                        printf("%s\n", buffer);
+
+                    if (phone_get_public_address_from_stun_server("stun.t-online.de", buffer, sizeof(buffer)) != PHONE_STATUS_SUCCESS)
+                        fprintf(stderr, "%s\n", phone_last_error());
+                    else
+                        printf("%s\n", buffer);
+                }
+                break;
+            case '6':
+                clear_input_buffer();
+                {
+                    size_t count = 0;
+                    if (phone_get_local_addresses_count(&count) != PHONE_STATUS_SUCCESS) {
+                        fprintf(stderr, "%s\n", phone_last_error());
+                        break;
+                    }
+
+                    size_t max_length = 0;
+                    if (phone_get_local_addresses_max_length(&max_length) != PHONE_STATUS_SUCCESS) {
+                        fprintf(stderr, "%s\n", phone_last_error());
+                        break;
+                    }
+
+                    if (count == 0)
+                        break;
+
+                    char buffer[count][max_length + 1];
+                    char *addresses[count];
+
+                    for (int i = 0; i < count; ++i)
+                        addresses[i] = buffer[i];
+
+                    if (phone_get_local_addresses(addresses, &count, sizeof(buffer[0])) != PHONE_STATUS_SUCCESS) {
+                        fprintf(stderr, "%s\n", phone_last_error());
+                        break;
+                    }
+
+                    for (int i = 0; i < count; ++i)
+                        printf("%s\n", addresses[i]);
+                }
+                break;
+            case '5':
+                clear_input_buffer();
+                {
+                    size_t count = 0;
+                    if (phone_get_local_addresses_from_transports_count(state->phone, &count) != PHONE_STATUS_SUCCESS) {
+                        fprintf(stderr, "%s\n", phone_last_error());
+                        break;
+                    }
+
+                    size_t max_lenght = 0;
+                    if (phone_get_local_addresses_from_transports_max_length(state->phone, &max_lenght) != PHONE_STATUS_SUCCESS) {
+                        fprintf(stderr, "%s\n", phone_last_error());
+                        break;
+                    }
+
+                    if (count == 0)
+                        break;
+
+                    char buffer[count][max_lenght + 1];
+                    char *addresses[count];
+
+                    for (int i = 0; i < count; ++i)
+                        addresses[i] = buffer[i];
+
+                    if (phone_get_local_addresses_from_transports(state->phone, addresses, &count, sizeof(buffer[0])) != PHONE_STATUS_SUCCESS) {
+                        fprintf(stderr, "%s\n", phone_last_error());
+                        break;
+                    }
+
+                    for (int i = 0; i < count; ++i)
+                        printf("%s\n", addresses[i]);
+                }
+                break;
+            case '4':
+                clear_input_buffer();
+                if (phone_update_nameserver(state->phone) != PHONE_STATUS_SUCCESS) {
+                    fprintf(stderr, "%s\n", phone_last_error());
+                    break;
+                }
                 break;
             case '!':
                 clear_input_buffer();
