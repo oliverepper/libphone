@@ -12,18 +12,19 @@ fi
 
 PREFIX=$1
 BUILD_BASE_DIR=build-opus
-OPUS_COMMIT=101a71e03bbf860aaafb7090a0e440675cb27660
+OPUS_URL=https://gitlab.xiph.org/xiph/opus.git
+OPUS_TAG=v1.5.2
 
 if [ -d opus ]
 then
     pushd opus
     git clean -fxd
-    git reset --hard "${OPUS_COMMIT}"
+    git reset --hard
     popd
 else
     # opus cmake script use .git, so check it out completely
-    git clone https://gitlab.xiph.org/xiph/opus.git
-    git -c advice.detachedHead=false -C opus checkout ${OPUS_COMMIT}
+    # git clone https://gitlab.xiph.org/xiph/opus.git
+    git -c advice.detachedHead=false clone -b ${OPUS_TAG} ${OPUS_URL}
 fi
 
 function build {

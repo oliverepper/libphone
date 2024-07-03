@@ -4,10 +4,7 @@
 #include <vector>
 #include <cstring>
 #include <ranges>
-#include <algorithm>
-#ifdef __linux__
 #include <numeric>
-#endif
 
 char global_last_error[1024] = "no error";
 
@@ -288,8 +285,15 @@ size_t phone_get_audio_device_info_name_length(void) {
     return PJMEDIA_AUD_DEV_INFO_NAME_LEN;
 }
 
+size_t phone_get_audio_device_info_driver_length(void) {
+    return 32;
+}
+
 phone_status_t phone_get_audio_device_driver_name_length(size_t *max_driver_name_length) {
-#ifdef __linux__
+    return phone_calculate_audio_device_driver_name_length(max_driver_name_length);
+}
+
+phone_status_t phone_calculate_audio_device_driver_name_length(size_t *max_driver_name_length) {
     try {
         auto audio_devices = phone_instance_t::get_audio_devices();
         auto max_length = std::transform_reduce(
@@ -305,19 +309,6 @@ phone_status_t phone_get_audio_device_driver_name_length(size_t *max_driver_name
         return PHONE_STATUS_FAILURE;
     }
     return PHONE_STATUS_SUCCESS;
-#else
-    try {
-        auto lens = std::views::transform(phone_instance_t::get_audio_devices(),
-                                          [](const phone::audio_device_info_t &info) {
-                                              return info.driver.length();
-                                          });
-        *max_driver_name_length = std::ranges::max(lens);
-    } catch (const phone::exception& e) {
-        strncpy(global_last_error, e.what(), sizeof(global_last_error));
-        return PHONE_STATUS_FAILURE;
-    }
-    return PHONE_STATUS_SUCCESS;
-#endif
 }
 
 phone_status_t phone_get_audio_device_names(char **device_names, size_t *devices_count, size_t max_device_name_length, device_filter_t filter) {
@@ -530,7 +521,7 @@ phone_status_t phone_stop_call_waiting(phone_t instance) {
     return PHONE_STATUS_SUCCESS;
 }
 
-unsigned phone_get_call_count(phone_t instance) {
+size_t phone_get_call_count(phone_t instance) {
     return instance->get_call_count();
 }
 
@@ -591,7 +582,120 @@ phone_status_t phone_adjust_rx_level_for_capture_device(phone_t instance, float 
     return PHONE_STATUS_SUCCESS;
 }
 
+phone_status_t phone_get_local_addresses_count(size_t *count) {
+    try {
+        *count = phone_instance_t::get_local_addresses().size();
+    } catch (const phone::exception& e) {
+        strncpy(global_last_error, e.what(), sizeof(global_last_error));
+        return PHONE_STATUS_FAILURE;
+    }
+    return PHONE_STATUS_SUCCESS;
+}
+
+phone_status_t phone_get_local_addresses_max_length(size_t *max_length) {
+    try {
+        auto addresses = phone_instance_t::get_local_addresses();
+        if (addresses.size() == 0)
+            *max_length = 0;
+        else
+            *max_length = std::ranges::max(phone_instance_t::get_local_addresses(), std::less{}, &std::string::size).size();
+    } catch (const phone::exception& e) {
+        strncpy(global_last_error, e.what(), sizeof(global_last_error));
+        return PHONE_STATUS_FAILURE;
+    }
+    return PHONE_STATUS_SUCCESS;
+}
+
+phone_status_t phone_get_local_addresses(char **addresses, size_t *addresses_count, size_t max_address_length) {
+    try {
+        int i = 0;
+        for (const auto& address: phone_instance_t::get_local_addresses()) {
+            if (i < *addresses_count) {
+                strncpy(addresses[i], address.c_str(), max_address_length);
+                ++i;
+            }
+        }
+        *addresses_count = i;
+    } catch (const phone::exception& e) {
+        strncpy(global_last_error, e.what(), sizeof(global_last_error));
+        return PHONE_STATUS_FAILURE;
+    }
+    return PHONE_STATUS_SUCCESS;
+}
+
+phone_status_t phone_get_local_addresses_from_transports_count(phone_t instance, size_t *count) {
+    try {
+        *count = instance->get_local_addresses_from_transports().size();
+    } catch (const phone::exception& e) {
+        strncpy(global_last_error, e.what(), sizeof(global_last_error));
+        return PHONE_STATUS_FAILURE;
+    }
+    return PHONE_STATUS_SUCCESS;
+}
+
+
+phone_status_t phone_get_local_addresses_from_transports_max_length(phone_t instance, size_t *max_length) {
+    try {
+        auto addresses = instance->get_local_addresses_from_transports();
+        if (addresses.size() == 0)
+            *max_length = 0;
+        else
+            *max_length = std::ranges::max(instance->get_local_addresses_from_transports(), std::less{}, &std::string::size).size();
+    } catch (const phone::exception& e) {
+        strncpy(global_last_error, e.what(), sizeof(global_last_error));
+        return PHONE_STATUS_FAILURE;
+    }
+    return PHONE_STATUS_SUCCESS;
+}
+
+phone_status_t phone_get_local_addresses_from_transports(phone_t instance, char **addresses, size_t *addresses_count, size_t max_address_length) {
+    try {
+        int i = 0;
+        for (const auto& address: instance->get_local_addresses_from_transports()) {
+            if (i < *addresses_count) {
+                strncpy(addresses[i], address.c_str(), max_address_length);
+                ++i;
+            }
+        }
+        *addresses_count = i;
+    } catch (const phone::exception& e) {
+        strncpy(global_last_error, e.what(), sizeof(global_last_error));
+        return PHONE_STATUS_FAILURE;
+    }
+    return PHONE_STATUS_SUCCESS;
+}
+
+phone_status_t phone_get_public_address(phone_t instance, char *address, size_t buffer_size) {
+    try {
+        strncpy(address, instance->get_public_address().c_str(), buffer_size);
+    } catch (const phone::exception& e) {
+        strncpy(global_last_error, e.what(), sizeof(global_last_error));
+        return PHONE_STATUS_FAILURE;
+    }
+    return PHONE_STATUS_SUCCESS;
+}
+
 void phone_crash(void) {
     phone_instance_t::crash();
+}
+
+phone_status_t phone_get_public_address_from_stun_server(char *stun_server, char *address, size_t buffer_size) {
+    try {
+        strncpy(address, phone_instance_t::get_public_address(stun_server).c_str(), buffer_size);
+    } catch (const phone::exception& e) {
+        strncpy(global_last_error, e.what(), sizeof(global_last_error));
+        return PHONE_STATUS_FAILURE;
+    }
+    return PHONE_STATUS_SUCCESS;
+}
+
+phone_status_t phone_update_nameserver(phone_t instance) {
+    try {
+        instance->update_nameserver();
+    } catch (const phone::exception& e) {
+        strncpy(global_last_error, e.what(), sizeof(global_last_error));
+        return PHONE_STATUS_FAILURE;
+    }
+    return PHONE_STATUS_SUCCESS;
 }
 

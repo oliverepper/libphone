@@ -80,8 +80,10 @@ PHONE_EXPORT void phone_set_no_sound_devices(void);
 PHONE_EXPORT void phone_disconnect_sound_device(void);
 PHONE_EXPORT phone_status_t phone_refresh_audio_devices(void);
 PHONE_EXPORT size_t phone_get_audio_devices_count(void);
-PHONE_EXPORT phone_status_t phone_get_audio_device_driver_name_length(size_t *max_driver_name_length);
 PHONE_EXPORT size_t phone_get_audio_device_info_name_length(void);
+PHONE_EXPORT size_t phone_get_audio_device_info_driver_length(void);
+PHONE_DEPRECATED_EXPORT phone_status_t phone_get_audio_device_driver_name_length(size_t *max_driver_name_length);
+PHONE_EXPORT phone_status_t phone_calculate_audio_device_driver_name_length(size_t *max_driver_name_length);
 PHONE_DEPRECATED_EXPORT phone_status_t phone_get_audio_device_names(char **device_names, size_t *devices_count, size_t max_device_name_length, device_filter_t filter);
 
 /**
@@ -166,7 +168,7 @@ PHONE_EXPORT int phone_is_thread_registered(phone_t instance);
 PHONE_EXPORT phone_status_t phone_play_call_waiting(phone_t instance);
 PHONE_EXPORT phone_status_t phone_stop_call_waiting(phone_t instance);
 
-PHONE_EXPORT unsigned phone_get_call_count(phone_t instance);
+PHONE_EXPORT size_t phone_get_call_count(phone_t instance);
 
 PHONE_EXPORT phone_status_t phone_handle_ip_change(void);
 
@@ -175,6 +177,19 @@ PHONE_EXPORT phone_status_t phone_adjust_tx_level_for_capture_device(phone_t ins
 
 PHONE_EXPORT phone_status_t phone_get_rx_level_adjustment_for_capture_device(phone_t instance, float *level);
 PHONE_EXPORT phone_status_t phone_adjust_rx_level_for_capture_device(phone_t instance, float level);
+
+PHONE_EXPORT phone_status_t phone_get_local_addresses_count(size_t *count);
+PHONE_EXPORT phone_status_t phone_get_local_addresses_max_length(size_t *max_length);
+PHONE_EXPORT phone_status_t phone_get_local_addresses(char **addresses, size_t *addresses_count, size_t max_address_length);
+
+PHONE_EXPORT phone_status_t phone_get_local_addresses_from_transports_count(phone_t instance, size_t *count);
+PHONE_EXPORT phone_status_t phone_get_local_addresses_from_transports_max_length(phone_t instance, size_t *max_length);
+PHONE_EXPORT phone_status_t phone_get_local_addresses_from_transports(phone_t instance, char **addresses, size_t *addresses_count, size_t max_address_length);
+
+PHONE_EXPORT phone_status_t phone_get_public_address(phone_t instance, char *address, size_t buffer_size);
+PHONE_EXPORT phone_status_t phone_get_public_address_from_stun_server(char *stun_server, char *address, size_t buffer_size);
+
+PHONE_EXPORT phone_status_t phone_update_nameserver(phone_t instance);
 
 PHONE_EXPORT void phone_crash(void);
 

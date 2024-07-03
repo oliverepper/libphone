@@ -1,6 +1,10 @@
 find_package(PkgConfig REQUIRED)
-pkg_check_modules(PJPROJECT REQUIRED libpjproject)
+list(APPEND PKG_CONFIG_EXECUTABLE "--static")
 
+pkg_check_modules(PJPROJECT REQUIRED IMPORTED_TARGET libpjproject)
+pkg_check_modules(OPUS REQUIRED IMPORTED_TARGET opus)
+
+# configure git variables in version templates
 find_package(Git REQUIRED)
 execute_process(
         COMMAND ${GIT_EXECUTABLE} -C ${CMAKE_SOURCE_DIR} rev-parse HEAD
@@ -30,14 +34,31 @@ target_include_directories(phone_version
         ${CMAKE_CURRENT_SOURCE_DIR}/include
         ${CMAKE_CURRENT_BINARY_DIR})
 
-add_library(phone OBJECT phone.cpp phone_instance_t.cpp include/private/account_t.h include/private/call_t.h)
+add_library(phone OBJECT
+        phone.cpp
+        phone_instance_t.cpp
+        include/private/account_t.h
+        include/private/call_t.h
+        include/private/calls_t.h
+        include/private/linked_list_iterator.h
+        include/private/IfAddrs.h)
 
 include(GenerateExportHeader)
 generate_export_header(phone BASE_NAME "phone")
 
-target_compile_options(phone PUBLIC ${PJPROJECT_CFLAGS})
+target_compile_options(phone PUBLIC ${PJPROJECT_CFLAGS} "-ffile-prefix-map=${CMAKE_SOURCE_DIR}=.")
 
-find_library(RESOLV_LIBRARY resolv)
+if (APPLE)
+        find_library(RESOLV_LIBRARY resolv)
+endif()
+
+include(FetchContent)
+
+FetchContent_Declare(stunning
+    GIT_REPOSITORY https://github.com/oliverepper/stunning.git
+    GIT_TAG        main)
+
+FetchContent_MakeAvailable(stunning)
 
 target_include_directories(phone
         PUBLIC
@@ -45,7 +66,12 @@ target_include_directories(phone
         ${CMAKE_CURRENT_BINARY_DIR}
         PRIVATE
         include/phone)
-target_link_libraries(phone PRIVATE ${PJPROJECT_LINK_LIBRARIES} ${RESOLV_LIBRARY})
+
+target_link_libraries(phone PRIVATE ${RESOLV_LIBRARY} stunning::stunning PkgConfig::PJPROJECT PkgConfig::OPUS)
+
+if(ADD_FRAMEWORKS)
+    target_link_libraries(phone PRIVATE ${ADD_FRAMEWORKS})
+endif()
 
 set(phone_PUBLIC_HEADERS
         ${CMAKE_CURRENT_SOURCE_DIR}/include/phone.h

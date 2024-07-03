@@ -4,6 +4,7 @@
 #include <iostream>
 #include <thread>
 #include <cassert>
+#include <private/system_nameserver.h>
 
 [[maybe_unused]] auto password_function = []() { return std::string{PASSWORD}; };
 
@@ -128,7 +129,12 @@ auto main() -> int {
         });
 
         // opus
-        state.phone.configure_opus();
+        try {
+            state.phone.configure_opus();
+        } catch (const phone::exception& e) {
+            std::cerr << "Error: " << e.what() << std::endl;
+            return 1;
+        }
 
         // connect
         state.phone.connect(SERVER, USER, PASSWORD_FUNCTION);
@@ -228,6 +234,11 @@ auto main() -> int {
                     state.phone.disconnect();
                 } else if (command == '9') {
                     state.phone.connect(SERVER, USER, PASSWORD_FUNCTION);
+                } else if (command == '6') {
+                    for (const auto& address : state.phone.get_local_addresses())
+                        std::cout << address << std::endl;
+                } else if (command == '5') {
+                    state.phone.update_nameserver();
                 }
             } catch (const phone::exception& e) {
                 std::cerr << "Error: " << e.what() << std::endl;

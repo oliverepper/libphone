@@ -24,7 +24,7 @@ fi
 
 ANDROID_NDK_ROOT="${NDK}" \
 TARGET_ABI=x86 \
-./configure-android --use-ndk-cflags --prefix="${PREFIX}" "${CONFIGURE_EXTRA_PARAMS[@]}"
+./configure-android --use-ndk-cflags --prefix="${PREFIX}" $(IFS=' '; echo "${CONFIGURE_EXTRA_PARAMS[*]}")
 
 make dep && make clean
 make

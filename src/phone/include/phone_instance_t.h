@@ -11,6 +11,7 @@
 namespace pj {
 class Endpoint;
 class ToneGenerator;
+class EpConfig;
 } //namespace pj
 
 class account_t;
@@ -133,7 +134,7 @@ public:
     PHONE_EXPORT void play_call_waiting() const;
     PHONE_EXPORT void stop_call_waiting() const;
 
-    [[nodiscard]] PHONE_EXPORT unsigned int get_call_count();
+    [[nodiscard]] PHONE_EXPORT size_t get_call_count();
 
     PHONE_EXPORT static void handle_ip_change();
 
@@ -143,21 +144,18 @@ public:
     PHONE_EXPORT void adjust_tx_level_for_capture_device(float level) const;
     PHONE_EXPORT void adjust_rx_level_for_capture_device(float level) const;
 
-//    [[nodiscard]] PHONE_EXPORT unsigned int get_rx_level_for_call(int call_index) const;
-//    [[nodiscard]] PHONE_EXPORT unsigned int get_rx_level_for_call(const std::string& call_id) const;
-//
-//    PHONE_EXPORT void set_rx_level_for_call(int call_index, float level) const;
-//    PHONE_EXPORT void set_rx_level_for_call(const std::string& call_id, float level) const;
-//
-//    PHONE_EXPORT void set_level_for_call(int call_index, phone::tx_rx_direction direction, float level) const;
-//    PHONE_EXPORT void set_level_for_call(const std::string& call_id, phone::tx_rx_direction direction, float level) const;
+    [[nodiscard]] PHONE_EXPORT static std::vector<std::string> get_local_addresses();
+    [[nodiscard]] PHONE_EXPORT std::vector<std::string> get_local_addresses_from_transports() const;
 
-//    [[nodiscard]] PHONE_EXPORT unsigned int get_level_adjustment_for_capture_device(phone::tx_rx_direction direction) const;
-//    PHONE_EXPORT void adjust_level_for_capture_device(phone::tx_rx_direction direction, float level) const;
+    [[nodiscard]] PHONE_EXPORT std::string get_public_address() const;
+    [[nodiscard]] PHONE_EXPORT static std::string get_public_address(std::string stun_server);
 
     PHONE_EXPORT static void crash();
 
+    PHONE_EXPORT void update_nameserver();
+
 private:
+    std::unique_ptr<pj::EpConfig> m_ep_cfg;
     std::unique_ptr<pj::Endpoint> m_ep;
     std::unique_ptr<account_t> m_account;
     std::optional<std::string> m_server;
