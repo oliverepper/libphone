@@ -14,9 +14,11 @@
 phone_instance_t::phone_instance_t(std::string user_agent,
                                    std::vector<std::string> nameserver,
                                    std::vector<std::string> stunserver)
-: m_ep{std::make_unique<pj::Endpoint>()}, m_account{std::make_unique<account_t>()}, m_ep_cfg{std::make_unique<pj::EpConfig>()} {
-    m_call_waiting_tone_generator = std::make_unique<pj::ToneGenerator>();
-    m_dtmf_tone_generator = std::make_unique<pj::ToneGenerator>();
+: m_ep{std::make_unique<pj::Endpoint>()},
+  m_account{std::make_unique<account_t>()},
+  m_ep_cfg{std::make_unique<pj::EpConfig>()},
+  m_call_waiting_tone_generator{std::make_unique<pj::ToneGenerator>()},
+  m_dtmf_tone_generator{std::make_unique<pj::ToneGenerator>()} {
 
     m_ep_cfg->uaConfig.userAgent = std::move(user_agent);
     m_ep_cfg->uaConfig.nameserver = std::move(nameserver);
