@@ -1,0 +1,6 @@
+[submodule "third-party/opus"]
+	path = third-party/opus
+	url = https://gitlab.xiph.org/xiph/opus.git
+[submodule "third-party/pjproject"]
+	path = third-party/pjproject
+	url = https://github.com/pjsip/pjproject.git

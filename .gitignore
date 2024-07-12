@@ -5,3 +5,4 @@ TODO.md
 cmake/credentials.cmake
 installed
 cmake-build-debug-event-trace
+cmake-build-debug-asan
