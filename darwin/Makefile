@@ -10,10 +10,12 @@ define TEMPLATE
 install-$(1):
 	$(MAKE) -f $(MAKEFILE_DIR)opus.mak $(1)
 	$(MAKE) -f $(MAKEFILE_DIR)pjproject.mak $(1)
+	$(MAKE) -f $(MAKEFILE_DIR)libphone.mak $(1)
 
 clean-$(1):
 	$(MAKE) -f $(MAKEFILE_DIR)pjproject.mak clean-$(1)
 	$(MAKE) -f $(MAKEFILE_DIR)opus.mak clean-$(1)
+	$(MAKE) -f $(MAKEFILE_DIR)libphone.mak clean-$(1)
 
 $(1): install-$(1)
 
