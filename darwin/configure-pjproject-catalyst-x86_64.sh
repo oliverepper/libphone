@@ -46,10 +46,11 @@ PARAMS+=(--disable-ffmpeg --enable-pjsua2 --enable-sound --enable-libsrtp \
 # Opus Codec
 PARAMS+=(--with-opus="${PREFIX}")
 
-SDKPATH=$(xcrun -sdk iphoneos --show-sdk-path)
+SDKPATH=$(xcrun -sdk macosx --show-sdk-path)
 PJ_SDK_NAME=$(basename "${SDKPATH}")
-export CFLAGS="${CFLAGS} -arch arm64 -isysroot $SDKPATH -miphoneos-version-min=13 -DPJ_SDK_NAME=\"\\\"${PJ_SDK_NAME}\\\"\""
-export LDFLAGS="-arch arm64 -isysroot ${SDKPATH}"
-./aconfigure --prefix= --host=arm64-apple-darwin_ios "${PARAMS[@]}"
+ARCH=x86_64
+export CFLAGS="${CFLAGS} -isysroot $SDKPATH -isystem ${SDKPATH}/System/iOSSupport/usr/include -iframework ${SDKPATH}/System/iOSSupport/System/Library/Frameworks -miphoneos-version-min=13.1 -DPJ_SDK_NAME=\"\\\"${PJ_SDK_NAME}\\\"\" -arch "${ARCH}" -target "${ARCH}"-apple-ios-macabi"
+export LDFLAGS="-isysroot ${SDKPATH} -isystem ${SDKPATH}/System/iOSSupport/usr/include -iframework ${SDKPATH}/System/iOSSupport/System/Library/Frameworks -miphoneos-version-min=13.1 -arch "${ARCH}" -target "${ARCH}"-apple-ios-macabi"
+./aconfigure --prefix= --host="${ARCH}"-apple-darwin_ios "${PARAMS[@]}"
 
 popd || exit 1
