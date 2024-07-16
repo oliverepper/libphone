@@ -1,8 +1,5 @@
-build
-cmake-build-debug
 .idea
 TODO.md
+cmake-build-debug
 cmake/credentials.cmake
-installed
-cmake-build-debug-event-trace
 cmake-build-debug-asan
