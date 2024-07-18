@@ -49,8 +49,8 @@ PARAMS+=(--with-opus="${PREFIX}")
 SDKPATH=$(xcrun -sdk macosx --show-sdk-path)
 PJ_SDK_NAME=$(basename "${SDKPATH}")
 ARCH=x86_64
-export CFLAGS="${CFLAGS} -isysroot $SDKPATH -isystem ${SDKPATH}/System/iOSSupport/usr/include -iframework ${SDKPATH}/System/iOSSupport/System/Library/Frameworks -miphoneos-version-min=13.1 -DPJ_SDK_NAME=\"\\\"${PJ_SDK_NAME}\\\"\" -arch "${ARCH}" -target "${ARCH}"-apple-ios-macabi"
-export LDFLAGS="-isysroot ${SDKPATH} -isystem ${SDKPATH}/System/iOSSupport/usr/include -iframework ${SDKPATH}/System/iOSSupport/System/Library/Frameworks -miphoneos-version-min=13.1 -arch "${ARCH}" -target "${ARCH}"-apple-ios-macabi"
+export CFLAGS="${CFLAGS} -isysroot $SDKPATH -isystem ${SDKPATH}/System/iOSSupport/usr/include -iframework ${SDKPATH}/System/iOSSupport/System/Library/Frameworks -miphoneos-version-min=13.1 -DPJ_SDK_NAME=\"\\\"${PJ_SDK_NAME}\\\"\" -arch ${ARCH} -target ${ARCH}-apple-ios-macabi"
+export LDFLAGS="-isysroot ${SDKPATH} -isystem ${SDKPATH}/System/iOSSupport/usr/include -iframework ${SDKPATH}/System/iOSSupport/System/Library/Frameworks -miphoneos-version-min=13.1 -arch ${ARCH} -target ${ARCH}-apple-ios-macabi"
 ./aconfigure --prefix= --host="${ARCH}"-apple-darwin_ios "${PARAMS[@]}"
 
 popd || exit 1

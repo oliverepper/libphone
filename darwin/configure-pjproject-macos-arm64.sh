@@ -12,7 +12,7 @@ fi
 BUILD_DIR=$1
 PREFIX=$2
 
- if [ ! -d "$PREFIX" ]; then
+if [ ! -d "$PREFIX" ]; then
 	print_error "The directory \"${PREFIX}\" does not exist. Please build Opus, first."
 	exit 1
 fi
