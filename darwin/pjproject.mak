@@ -59,6 +59,8 @@ install-$(1): $(INSTALL_DIR)/$(1)/lib/pkgconfig/libpjproject.pc
 
 $(1): install-$(1)
 
+clean-$(1): clean-$(1)-arm64 clean-$(1)-x86_64
+
 .PHONY: install-$(1) $(1)
 endef
 
