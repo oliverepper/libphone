@@ -4,6 +4,7 @@ TODO.md
 cmake/credentials.cmake
 cmake-build-debug
 cmake-build-debug-asan
+cmake-build-debug-tsan
 darwin/build
 darwin/installed
 darwin/stage
