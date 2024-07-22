@@ -6,7 +6,7 @@ BUILD_DIR = $(BASE_BUILD_DIR)/libphone
 SOURCE_DIR = $(MAKEFILE_DIR)../
 TOOLCHAIN_DIR = $(MAKEFILE_DIR)../cmake
 
-PLATFORMS = macos macos-asan ios simulator catalyst # xrsimulator
+PLATFORMS = macos macos-asan macos-tsan ios simulator catalyst # xrsimulator
 
 GENERATOR = "Ninja Multi-Config" # This may get overwritten by the configure script
 CONFIG = RelWithDebInfo
@@ -19,20 +19,20 @@ $(BUILD_DIR)/$(1):
 
 config-$(1): $(BUILD_DIR)/$(1)
 
-$(BUILD_DIR)/$(1)/bin/phone/$(CONFIG)/libphone.dylib: $(BUILD_DIR)/$(1)
+$(BUILD_DIR)/$(1)/build.flag: $(BUILD_DIR)/$(1)
 	if [ "$$(shell grep CMAKE_GENERATOR:INTERNAL $(BUILD_DIR)/$(1)/CMakeCache.txt | cut -d '=' -f 2)" = "Xcode" ] && which xcpretty > /dev/null 2>&1; then \
-		cmake --build $(BUILD_DIR)/$(1) --config=$(CONFIG) | xcpretty; \
+		cmake --build $(BUILD_DIR)/$(1) --config=$(CONFIG) | xcpretty && touch $(BUILD_DIR)/$(1)/build.flag; \
 	else \
-		cmake --build $(BUILD_DIR)/$(1) --config=$(CONFIG); \
+		cmake --build $(BUILD_DIR)/$(1) --config=$(CONFIG) && touch $(BUILD_DIR)/$(1)/build.flag; \
 	fi
 
-build-$(1): $(BUILD_DIR)/$(1)/bin/phone/$(CONFIG)/libphone.dylib
+build-$(1): $(BUILD_DIR)/$(1)/build.flag
 
-$(INSTALL_DIR)/$(1)/lib/libphone.dylib: $(BUILD_DIR)/$(1)/bin/phone/$(CONFIG)/libphone.dylib
+$(INSTALL_DIR)/$(1)/lib/libphone.dylib: $(BUILD_DIR)/$(1)/build.flag
 	if [ "$$(shell grep CMAKE_GENERATOR:INTERNAL $(BUILD_DIR)/$(1)/CMakeCache.txt | cut -d '=' -f 2)" = "Xcode" ] && which xcpretty > /dev/null 2>&1; then \
-		cmake --build $(BUILD_DIR)/$(1) --config=$(CONFIG) --target=install | xcpretty; \
+		cmake --build $(BUILD_DIR)/$(1) --config=$(CONFIG) --target=install | xcpretty && touch $(BUILD_DIR)/$(1)/build.flag; \
 	else \
-		cmake --build $(BUILD_DIR)/$(1) --config=$(CONFIG) --target=install; \
+		cmake --build $(BUILD_DIR)/$(1) --config=$(CONFIG) --target=install && touch $(BUILD_DIR)/$(1)/build.flag; \
 	fi
 
 install-$(1): $(INSTALL_DIR)/$(1)/lib/libphone.dylib

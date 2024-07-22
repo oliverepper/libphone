@@ -5,9 +5,9 @@ include $(MAKEFILE_DIR)base.mak
 SOURCE_DIR=$(MAKEFILE_DIR)../third-party/pjproject
 BUILD_DIR = $(BASE_BUILD_DIR)/pjproject
 
-BUILD_PLATFORMS = macos-arm64 macos-x86_64 macos-asan ios simulator-arm64 simulator-x86_64 catalyst-arm64 catalyst-x86_64
+BUILD_PLATFORMS = macos-arm64 macos-x86_64 macos-asan macos-tsan ios simulator-arm64 simulator-x86_64 catalyst-arm64 catalyst-x86_64
 UNIVERSAL_PLATFORMS = macos simulator catalyst
-SINGLE_ARCH_PLATFORMS = macos-asan ios
+SINGLE_ARCH_PLATFORMS = macos-asan macos-tsan ios
 
 include $(SOURCE_DIR)/version.mak
 
@@ -21,7 +21,7 @@ $(BUILD_DIR)/$(1)/aconfigure:
 setup-$(1): $(BUILD_DIR)/$(1)/aconfigure
 
 $(BUILD_DIR)/$(1)/config.log: $(BUILD_DIR)/$(1)/aconfigure
-	zsh $(MAKEFILE_DIR)configure-pjproject-$(1).sh $(BUILD_DIR)/$(1) $(INSTALL_DIR)/$(subst -arm64,,$(subst -x86_64,,$(1)))
+	bash $(MAKEFILE_DIR)configure-pjproject-$(1).sh $(BUILD_DIR)/$(1) $(INSTALL_DIR)/$(subst -arm64,,$(subst -x86_64,,$(1)))
 
 config-$(1): $(BUILD_DIR)/$(1)/config.log
 
