@@ -77,7 +77,7 @@ add_library(phone_sharedlib SHARED dummy.cpp)
 set_target_properties(phone_sharedlib PROPERTIES
     OUTPUT_NAME "phone"
     VERSION ${CMAKE_PROJECT_VERSION}
-    SOVERSION 0
+    SOVERSION ${CMAKE_PROJECT_VERSION_MAJOR}
     PUBLIC_HEADER "${phone_PUBLIC_HEADERS}")
 target_link_libraries(phone_sharedlib PUBLIC phone phone_version)
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/phone DESTINATION include)

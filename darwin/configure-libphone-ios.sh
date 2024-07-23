@@ -8,7 +8,7 @@ if [ $# -ne 4 ]; then
 	exit 1
 fi
 
-GENERATOR=Xcode
+GENERATOR=$1
 BUILD_DIR=$2
 SOURCE_DIR=$3
 INSTALL_DIR=$4
@@ -26,5 +26,4 @@ cmake -B"${BUILD_DIR}" \
 	  -DCMAKE_TOOLCHAIN_FILE="$(dirname "$0")/../third-party/ios-cmake/ios.toolchain.cmake" \
 	  -DPLATFORM=OS64 \
 	  -DDEPLOYMENT_TARGET=13 \
-	  -DCMAKE_MACOSX_BUNDLE=NO \
-	  -DCMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM=AWJ83G3EPY
+	  -DCMAKE_MACOSX_BUNDLE=NO

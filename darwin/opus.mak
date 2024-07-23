@@ -19,23 +19,23 @@ $(BUILD_DIR)/$(1):
 
 config-$(1): $(BUILD_DIR)/$(1)
 
-$(BUILD_DIR)/$(1)/$(CONFIG)/libopus.a: $(BUILD_DIR)/$(1)
+$(BUILD_DIR)/$(1)/build.flag: $(BUILD_DIR)/$(1)
 	if [ "$$(shell grep CMAKE_GENERATOR:INTERNAL $(BUILD_DIR)/$(1)/CMakeCache.txt | cut -d '=' -f 2)" = "Xcode" ] && which xcpretty > /dev/null 2>&1; then \
-		cmake --build $(BUILD_DIR)/$(1) --config=$(CONFIG) | xcpretty; \
+		cmake --build $(BUILD_DIR)/$(1) --config=$(CONFIG) | xcpretty && touch $(BUILD_DIR)/$(1)/build.flag; \
 	else \
-		cmake --build $(BUILD_DIR)/$(1) --config=$(CONFIG); \
+		cmake --build $(BUILD_DIR)/$(1) --config=$(CONFIG) && touch $(BUILD_DIR)/$(1)/build.flag; \
 	fi
 
-build-$(1): $(BUILD_DIR)/$(1)/$(CONFIG)/libopus.a
+build-$(1): $(BUILD_DIR)/$(1)/build.flag
 
-$(INSTALL_DIR)/$(1): $(BUILD_DIR)/$(1)/$(CONFIG)/libopus.a
+$(INSTALL_DIR)/$(1)/lib/libopus.a: $(BUILD_DIR)/$(1)/build.flag
 	if [ "$$(shell grep CMAKE_GENERATOR:INTERNAL $(BUILD_DIR)/$(1)/CMakeCache.txt | cut -d '=' -f 2)" = "Xcode" ] && which xcpretty > /dev/null 2>&1; then \
 		cmake --build $(BUILD_DIR)/$(1) --config=$(CONFIG) --target=install | xcpretty; \
 	else \
 		cmake --build $(BUILD_DIR)/$(1) --config=$(CONFIG) --target=install; \
 	fi
 
-install-$(1): $(INSTALL_DIR)/$(1)
+install-$(1): $(INSTALL_DIR)/$(1)/lib/libopus.a
 
 clean-$(1):
 	rm -rf $(BUILD_DIR)/$(1)

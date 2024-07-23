@@ -30,9 +30,9 @@ build-$(1): $(BUILD_DIR)/$(1)/build.flag
 
 $(INSTALL_DIR)/$(1)/lib/libphone.dylib: $(BUILD_DIR)/$(1)/build.flag
 	if [ "$$(shell grep CMAKE_GENERATOR:INTERNAL $(BUILD_DIR)/$(1)/CMakeCache.txt | cut -d '=' -f 2)" = "Xcode" ] && which xcpretty > /dev/null 2>&1; then \
-		cmake --build $(BUILD_DIR)/$(1) --config=$(CONFIG) --target=install | xcpretty && touch $(BUILD_DIR)/$(1)/build.flag; \
+		cmake --build $(BUILD_DIR)/$(1) --config=$(CONFIG) --target=install | xcpretty; \
 	else \
-		cmake --build $(BUILD_DIR)/$(1) --config=$(CONFIG) --target=install && touch $(BUILD_DIR)/$(1)/build.flag; \
+		cmake --build $(BUILD_DIR)/$(1) --config=$(CONFIG) --target=install; \
 	fi
 
 install-$(1): $(INSTALL_DIR)/$(1)/lib/libphone.dylib
