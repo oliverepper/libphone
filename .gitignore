@@ -1,7 +1,10 @@
-build
-cmake-build-debug
+.DS_Store
 .idea
 TODO.md
 cmake/credentials.cmake
-installed
-cmake-build-debug-event-trace
+cmake-build-debug
+cmake-build-debug-asan
+cmake-build-debug-tsan
+darwin/build
+darwin/installed
+darwin/stage

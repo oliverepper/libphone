@@ -1,0 +1,11 @@
+prefix=`'PREFIX`'
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: libpjproject
+Description: Multimedia communication library
+URL: http://www.pjsip.org
+Version: `'PJ_VERSION`'
+
+Libs: -L${libdir} -lpjproject -framework Network -framework Security -framework Foundation -framework CoreAudio -framework AudioToolbox -framework UIKit -framework AVFAudio
+Cflags: -I${includedir} -DPJ_AUTOCONF=1  -DPJ_IS_BIG_ENDIAN=0 -DPJ_IS_LITTLE_ENDIAN=1
