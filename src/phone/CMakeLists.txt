@@ -1,5 +1,4 @@
 find_package(PkgConfig REQUIRED)
-list(APPEND PKG_CONFIG_EXECUTABLE "--static")
 
 pkg_check_modules(PJPROJECT REQUIRED IMPORTED_TARGET libpjproject)
 pkg_check_modules(OPUS REQUIRED IMPORTED_TARGET opus)
@@ -68,10 +67,6 @@ target_include_directories(phone
         include/phone)
 
 target_link_libraries(phone PRIVATE ${RESOLV_LIBRARY} stunning::stunning PkgConfig::PJPROJECT PkgConfig::OPUS)
-
-if(ADD_FRAMEWORKS)
-    target_link_libraries(phone PRIVATE ${ADD_FRAMEWORKS})
-endif()
 
 set(phone_PUBLIC_HEADERS
         ${CMAKE_CURRENT_SOURCE_DIR}/include/phone.h
