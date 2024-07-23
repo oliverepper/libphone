@@ -4,3 +4,6 @@
 [submodule "third-party/pjproject"]
 	path = third-party/pjproject
 	url = https://github.com/pjsip/pjproject.git
+[submodule "third-party/ios-cmake"]
+	path = third-party/ios-cmake
+	url = https://github.com/leetal/ios-cmake.git
