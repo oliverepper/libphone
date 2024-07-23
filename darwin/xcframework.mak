@@ -7,8 +7,9 @@ BUILD_DIR = $(BASE_BUILD_DIR)/libphone
 SOURCE_DIR = $(MAKEFILE_DIR)../
 TOOLCHAIN_DIR = $(MAKEFILE_DIR)../cmake
 
-SOVERSION = 0
 CODESIGN_IDENTITY = AWJ83G3EPY
+
+.DEFAULT_GOAL := all
 
 asan: $(INSTALL_DIR)/macos-asan/lib/libphone.dylib
 	bash $(MAKEFILE_DIR)create-xcframework.sh $(INSTALL_DIR) $(STAGE_DIR) $(CODESIGN_IDENTITY) asan macos-asan
@@ -22,4 +23,6 @@ release: $(INSTALL_DIR)/macos/lib/libphone.dylib \
 	 $(INSTALL_DIR)/catalyst/lib/libphone.dylib
 	bash $(MAKEFILE_DIR)create-xcframework.sh $(INSTALL_DIR) $(STAGE_DIR) $(CODESIGN_IDENTITY) "" macos ios simulator catalyst
 
-.PHONY: asan tsan release
+all: release asan tsan
+
+.PHONY: asan tsan release all
