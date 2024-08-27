@@ -28,6 +28,7 @@ phone_instance_t::phone_instance_t(std::string user_agent,
     // https://github.com/pjsip/pjproject/issues/3511
     m_log_writer = new log_writer_t{};
     m_ep_cfg->logConfig.writer = m_log_writer;
+    m_ep_cfg->logConfig.consoleLevel = INT_MAX;
 
     m_ep_cfg->medConfig.ecOptions = PJMEDIA_ECHO_WEBRTC | PJMEDIA_ECHO_USE_SW_ECHO;
 
