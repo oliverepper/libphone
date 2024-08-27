@@ -76,7 +76,7 @@ public:
         }
         if (on_incoming_call_with_id.has_value()) {
             auto id = static_cast<std::string>(*current_call);
-            PJ_LOG(6, (__FILE__, "calling on_incoming_call with id: %s", index));
+            PJ_LOG(6, (__FILE__, "calling on_incoming_call with id: %s", id.c_str()));
             on_incoming_call_with_id.value()(id);
         }
     }
