@@ -71,12 +71,12 @@ public:
 
         if (on_incoming_call_with_index.has_value()) {
             auto index = static_cast<int>(*current_call);
-            PJ_LOG(6, (__FILE__, "calling on_incoming_call with index: %d", index));
+            PJ_LOG(5, (__FILE__, "calling on_incoming_call with index: %d", index));
             on_incoming_call_with_index.value()(index);
         }
         if (on_incoming_call_with_id.has_value()) {
             auto id = static_cast<std::string>(*current_call);
-            PJ_LOG(6, (__FILE__, "calling on_incoming_call with id: %s", id.c_str()));
+            PJ_LOG(5, (__FILE__, "calling on_incoming_call with id: %s", id.c_str()));
             on_incoming_call_with_id.value()(id);
         }
     }
