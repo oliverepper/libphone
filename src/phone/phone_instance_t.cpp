@@ -24,10 +24,9 @@ phone_instance_t::phone_instance_t(std::string user_agent,
     m_ep_cfg->uaConfig.nameserver = std::move(nameserver);
     m_ep_cfg->uaConfig.stunServer = std::move(stunserver);
 
-    // FIXME: hopefully pjsip fixes the assumption about beeing the owner of the *log_writer_t
-    // https://github.com/pjsip/pjproject/issues/3511
-    m_log_writer = new log_writer_t{};
+    m_log_writer = new log_writer_t{}; // see header for details
     m_ep_cfg->logConfig.writer = m_log_writer;
+    m_ep_cfg->logConfig.consoleLevel = INT_MAX;
 
     m_ep_cfg->medConfig.ecOptions = PJMEDIA_ECHO_WEBRTC | PJMEDIA_ECHO_USE_SW_ECHO;
 
