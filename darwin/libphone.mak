@@ -6,7 +6,7 @@ BUILD_DIR = $(BASE_BUILD_DIR)/libphone
 SOURCE_DIR = $(MAKEFILE_DIR)../
 TOOLCHAIN_DIR = $(MAKEFILE_DIR)../cmake
 
-PLATFORMS = macos macos-asan macos-tsan ios simulator catalyst # xrsimulator
+PLATFORMS = macos macos-asan macos-tsan ios ios-asan simulator catalyst # xrsimulator
 
 GENERATOR = "Ninja Multi-Config" # This may get overwritten by the configure script
 CONFIG = RelWithDebInfo

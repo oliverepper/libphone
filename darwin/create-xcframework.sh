@@ -18,14 +18,15 @@ shift 4
 INCLUDE=("$@")
 
 INCLUDED_PLATFORMS=("${INCLUDE[@]}")
-echo "Including: ${INCLUDED_PLATFORMS[@]}"
+echo "Including: " "${INCLUDED_PLATFORMS[@]}"
 
 extract_version() {
 	local install_dir="${INSTALL_DIR}/${1}"
-	local dso=$(find "${install_dir}/lib" -name "libphone*" -type f | sort -V | tail -n 1)
+	local dso
+	dso=$(find "${install_dir}/lib" -name "libphone*" -type f | sort -V | tail -n 1)
 	local version="${dso##*libphone.}"
 	local version="${version%.dylib}"
-	echo ${version}
+	echo "${version}"
 }
 
 copy_dso() {
@@ -33,7 +34,7 @@ copy_dso() {
 	local stage_dir="${STAGE_DIR}/${1}"
 	local soversion="${2}"
 	mkdir -p "${stage_dir}"
-	version=$(extract_version ${1})
+	version=$(extract_version "${1}")
 	cp "${install_dir}/lib/libphone.${soversion}.dylib" "${stage_dir}"
 }
 
@@ -53,7 +54,8 @@ add_params() {
 	local install_dir="${INSTALL_DIR}/${1}"
 	local stage_dir="${STAGE_DIR}/${1}"
 	local soversion="${2}"
-	local stage_dir_realpath=$(realpath ${stage_dir})
+	local stage_dir_realpath
+	stage_dir_realpath=$(realpath "${stage_dir}")
 	PARAMS+=(-library "${stage_dir}/libphone.${soversion}.dylib")
 	PARAMS+=(-headers "${install_dir}/include")
 	PARAMS+=(-debug-symbols "${stage_dir_realpath}/libphone.${soversion}.dylib.dSYM")

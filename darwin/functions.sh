@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # This script is intended to be sourced
 # Oliver Epper <oliver.epper@gmail.com>
 
@@ -20,18 +21,18 @@ is_greater_version() {
 	IFS='.' read -r -a rhs_parts <<< "${rhs}"
 
 	local max_len=${#lhs_parts[@]}
-	if [ ${#rhs_parts[@]} -gt $max_len ]; then
+	if [ ${#rhs_parts[@]} -gt "${max_len}" ]; then
 		max_len=${#rhs_parts[@]}
 	fi
 
-	for ((i=${#lhs_parts[@]}; i<$max_len; i++)); do
+	for ((i=${#lhs_parts[@]}; i<max_len; i++)); do
 		lhs_parts[i]=0
 	done
-	for ((i=${#rhs_parts[@]}; i<$max_len; i++)); do
+	for ((i=${#rhs_parts[@]}; i<max_len; i++)); do
 		rhs_parts[i]=0
 	done
 
-	for ((i=0; i<$max_len; i++)); do
+	for ((i=0; i<"${max_len}"; i++)); do
 		if [[ ${lhs_parts[i]} -gt ${rhs_parts[i]} ]]; then
 			return 0
 		elif [[ ${lhs_parts[i]} -lt ${rhs_parts[i]} ]]; then

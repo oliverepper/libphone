@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(phone VERSION 0.9.5.1 LANGUAGES C CXX)
+project(phone VERSION 0.9.6 LANGUAGES C CXX)
 
 option(BUILD_APPS "Build demo apps" OFF)
 

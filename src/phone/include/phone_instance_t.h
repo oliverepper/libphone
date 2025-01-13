@@ -161,7 +161,7 @@ private:
     std::optional<std::string> m_server;
     std::unique_ptr<pj::ToneGenerator> m_call_waiting_tone_generator;
     std::unique_ptr<pj::ToneGenerator> m_dtmf_tone_generator;
-    // FIXME: hopefully pjsip fixes the assumption about beeing the owner of the *log_writer_t
+    // HOLD: hopefully pjsip fixes the assumption about beeing the owner of the *log_writer_t
     // https://github.com/pjsip/pjproject/issues/3511
     log_writer_t *m_log_writer;
 
@@ -169,4 +169,4 @@ private:
     void adjust_level_for_capture_device(phone::tx_rx_direction direction, float level) const;
 };
 
-#endif //PHONE_INSTANCE_T_H
+#endif // PHONE_INSTANCE_T_H
