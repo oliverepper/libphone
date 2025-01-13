@@ -1,10 +1,11 @@
 .DS_Store
+.clangd
 .idea
 TODO.md
-cmake/credentials.cmake
 cmake-build-debug
 cmake-build-debug-asan
 cmake-build-debug-tsan
+cmake/credentials.cmake
 darwin/build
 darwin/installed
 darwin/stage
