@@ -2,7 +2,7 @@ MAKEFILE_DIR := $(dir $(realpath $(firstword $(MAKEFILE_LIST))))
 
 include $(MAKEFILE_DIR)base.mak
 
-PLATFORMS = macos macos-asan macos-tsan ios simulator catalyst
+PLATFORMS = macos macos-asan macos-tsan ios ios-asan simulator catalyst
 
 .DEFAULT_GOAL := install
 
