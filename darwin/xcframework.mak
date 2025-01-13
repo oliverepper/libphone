@@ -12,16 +12,16 @@ CODESIGN_IDENTITY = AWJ83G3EPY
 .DEFAULT_GOAL := all
 
 asan: $(INSTALL_DIR)/macos-asan/lib/libphone.dylib
-	bash $(MAKEFILE_DIR)create-xcframework.sh $(INSTALL_DIR) $(STAGE_DIR) $(CODESIGN_IDENTITY) asan macos-asan
+	bash $(MAKEFILE_DIR)create-xcframework.sh $(INSTALL_DIR) $(STAGE_DIR) "$(CODESIGN_IDENTITY)" "$(POSTFIX)-asan" macos-asan
 
 tsan: $(INSTALL_DIR)/macos-tsan/lib/libphone.dylib
-	bash $(MAKEFILE_DIR)create-xcframework.sh $(INSTALL_DIR) $(STAGE_DIR) $(CODESIGN_IDENTITY) tsan macos-tsan
+	bash $(MAKEFILE_DIR)create-xcframework.sh $(INSTALL_DIR) $(STAGE_DIR) "$(CODESIGN_IDENTITY)" "$(POSTFIX)-tsan" macos-tsan
 
 release: $(INSTALL_DIR)/macos/lib/libphone.dylib \
 	 $(INSTALL_DIR)/ios/lib/libphone.dylib \
 	 $(INSTALL_DIR)/simulator/lib/libphone.dylib \
 	 $(INSTALL_DIR)/catalyst/lib/libphone.dylib
-	bash $(MAKEFILE_DIR)create-xcframework.sh $(INSTALL_DIR) $(STAGE_DIR) $(CODESIGN_IDENTITY) "" macos ios simulator catalyst
+	bash $(MAKEFILE_DIR)create-xcframework.sh $(INSTALL_DIR) $(STAGE_DIR) "$(CODESIGN_IDENTITY)" "$(POSTFIX)" macos ios simulator catalyst
 
 all: release asan tsan
 
