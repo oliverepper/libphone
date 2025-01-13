@@ -25,5 +25,7 @@ application {
 }
 
 tasks.named<JavaExec>("run") {
+    //Put as value with trailing slash: "/<build output or download path>/"
+    systemProperty("native-libs", "")
     standardInput = System.`in`
 }
