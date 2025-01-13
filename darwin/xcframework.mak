@@ -7,7 +7,13 @@ BUILD_DIR = $(BASE_BUILD_DIR)/libphone
 SOURCE_DIR = $(MAKEFILE_DIR)../
 TOOLCHAIN_DIR = $(MAKEFILE_DIR)../cmake
 
-CODESIGN_IDENTITY = AWJ83G3EPY
+ENV_CODESIGN_IDENTITY := CODESIGN_IDENTITY
+
+ifeq ($(strip $(origin $(ENV_CODESIGN_IDENTITY))), undefined)
+$(error The environment variable $(ENV_CODESIGN_IDENTITY) ist not set)
+else ifeq ($(strip $($(ENV_CODESIGN_IDENTITY))),)
+$(error The environment variable $(ENV_CODESIGN_IDENTITY) is empty)
+endif
 
 .DEFAULT_GOAL := all
 
