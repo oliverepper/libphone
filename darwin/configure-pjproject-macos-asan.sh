@@ -12,7 +12,7 @@ fi
 BUILD_DIR=$1
 PREFIX=$2
 
- if [ ! -d "$PREFIX" ]; then
+if [ ! -d "$PREFIX" ]; then
 	print_error "The directory \"${PREFIX}\" does not exist. Please build Opus, first."
 	exit 1
 fi
@@ -24,7 +24,7 @@ export CFLAGS += -Wno-unused-label
 export LDFLAGS += -framework Network -framework Security
 EOF
 
-	cat << EOF > pjlib/include/pj/config_site.h
+cat << EOF > pjlib/include/pj/config_site.h
 #include <pj/config_site_sample.h>
 #define PJ_HAS_SSL_SOCK 1
 #undef PJ_SSL_SOCK_IMP
