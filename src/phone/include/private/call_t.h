@@ -25,13 +25,13 @@ public:
     void onCallState(pj::OnCallStateParam &prm) override {
         auto info = getInfo();
         if (on_call_state_with_index.has_value()) {
-            PJ_LOG(6, (__FILE__, "calling on_call_state with index: %d and state: %s(%d)",
-                    info.id, phone::call_state_name(info.state), info.state));
+            PJ_LOG(5, (__FILE__, "calling on_call_state with index: %d and state: %s(%d)",
+                    info.id, phone::call_state_name(info.state).data(), info.state));
             on_call_state_with_index.value()(info.id, info.state);
         }
         if (on_call_state_with_id.has_value()) {
-            PJ_LOG(6, (__FILE__, "calling on_call_state with id: %s and state: %s(%d)",
-                    info.callIdString.c_str(), phone::call_state_name(info.state), info.state));
+            PJ_LOG(5, (__FILE__, "calling on_call_state with id: %s and state: %s(%d)",
+                    info.callIdString.c_str(), phone::call_state_name(info.state).data(), info.state));
             on_call_state_with_id.value()(info.callIdString, info.state);
         }
         if (info.state == PJSIP_INV_STATE_DISCONNECTED) {
