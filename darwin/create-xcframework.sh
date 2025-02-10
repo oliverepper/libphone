@@ -42,6 +42,9 @@ sign() {
 	local stage_dir="${STAGE_DIR}/${1}"
 	local soversion="${2}"
 	codesign --deep --force --verify --verbose -s "${CODESIGN_IDENTITY}" --options runtime "${stage_dir}/libphone.${soversion}.dylib"
+    if [ -d "${INSTALL_DIR}/${1}/PhoneKit.framework" ]; then
+	    codesign --deep --force --verify --verbose -s "${CODESIGN_IDENTITY}" --options runtime "${INSTALL_DIR}/${1}/PhoneKit.framework/PhoneKit"
+    fi
 }
 
 create_debug_symbols() {
