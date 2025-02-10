@@ -26,4 +26,5 @@ cmake -B"${BUILD_DIR}" \
 	  -DCMAKE_TOOLCHAIN_FILE="$(dirname "$0")/../third-party/ios-cmake/ios.toolchain.cmake" \
 	  -DPLATFORM=MAC_CATALYST_UNIVERSAL \
 	  -DDEPLOYMENT_TARGET=13.1 \
-	  -DCMAKE_MACOSX_BUNDLE=NO
+	  -DCMAKE_MACOSX_BUNDLE=NO \
+      -DBUILD_FRAMEWORK=YES

@@ -6,7 +6,7 @@ extern "C"
 {
 #endif
 
-#include <phone_export.h>
+#include "phone_export.h"
 #include <stdlib.h>
 
 #define PHONE_STATUS_SUCCESS 0

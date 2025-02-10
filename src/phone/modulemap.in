@@ -1,0 +1,6 @@
+framework module PhoneKit [system] {
+  umbrella header "PhoneKit.h"
+
+  export *
+  module * { export * }
+}

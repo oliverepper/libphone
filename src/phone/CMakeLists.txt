@@ -81,3 +81,39 @@ set_target_properties(phone_sharedlib PROPERTIES
     PUBLIC_HEADER "${phone_PUBLIC_HEADERS}")
 target_link_libraries(phone_sharedlib PUBLIC phone phone_version)
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/phone DESTINATION include)
+
+if(BUILD_FRAMEWORK)
+  set(phonekit_FRAMEWORK_PUBLIC_HEADERS
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/PhoneKit.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/phone.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/phone/version.h
+    ${CMAKE_CURRENT_BINARY_DIR}/phone_export.h)
+
+  add_library(PhoneKit SHARED
+    dummy.cpp
+    ${phonekit_FRAMEWORK_PUBLIC_HEADERS})
+
+  set_target_properties(PhoneKit PROPERTIES
+    FRAMEWORK TRUE
+    FRAMEWORK_VERSION A
+    MACOSX_FRAMEWORK_BUNDLE_NAME PhoneKit
+    MACOSX_FRAMEWORK_IDENTIFIER de.oliver-epper.PhoneKit
+    MACOSX_FRAMEWORK_BUNDLE_VERSION 1
+    MACOSX_FRAMEWORK_SHORT_VERSION_STRING "1.0"
+    PUBLIC_HEADER "${phonekit_FRAMEWORK_PUBLIC_HEADERS}")
+
+  target_link_libraries(PhoneKit PUBLIC phone phone_version)
+
+  configure_file(modulemap.in module.modulemap @ONLY)
+
+  target_sources(PhoneKit PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/module.modulemap)
+
+  set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/module.modulemap PROPERTIES
+    MACOSX_PACKAGE_LOCATION Modules)
+
+  install(TARGETS PhoneKit DESTINATION "${CMAKE_INSTALL_PREFIX}")
+
+  if(CMAKE_SYSTEM_NAME STREQUAL "Darwin" AND NOT CMAKE_OSX_SYSROOT MATCHES "iphone")
+    install(CODE "execute_process(COMMAND ln -sf Versions/Current/Modules \"${CMAKE_INSTALL_PREFIX}/PhoneKit.framework\")")
+  endif()
+endif()

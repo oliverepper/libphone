@@ -48,6 +48,9 @@ create_debug_symbols() {
 	local stage_dir="${STAGE_DIR}/${1}"
 	local soversion="${2}"
 	dsymutil "${stage_dir}/libphone.${soversion}.dylib"
+    if [ -d "${INSTALL_DIR}/${1}/PhoneKit.framework" ]; then
+        dsymutil -o "${INSTALL_DIR}/${1}/PhoneKit.framework.dSYM" "${INSTALL_DIR}/${1}/PhoneKit.framework/PhoneKit" 
+    fi
 }
 
 add_params() {
@@ -56,9 +59,14 @@ add_params() {
 	local soversion="${2}"
 	local stage_dir_realpath
 	stage_dir_realpath=$(realpath "${stage_dir}")
-	PARAMS+=(-library "${stage_dir}/libphone.${soversion}.dylib")
-	PARAMS+=(-headers "${install_dir}/include")
-	PARAMS+=(-debug-symbols "${stage_dir_realpath}/libphone.${soversion}.dylib.dSYM")
+    if [ ! -d "${install_dir}/PhoneKit.framework" ]; then
+	    PARAMS+=(-library "${stage_dir}/libphone.${soversion}.dylib")
+        PARAMS+=(-headers "${install_dir}/include")
+        PARAMS+=(-debug-symbols "${stage_dir_realpath}/libphone.${soversion}.dylib.dSYM")
+    else
+        PARAMS+=(-framework "${install_dir}/PhoneKit.framework")
+	    PARAMS+=(-debug-symbols "${install_dir}/PhoneKit.framework.dSYM")
+    fi
 }
 
 excluded () {
