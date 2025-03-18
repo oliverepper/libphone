@@ -123,5 +123,5 @@ PARAMS+=(-output "${filename}")
 rm -rf "${filename}"
 
 xcodebuild -create-xcframework "${PARAMS[@]}"
-zip -r "${filename}.zip" "${filename}"
+zip -y -r "${filename}.zip" "${filename}"
 shasum -a 256 "${filename}.zip"
