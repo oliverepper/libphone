@@ -468,6 +468,10 @@ std::string phone_instance_t::get_public_address() const {
     }
 }
 
+std::string phone_instance_t::pjproject_version() {
+  return pj_get_version();
+}
+
 std::string phone_instance_t::get_public_address(std::string stun_server) {
     try {
         auto result = perform_binding_request(stun_server);

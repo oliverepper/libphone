@@ -154,6 +154,8 @@ public:
 
     PHONE_EXPORT void update_nameserver();
 
+    [[nodiscard]] PHONE_EXPORT static std::string pjproject_version();
+
 private:
     std::unique_ptr<pj::EpConfig> m_ep_cfg;
     std::unique_ptr<pj::Endpoint> m_ep;

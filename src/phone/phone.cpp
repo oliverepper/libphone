@@ -1,3 +1,4 @@
+#include "include/phone.h"
 #include <pjsua.h>
 #include <phone.h>
 #include <phone_instance_t.h>
@@ -248,6 +249,10 @@ const char* phone_last_error(void) {
 
 void phone_state_name(char *out, size_t buffer_size, int state) {
     phone_call_state_name(out, buffer_size, state);
+}
+
+void phone_pjproject_version(char *out, size_t buffer_size) {
+  strncpy(out, phone_instance_t::pjproject_version().data(), buffer_size);
 }
 
 void phone_status_name(char *out, size_t buffer_size, int code) {
