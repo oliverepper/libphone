@@ -1,6 +1,7 @@
 #ifndef CALL_T_H
 #define CALL_T_H
 
+#include <phone_instance_t.h>
 #include <pjsua2.hpp>
 
 namespace phone {

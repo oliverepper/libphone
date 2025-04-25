@@ -1,10 +1,15 @@
 #include "phone_instance_t.h"
+#include "include/phone.h"
+#include "include/phone_instance_t.h"
+#include "pjsua2/types.hpp"
 #include "private/account_t.h"
 #include "private/system_nameserver.h"
 #include "private/tone_generator_helper.h"
 #include "private/log_writer_t.h"
 #include "private/IfAddrs.h"
 
+#include <exception>
+#include <stdexcept>
 #include <stunning.h>
 
 #include <pjsua2.hpp>
@@ -482,6 +487,27 @@ std::string phone_instance_t::get_public_address(std::string stun_server) {
     } catch (const stunning::exception& e) {
         throw phone::exception{e.what()};
     }
+}
+
+std::vector<phone::rtcpstat_t> phone_instance_t::call_stats(int call_index) const {
+  try {
+    return m_account->call_stats(call_index);
+  } catch (const std::invalid_argument &e) {
+    throw phone::exception(e.what());
+  } catch (const pj::Error &e) {
+    throw phone::exception(e.info());
+  }
+}
+
+
+std::vector<phone::rtcpstat_t> phone_instance_t::call_stats(const std::string &call_id) const {
+  try {
+    return m_account->call_stats(call_id);
+  } catch (const std::invalid_argument &e) {
+    throw phone::exception(e.what());
+  } catch (const pj::Error &e) {
+    throw phone::exception(e.info());
+  }
 }
 
 std::vector<std::string> phone_instance_t::get_local_addresses() {

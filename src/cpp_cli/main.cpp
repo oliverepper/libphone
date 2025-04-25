@@ -1,4 +1,5 @@
 #include "simple_task_system.h"
+#include <ostream>
 #include <phone_instance_t.h>
 #include <phone/version.hpp>
 #include <iostream>
@@ -239,6 +240,136 @@ auto main() -> int {
                         std::cout << address << std::endl;
                 } else if (command == '5') {
                     state.phone.update_nameserver();
+                } else if (command == '4') {
+                  int call_index;
+                  std::cout << "please enter call index: ";
+                  std::cin >> call_index;
+                  std::vector<phone::rtcpstat_t> stats = state.phone.call_stats(call_index);
+
+                  std::cout
+                      << "Rx update sec: " << stats.front().rxStat.update.sec
+                      << std::endl;
+                  std::cout
+                      << "Rx update msec: " << stats.front().rxStat.update.msec
+                      << std::endl;
+                  std::cout
+                      << "Rx updateCount: " << stats.front().rxStat.updateCount
+                      << std::endl;
+                  std::cout << "Rx pkt: " << stats.front().rxStat.pkt
+                            << std::endl;
+                  std::cout << "Rx bytes: " << stats.front().rxStat.bytes
+                            << std::endl;
+                  std::cout << "Rx discard: " << stats.front().rxStat.discard
+                            << std::endl;
+                  std::cout << "Rx loss: " << stats.front().rxStat.loss
+                            << std::endl;
+                  std::cout << "Rx reorder: " << stats.front().rxStat.reorder
+                            << std::endl;
+                  std::cout << "Rx dup: " << stats.front().rxStat.dup
+                            << std::endl;
+                  std::cout << "Rx lossPeriodUsec.samples: "
+                            << stats.front().rxStat.lossPeriodUsec.samples
+                            << std::endl;
+                  std::cout << "Rx lossPeriodUsec.max: "
+                            << stats.front().rxStat.lossPeriodUsec.max
+                            << std::endl;
+                  std::cout << "Rx lossPeriodUsec.min: "
+                            << stats.front().rxStat.lossPeriodUsec.min
+                            << std::endl;
+                  std::cout << "Rx lossPeriodUsec.last: "
+                            << stats.front().rxStat.lossPeriodUsec.last
+                            << std::endl;
+                  std::cout << "Rx lossPeriodUsec.mean: "
+                            << stats.front().rxStat.lossPeriodUsec.mean
+                            << std::endl;
+                  std::cout << "Rx lossType.burst: "
+                            << stats.front().rxStat.lossType.burst << std::endl;
+                  std::cout << "Rx lossType.random: "
+                            << stats.front().rxStat.lossType.random
+                            << std::endl;
+                  std::cout << "Rx jitterUsec.samples: "
+                            << stats.front().rxStat.jitterUsec.samples
+                            << std::endl;
+                  std::cout << "Rx jitterUsec.max: "
+                            << stats.front().rxStat.jitterUsec.max
+                            << std::endl;
+                  std::cout << "Rx jitterUsec.min: "
+                            << stats.front().rxStat.jitterUsec.min
+                            << std::endl;
+                  std::cout << "Rx jitterUsec.last: "
+                            << stats.front().rxStat.jitterUsec.last
+                            << std::endl;
+                  std::cout << "Rx jitterUsec.mean: "
+                            << stats.front().rxStat.jitterUsec.mean
+                            << std::endl;
+
+                  std::cout
+                    << "Tx update sec: " << stats.front().txStat.update.sec
+                    << std::endl;
+                  std::cout
+                    << "Tx update msec: " << stats.front().txStat.update.msec
+                    << std::endl;
+                  std::cout
+                    << "Tx updateCount: " << stats.front().txStat.updateCount
+                    << std::endl;
+                  std::cout << "Tx pkt: " << stats.front().txStat.pkt
+                            << std::endl;
+                  std::cout << "Tx bytes: " << stats.front().txStat.bytes
+                            << std::endl;
+                  std::cout << "Tx discard: " << stats.front().txStat.discard
+                            << std::endl;
+                  std::cout << "Tx loss: " << stats.front().txStat.loss
+                            << std::endl;
+                  std::cout << "Tx reorder: " << stats.front().txStat.reorder
+                            << std::endl;
+                  std::cout << "Tx dup: " << stats.front().txStat.dup
+                            << std::endl;
+                  std::cout << "Tx lossPeriodUsec.samples: "
+                            << stats.front().txStat.lossPeriodUsec.samples
+                            << std::endl;
+                  std::cout << "Tx lossPeriodUsec.max: "
+                            << stats.front().txStat.lossPeriodUsec.max
+                            << std::endl;
+                  std::cout << "Tx lossPeriodUsec.min: "
+                            << stats.front().txStat.lossPeriodUsec.min
+                            << std::endl;
+                  std::cout << "Tx lossPeriodUsec.last: "
+                            << stats.front().txStat.lossPeriodUsec.last
+                            << std::endl;
+                  std::cout << "Tx lossPeriodUsec.mean: "
+                            << stats.front().txStat.lossPeriodUsec.mean
+                            << std::endl;
+                  std::cout << "Tx lossType.burst: "
+                            << stats.front().txStat.lossType.burst << std::endl;
+                  std::cout << "Tx lossType.random: "
+                            << stats.front().txStat.lossType.random
+                            << std::endl;
+                  std::cout << "Tx jitterUsec.samples: "
+                            << stats.front().txStat.jitterUsec.samples
+                            << std::endl;
+                  std::cout << "Tx jitterUsec.max: "
+                            << stats.front().txStat.jitterUsec.max
+                            << std::endl;
+                  std::cout << "Tx jitterUsec.min: "
+                            << stats.front().txStat.jitterUsec.min
+                            << std::endl;
+                  std::cout << "Tx jitterUsec.last: "
+                            << stats.front().txStat.jitterUsec.last
+                            << std::endl;
+                  std::cout << "Tx jitterUsec.mean: "
+                            << stats.front().txStat.jitterUsec.mean
+                            << std::endl;
+
+                  std::cout << "RTT samples: " << stats.front().rttUsec.samples
+                            << std::endl;
+                  std::cout << "RTT max: " << stats.front().rttUsec.max
+                            << std::endl;
+                  std::cout << "RTT min: " << stats.front().rttUsec.min
+                            << std::endl;
+                  std::cout << "RTT last: " << stats.front().rttUsec.last
+                            << std::endl;
+                  std::cout << "RTT mean: " << stats.front().rttUsec.mean
+                            << std::endl;
                 }
             } catch (const phone::exception& e) {
                 std::cerr << "Error: " << e.what() << std::endl;
