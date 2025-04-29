@@ -244,7 +244,7 @@ auto main() -> int {
                   int call_index;
                   std::cout << "please enter call index: ";
                   std::cin >> call_index;
-                  std::vector<phone::rtcpstat_t> stats = state.phone.call_stats(call_index);
+                  std::vector<rtcpstat_t> stats = state.phone.call_stats(call_index);
 
                   std::cout
                       << "Rx update sec: " << stats.front().rxStat.update.sec

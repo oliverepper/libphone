@@ -156,16 +156,16 @@ public:
     };
   }
 
-  std::vector<phone::rtcpstat_t> call_stats(phone::CallID auto id) {
+  std::vector<rtcpstat_t> call_stats(phone::CallID auto id) {
     auto call = m_calls.find(id);
     pj::CallInfo ci = call->getInfo();
     pj::CallMediaInfoVector mediaInfo = ci.media;
-    std::vector<phone::rtcpstat_t> stats{};
+    std::vector<rtcpstat_t> stats{};
     for (unsigned i = 0; i < mediaInfo.size(); ++i) {
       if (mediaInfo[i].type == PJMEDIA_TYPE_AUDIO &&
           mediaInfo[i].status == PJSUA_CALL_MEDIA_ACTIVE) {
         pj::StreamStat stat = call->getStreamStat(i);
-        phone::rtcpstat_t rtcpStat{};
+        rtcpstat_t rtcpStat{};
         rtcpStat.rxStat = convertRtcpStreamStat(stat.rtcp.rxStat);
         rtcpStat.txStat = convertRtcpStreamStat(stat.rtcp.txStat);
         rtcpStat.rttUsec = convertMathStat(stat.rtcp.rttUsec);

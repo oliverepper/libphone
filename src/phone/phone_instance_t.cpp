@@ -489,7 +489,7 @@ std::string phone_instance_t::get_public_address(std::string stun_server) {
     }
 }
 
-std::vector<phone::rtcpstat_t> phone_instance_t::call_stats(int call_index) const {
+std::vector<rtcpstat_t> phone_instance_t::call_stats(int call_index) const {
   try {
     return m_account->call_stats(call_index);
   } catch (const std::invalid_argument &e) {
@@ -500,7 +500,7 @@ std::vector<phone::rtcpstat_t> phone_instance_t::call_stats(int call_index) cons
 }
 
 
-std::vector<phone::rtcpstat_t> phone_instance_t::call_stats(const std::string &call_id) const {
+std::vector<rtcpstat_t> phone_instance_t::call_stats(const std::string &call_id) const {
   try {
     return m_account->call_stats(call_id);
   } catch (const std::invalid_argument &e) {

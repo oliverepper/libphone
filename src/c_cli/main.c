@@ -451,6 +451,47 @@ int main() {
                     break;
                 }
                 break;
+            case '3':
+              clear_input_buffer();
+              {
+                int call_index;
+                printf("please enter call index: ");
+                if (read_int(&call_index) != 0) break;
+                rtcpstat_t stats[10];
+                size_t length;
+                length = 10;
+                if (phone_call_stats_index(state->phone, call_index, stats, &length) !=
+                    PHONE_STATUS_SUCCESS) {
+                  fprintf(stderr, "%s\n", phone_last_error());
+                  break;
+                }
+                for (int i = 0; i < length; i++) {
+                  printf("Rx jitter: %d\n", stats[i].rxStat.jitterUsec.mean);
+                }
+              }
+              break;
+            case '2':
+              clear_input_buffer();
+              {
+                char call_id[128];
+                printf("please enter call id: ");
+                if (read_string(call_id, sizeof(call_id)) != 0)
+                  break;
+                rtcpstat_t stats[10];
+                size_t length;
+                length = 10;
+                if (phone_call_stats_id(state->phone, call_id, stats,
+                                        &length) != PHONE_STATUS_SUCCESS) {
+                  fprintf(stderr, "%s\n", phone_last_error());
+                  break;
+                }
+                for (int i = 0; i < length; i++) {
+                  printf("Rx jitter: %d\n", stats[i].rxStat.jitterUsec.mean);
+                  printf("Tx jitter: %d\n", stats[i].txStat.jitterUsec.mean);
+                  printf("RTT: %d\n", stats[i].rttUsec.mean);
+                }
+              }
+              break;
             case '!':
                 clear_input_buffer();
                 phone_crash();

@@ -67,13 +67,6 @@ namespace phone {
   };
 
   enum class tx_rx_direction { Transmit, Receive };
-
-  struct rtcpstat_t {
-    rtcpstreamstat_t rxStat;
-    rtcpstreamstat_t txStat;
-    mathstat_t rttUsec;
-  };
-
 } //namespace phone
 
 class phone_instance_t {
@@ -161,8 +154,8 @@ public:
 
   [[nodiscard]] PHONE_EXPORT static std::string pjproject_version();
 
-  [[nodiscard]] PHONE_EXPORT std::vector<phone::rtcpstat_t> call_stats(int call_index) const;
-  [[nodiscard]] PHONE_EXPORT std::vector<phone::rtcpstat_t> call_stats(const std::string& call_id) const;
+  [[nodiscard]] PHONE_EXPORT std::vector<rtcpstat_t> call_stats(int call_index) const;
+  [[nodiscard]] PHONE_EXPORT std::vector<rtcpstat_t> call_stats(const std::string& call_id) const;
 
 private:
   std::unique_ptr<pj::EpConfig> m_ep_cfg;

@@ -1,4 +1,5 @@
 #include "include/phone.h"
+#include <cstdlib>
 #include <pjsua.h>
 #include <phone.h>
 #include <phone_instance_t.h>
@@ -702,5 +703,41 @@ phone_status_t phone_update_nameserver(phone_t instance) {
         return PHONE_STATUS_FAILURE;
     }
     return PHONE_STATUS_SUCCESS;
+}
+
+phone_status_t phone_call_stats_index(phone_t instance, int call_index,
+                                      rtcpstat_t *stats, size_t *length) {
+  try {
+    int i = 0;
+    for (const auto &stat : instance->call_stats(call_index)) {
+      if (i < *length) {
+        stats[i] = stat;
+        ++i;
+      }
+    }
+    *length = i;
+  } catch (const phone::exception &e) {
+    strncpy(global_last_error, e.what(), sizeof(global_last_error));
+    return EXIT_FAILURE;
+  }
+  return EXIT_SUCCESS;
+}
+
+phone_status_t phone_call_stats_id(phone_t instance, const char *call_id,
+                                   rtcpstat_t *stats, size_t *length) {
+  try {
+    int i = 0;
+    for (const auto &stat : instance->call_stats(call_id)) {
+      if (i < *length) {
+        stats[i] = stat;
+        ++i;
+      }
+    }
+    *length = i;
+  } catch (const phone::exception &e) {
+    strncpy(global_last_error, e.what(), sizeof(global_last_error));
+    return EXIT_FAILURE;
+  }
+  return EXIT_SUCCESS;
 }
 

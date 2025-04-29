@@ -30,6 +30,8 @@ extern "C"
     unsigned output_count;
   } audio_device_info_t;
 
+  // Types required for rtcpstat_t, which communicates in call stats
+  // to the outside world.
   typedef struct {
     int samples;
     int max;
@@ -48,7 +50,6 @@ extern "C"
     unsigned random;
   } losstype_t;
 
-  // this loosley resembles the pj::RtcpStreamStat
   typedef struct {
     timeval_t update;
     unsigned updateCount;
@@ -63,13 +64,11 @@ extern "C"
     mathstat_t jitterUsec;
   } rtcpstreamstat_t;
 
-  // the resembles the pj::RtcpStat
   typedef struct {
-    unsigned num_rx_streams;
-    unsigned num_tx_streams;
-    rtcpstreamstat_t *rx;
-    rtcpstreamstat_t *tx;
-  } call_stats_t;
+    rtcpstreamstat_t rxStat;
+    rtcpstreamstat_t txStat;
+    mathstat_t rttUsec;
+  } rtcpstat_t;
 
   PHONE_EXPORT phone_t phone_create(const char *user_agent,
                                     const char * const nameserver[], size_t nameserver_count,
@@ -232,6 +231,38 @@ extern "C"
 
   PHONE_EXPORT void phone_pjproject_version(char *out, size_t buffer_size);
   PHONE_EXPORT phone_status_t phone_update_nameserver(phone_t instance);
+
+  /**
+   * @brief Query RTCP statistics for a call by index.
+   *
+   * @param[in] instance
+   * @param[in] call_index
+   * @param[out] stats   Pointer to a caller-allocated array of rtcpstat_t.
+   * @param[out] length  In: max number of entries available
+   *                     Out: number of entries actually written.
+   * @return PHONE_STATUS_SUCCESS if successful, error code otherwise.
+   */
+  PHONE_EXPORT phone_status_t phone_call_stats_index(phone_t instance,
+                                                     int call_index,
+                                                     rtcpstat_t *stats,
+                                                     size_t *length);
+
+
+  /**
+   * @brief Query RTCP statistics for a call by id.
+   *
+   * @param[in] instance
+   * @param[in] call_id
+   * @param[out] stats   Pointer to a caller-allocated array of rtcpstat_t.
+   * @param[out] length  In: max number of entries available
+   *                     Out: number of entries actually written.
+   * @return PHONE_STATUS_SUCCESS if successful, error code otherwise.
+   */
+  PHONE_EXPORT phone_status_t phone_call_stats_id(phone_t instance,
+                                                  const char *call_id,
+                                                  rtcpstat_t *stats,
+                                                  size_t *length);
+
 
   PHONE_EXPORT void phone_crash(void);
 
