@@ -2,11 +2,11 @@
 #include "include/phone.h"
 #include "include/phone_instance_t.h"
 #include "pjsua2/types.hpp"
-#include "private/account_t.h"
-#include "private/system_nameserver.h"
-#include "private/tone_generator_helper.h"
-#include "private/log_writer_t.h"
-#include "private/IfAddrs.h"
+#include "include/private/account_t.h"
+#include "include/private/system_nameserver.h"
+#include "include/private/tone_generator_helper.h"
+#include "include/private/log_writer_t.h"
+#include "include/private/IfAddrs.h"
 
 #include <exception>
 #include <stdexcept>
