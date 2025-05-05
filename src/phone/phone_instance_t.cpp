@@ -33,7 +33,7 @@ phone_instance_t::phone_instance_t(std::string user_agent,
     m_ep_cfg->logConfig.writer = m_log_writer;
     m_ep_cfg->logConfig.consoleLevel = INT_MAX;
 
-    m_ep_cfg->medConfig.ecOptions = PJMEDIA_ECHO_WEBRTC | PJMEDIA_ECHO_USE_SW_ECHO;
+    // m_ep_cfg->medConfig.ecOptions = PJMEDIA_ECHO_WEBRTC | PJMEDIA_ECHO_USE_SW_ECHO;
 
     try {
         m_ep->libCreate();
