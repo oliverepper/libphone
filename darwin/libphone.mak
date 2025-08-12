@@ -1,3 +1,4 @@
+# -*- mode: makefile-gmake -*-
 MAKEFILE_DIR := $(dir $(realpath $(firstword $(MAKEFILE_LIST))))
 
 include $(MAKEFILE_DIR)base.mak
