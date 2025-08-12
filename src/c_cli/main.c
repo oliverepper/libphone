@@ -124,7 +124,7 @@ void log_function(int level, const char *message, long thread_id, const char *th
 }
 
 int main() {
-    struct app_state *state = malloc(sizeof(struct app_state));
+  struct app_state *state = (struct app_state *)malloc(sizeof(struct app_state));
     state->last_call_index = -1;
     memset(state->last_call_id, 0, sizeof(state->last_call_id));
 
