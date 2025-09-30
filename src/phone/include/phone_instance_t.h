@@ -3,11 +3,17 @@
 
 #include "phone.h"
 #include "phone_export.h"
-#include <string>
-#include <optional>
-#include <vector>
+#include <algorithm>
+#include <array>
+#include <concepts>
+#include <exception>
 #include <functional>
 #include <memory>
+#include <optional>
+#include <string>
+#include <string_view>
+#include <utility>
+#include <vector>
 
 namespace pj {
   class Endpoint;
@@ -67,16 +73,59 @@ namespace phone {
   };
 
   enum class tx_rx_direction { Transmit, Receive };
+
+  enum class ec_option { WEBRTC = 3, WEBRTC_AEC3 = 4 };
+
+  constexpr auto to_underlying(ec_option opt) noexcept {
+    return static_cast<unsigned int>(opt);
+  }
+
+  constexpr auto operator|(ec_option lhs, ec_option rhs) noexcept {
+    return static_cast<int>(lhs) | static_cast<int>(rhs);
+  }
+
+  constexpr unsigned int &operator|=(unsigned int &lhs,
+                                     ec_option rhs) noexcept {
+    lhs |= to_underlying(rhs);
+    return lhs;
+  }
 } //namespace phone
 
-class phone_instance_t {
+struct phone_instance_t {
 public:
+  template <typename T>
+  struct non_empty_vector {
+      const std::vector<T> elements;
+
+      template <typename First, typename... Rest>
+      requires std::convertible_to<First, T> && (std::convertible_to<Rest, T> && ...)
+      constexpr explicit non_empty_vector(First && first, Rest &&... rest)
+          : elements{std::forward<First>(first), std::forward<Rest>(rest)...} {}
+  };
+
+  struct phone_config_t {
+    std::string user_agent;
+    /// Optional list of DNS servers to use for SIP resolution.
+    ///
+    /// - If `std::nullopt`: use the same DNS server(s) as configured in the
+    /// system
+    /// - If presented but empty (`{}`): use the host resolver (queries only A
+    /// records)
+    /// - If presented and non-empty: use DNS resolution with the specified
+    /// servers
+    std::optional<std::vector<std::string>> nameserver;
+    std::vector<std::string> stunserver;
+    std::vector<phone::ec_option> ec_options;
+  };
+
   explicit PHONE_EXPORT phone_instance_t(std::string user_agent,
                                          std::vector<std::string> nameserver,
                                          std::vector<std::string> stunserver);
 
   explicit PHONE_EXPORT phone_instance_t(std::string user_agent,
                                          std::vector<std::string> stunserver);
+
+  explicit PHONE_EXPORT phone_instance_t(phone_config_t config);
 
   PHONE_EXPORT ~phone_instance_t();
 
@@ -158,9 +207,9 @@ public:
   [[nodiscard]] PHONE_EXPORT std::vector<rtcpstat_t> call_stats(const std::string& call_id) const;
 
 private:
-  std::unique_ptr<pj::EpConfig> m_ep_cfg;
   std::unique_ptr<pj::Endpoint> m_ep;
   std::unique_ptr<account_t> m_account;
+  std::unique_ptr<pj::EpConfig> m_ep_cfg;
   std::optional<std::string> m_server;
   std::unique_ptr<pj::ToneGenerator> m_call_waiting_tone_generator;
   std::unique_ptr<pj::ToneGenerator> m_dtmf_tone_generator;

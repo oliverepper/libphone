@@ -1,6 +1,9 @@
 #include "phone_instance_t.h"
 #include "include/phone.h"
 #include "include/phone_instance_t.h"
+#include "pj/log.h"
+#include "pjmedia-codec/config.h"
+#include "pjmedia/echo.h"
 #include "pjsua2/types.hpp"
 #include "include/private/account_t.h"
 #include "include/private/system_nameserver.h"
@@ -8,13 +11,22 @@
 #include "include/private/log_writer_t.h"
 #include "include/private/IfAddrs.h"
 
+#include <cassert>
 #include <exception>
+#include <memory>
 #include <stdexcept>
 #include <stunning.h>
 
 #include <pjsua2.hpp>
 #include <vector>
 #include <iostream>
+#include <source_location>
+
+constexpr const char* filename_only(const char* path) {
+    const char* file = std::strrchr(path, '/');
+    if (!file) file = std::strrchr(path, '\\');
+    return file ? file + 1 : path;
+}
 
 phone_instance_t::phone_instance_t(std::string user_agent,
                                    std::vector<std::string> nameserver,
@@ -33,8 +45,6 @@ phone_instance_t::phone_instance_t(std::string user_agent,
     m_ep_cfg->logConfig.writer = m_log_writer;
     m_ep_cfg->logConfig.consoleLevel = INT_MAX;
 
-    // m_ep_cfg->medConfig.ecOptions = PJMEDIA_ECHO_WEBRTC | PJMEDIA_ECHO_USE_SW_ECHO;
-
     try {
         m_ep->libCreate();
         m_ep->libInit(*m_ep_cfg);
@@ -49,6 +59,66 @@ phone_instance_t::phone_instance_t(std::string user_agent,
     } catch (const pj::Error& e) {
         throw phone::exception{e.info()};
     }
+}
+
+phone_instance_t::phone_instance_t(phone_instance_t::phone_config_t config)
+  : m_ep{std::make_unique<pj::Endpoint>()},
+    m_account{std::make_unique<account_t>()},
+    m_ep_cfg{std::make_unique<pj::EpConfig>()},
+    m_call_waiting_tone_generator{std::make_unique<pj::ToneGenerator>()},
+    m_dtmf_tone_generator{std::make_unique<pj::ToneGenerator>()} {
+
+  m_ep_cfg->uaConfig.userAgent = std::move(config.user_agent);
+  m_ep_cfg->uaConfig.stunServer = std::move(config.stunserver);
+
+  // pjproject uses either DNS (queries srv records) or the host resolver
+  // (queries just an a record)
+  if (config.nameserver.has_value()) {
+    // if empty use host resolver
+    // else use DNS configured with the elements
+    m_ep_cfg->uaConfig.nameserver = std::move(config.nameserver.value());
+  } else {
+    // use DNS configured with the same nameservers that the system uses
+    m_ep_cfg->uaConfig.nameserver = system_nameserver();
+  }
+
+  m_log_writer = new log_writer_t{}; // see header for details
+  m_ep_cfg->logConfig.writer = m_log_writer;
+  m_ep_cfg->logConfig.consoleLevel = INT_MAX;
+
+  // m_ep_cfg->medConfig.ecOptions = PJMEDIA_ECHO_WEBRTC_XXX |
+  // PJMEDIA_ECHO_USE_SW_ECHO;
+
+  // m_ep_cfg->medConfig.ecOptions = 0; // [] -> 0, 0x00 && 0x11
+
+  if (!config.ec_options.empty()) {
+    m_ep_cfg->medConfig.ecOptions = PJMEDIA_ECHO_USE_SW_ECHO;
+    for (auto opt : config.ec_options) {
+      m_ep_cfg->medConfig.ecOptions |= opt;
+    }
+  }
+
+  try {
+    m_ep->libCreate();
+    m_ep->libInit(*m_ep_cfg);
+    m_ep->audDevManager().setNullDev();
+    m_ep->libStart();
+
+    m_call_waiting_tone_generator->createToneGenerator();
+    m_call_waiting_tone_generator->startTransmit2(m_ep->audDevManager().getPlaybackDevMedia(), {});
+
+    m_dtmf_tone_generator->createToneGenerator();
+    m_dtmf_tone_generator->startTransmit2(m_ep->audDevManager().getPlaybackDevMedia(), {});
+  } catch (const pj::Error& e) {
+    throw phone::exception{e.info()};
+  }
+
+  auto location = std::source_location::current();
+  if (config.nameserver.has_value()) {
+      PJ_LOG(3, (filename_only(location.file_name()), "Using host resolver or given DNS"));
+  } else {
+      PJ_LOG(3, (filename_only(location.file_name()), "Using DNS configured in the system"));
+  }
 }
 
 phone_instance_t::phone_instance_t(std::string user_agent, std::vector<std::string> stunserver)
@@ -539,7 +609,7 @@ std::vector<std::string> phone_instance_t::get_local_addresses_from_transports()
 
 void phone_instance_t::update_nameserver() {
     auto server = system_nameserver();
-    pj_str_t nameserver[server.size()];
+    std::vector<pj_str_t> nameserver(server.size());
 
     int count = 0;
     for (const auto& ns : server) {
@@ -553,7 +623,7 @@ void phone_instance_t::update_nameserver() {
     auto ep = pjsua_get_pjsip_endpt();
     auto resolver = pjsip_endpt_get_resolver(ep);
 
-    if (pj_status_t status = pj_dns_resolver_set_ns(resolver, count, nameserver, NULL); status != PJ_SUCCESS) {
+    if (pj_status_t status = pj_dns_resolver_set_ns(resolver, count, nameserver.data(), NULL); status != PJ_SUCCESS) {
         char error_message[PJ_ERR_MSG_SIZE] = {0};
         pj_strerror(status, error_message, sizeof(error_message));
         throw phone::exception{error_message};

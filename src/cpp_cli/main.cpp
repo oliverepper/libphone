@@ -1,11 +1,15 @@
 #include "simple_task_system.h"
-#include <ostream>
 #include <phone_instance_t.h>
 #include <phone/version.hpp>
-#include <iostream>
-#include <thread>
-#include <cassert>
 #include <private/system_nameserver.h>
+
+#include <cassert>
+#include <chrono>
+#include <iostream>
+#include <optional>
+#include <string>
+#include <thread>
+#include <vector>
 
 [[maybe_unused]] auto password_function = []() { return std::string{PASSWORD}; };
 
@@ -97,12 +101,21 @@ struct app_state {
 };
 
 auto main() -> int {
+    // you can use
+    // .nameserver = std::nullopt, or
+    // .nameserver = std::vector<std::string>{}, or
+    // .nameserver = std::vector<std::string>{"1.1.1.1", "8.8.8.8"} here
+    // phone_instance_t::phone_config_t config{
+    //   .user_agent = "Cli Phone in C++", .stunserver = {"stun.t-online.de"},
+    //   .ec_options = {phone::ec_option::WEBRTC_AEC3} };
+
+    phone_instance_t::phone_config_t config{
+        .user_agent = "Cli Phone in C++", .stunserver = {"stun.t-online.de"}};
+
     try {
-        app_state state{
-                phone_instance_t{
-                    "Cli Phone in C++",
-                    {"stun.t-online.de"}
-                }};
+        app_state state {
+            .phone = phone_instance_t{config}
+        };
 
         // set log level
         phone_instance_t::set_log_level(0);
@@ -143,8 +156,8 @@ auto main() -> int {
         // repl
         char command = 'q';
         std::cout << "libphone version: " << phone_version_major() << "."
-                                          << phone_version_minor() << "."
-                                          << phone_version_patch() << std::endl;
+                  << phone_version_minor() << "."
+                  << phone_version_patch() << std::endl;
         std::cout << phone_git_hash() << std::endl;
         std::cout << phone_git_description() << std::endl;
         std::cout << std::endl;

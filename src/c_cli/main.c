@@ -130,7 +130,20 @@ int main() {
 
     // create phone in app state
     const char *stunserver[] = {"stun.t-online.de"};
-    state->phone = phone_create_with_system_nameserver("Cli Phone in C", stunserver, 1);
+    const char *nameserver[] = {};
+    // const char *nameserver[] = {"1.1.1.1", "8.8.8.8"};
+    // const phone_ec_option_t ec_options[] = {PHONE_EC_WEBRTC_AEC3};
+
+    phone_config_t config = {
+      .user_agent = "Cli Phone in C",
+      .nameserver = nameserver,
+      .nameserver_count = 0,
+      .stunserver = stunserver,
+      .stunserver_count = 1};
+      /* .ec_options = ec_options, */
+      /* .ec_options_count = 1}; */
+
+    state->phone = phone_create_with_config(config);
     if (!state->phone)
         die(state->phone);
 

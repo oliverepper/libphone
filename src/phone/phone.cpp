@@ -1,5 +1,7 @@
 #include "include/phone.h"
+#include <cstddef>
 #include <cstdlib>
+#include <optional>
 #include <pjsua.h>
 #include <phone.h>
 #include <phone_instance_t.h>
@@ -21,6 +23,47 @@ phone_t phone_create(const char *user_agent,
         strncpy(global_last_error, e.what(), sizeof(global_last_error));
         return nullptr;
     }
+}
+
+phone_instance_t::phone_config_t to_cpp_config(::phone_config_t config) {
+  phone_instance_t::phone_config_t cpp_config;
+
+  cpp_config.user_agent =
+      config.user_agent ? std::string{config.user_agent} : std::string{};
+
+  if (config.nameserver == nullptr)
+    cpp_config.nameserver = std::nullopt;
+  else
+    cpp_config.nameserver = {config.nameserver,
+                             config.nameserver + config.nameserver_count};
+
+  cpp_config.stunserver = {config.stunserver,
+                           config.stunserver + config.stunserver_count};
+
+  if (config.ec_options != nullptr) {
+    cpp_config.ec_options.reserve(config.ec_options_count);
+    for (size_t i = 0; i < config.ec_options_count; ++i) {
+      switch (config.ec_options[i]) {
+      case PHONE_EC_WEBRTC:
+        cpp_config.ec_options.push_back(phone::ec_option::WEBRTC);
+        break;
+      case PHONE_EC_WEBRTC_AEC3:
+        cpp_config.ec_options.push_back(phone::ec_option::WEBRTC_AEC3);
+        break;
+      }
+    }
+  }
+
+  return cpp_config;
+}
+
+phone_t phone_create_with_config(::phone_config_t config) {
+  try {
+    return new phone_instance_t{to_cpp_config(config)};
+  } catch (const phone::exception& e) {
+    strncpy(global_last_error, e.what(), sizeof(global_last_error));
+    return nullptr;
+  }
 }
 
 phone_t

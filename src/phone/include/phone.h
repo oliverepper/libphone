@@ -70,11 +70,31 @@ extern "C"
     mathstat_t rttUsec;
   } rtcpstat_t;
 
+  typedef enum {
+    PHONE_EC_WEBRTC = 3,
+    PHONE_EC_WEBRTC_AEC3 = 4
+  } phone_ec_option_t;
+
+  typedef struct {
+    const char *user_agent;
+    // nameserver: pointer to (const pointer to (const char))
+    const char * const *nameserver; // nullptr, [], ["",...]
+    size_t nameserver_count;
+    // stunserver: pointer to (const pointer to (const char))
+    const char * const *stunserver;
+    size_t stunserver_count;
+    const phone_ec_option_t *ec_options;
+    size_t ec_options_count;
+  } phone_config_t;
+
   PHONE_EXPORT phone_t phone_create(const char *user_agent,
                                     const char * const nameserver[], size_t nameserver_count,
                                     const char * const stunserver[], size_t stunserver_count);
-  PHONE_EXPORT phone_t phone_create_with_system_nameserver(const char *user_agent,
-                                                           const char * const stunserver[], size_t stunserver_count);
+  PHONE_EXPORT phone_t phone_create_with_system_nameserver(
+      const char *user_agent, const char *const stunserver[],
+      size_t stunserver_count);
+
+  PHONE_EXPORT phone_t phone_create_with_config(phone_config_t config);
 
   PHONE_EXPORT void phone_destroy(phone_t instance);
 
