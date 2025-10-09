@@ -118,11 +118,11 @@ public:
     std::vector<phone::ec_option> ec_options;
   };
 
-  explicit PHONE_EXPORT phone_instance_t(std::string user_agent,
+  explicit PHONE_DEPRECATED_EXPORT phone_instance_t(std::string user_agent,
                                          std::vector<std::string> nameserver,
                                          std::vector<std::string> stunserver);
 
-  explicit PHONE_EXPORT phone_instance_t(std::string user_agent,
+  explicit PHONE_DEPRECATED_EXPORT phone_instance_t(std::string user_agent,
                                          std::vector<std::string> stunserver);
 
   explicit PHONE_EXPORT phone_instance_t(phone_config_t config);

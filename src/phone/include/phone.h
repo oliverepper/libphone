@@ -87,10 +87,10 @@ extern "C"
     size_t ec_options_count;
   } phone_config_t;
 
-  PHONE_EXPORT phone_t phone_create(const char *user_agent,
+  PHONE_DEPRECATED_EXPORT phone_t phone_create(const char *user_agent,
                                     const char * const nameserver[], size_t nameserver_count,
                                     const char * const stunserver[], size_t stunserver_count);
-  PHONE_EXPORT phone_t phone_create_with_system_nameserver(
+  PHONE_DEPRECATED_EXPORT phone_t phone_create_with_system_nameserver(
       const char *user_agent, const char *const stunserver[],
       size_t stunserver_count);
 
